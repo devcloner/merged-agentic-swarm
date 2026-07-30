@@ -1,0 +1,85 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.egg
+
+# Environment & Secrets
+.env
+.env.*
+env.txt
+.key
+*-keys/
+.ssh/
+*.pem
+secret*
+
+# Claude & AI internal state
+.claude/
+.claude-isolated/
+.remember/
+
+# Runtime state dirs
+.opencode/
+.taskmaster/
+.aws/
+.appwrite/
+.bun/
+.cloudcli/
+.codegraph/
+.codex/
+.config/
+.cursor/
+.docker/
+.fcc-tmp/
+.gemini/
+.local/
+.omo/
+.opencode/
+.pi/
+.serena/
+.cargo/
+.rustup/
+.npm/
+.pnpm-store/
+.cache/
+
+# Other projects/dirs
+spotify-ai/
+fcc-gh-clone/
+claudecodeui/
+cliproxyapi-dashboard/
+Spotify-project-main/
+gemlni-keys/
+snap/
+
+# System files
+.bash_history
+.bashrc
+.bash_logout
+.bash_profile
+.profile
+.lesshst
+.wget-hsts
+.sudo_as_admin_successful
+.welcome_msg
+.git-credentials
+.gitconfig
+.tmux.conf
+.viminfo
+
+# Generated files
+*.log
+*.tmp
+*.swp
+*.swo
+*.zip
+*.tar.gz
+test-results/
+__pycache__/
+*.pyc
+
+# Configs with secrets
+providers/
