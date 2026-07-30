@@ -21,8 +21,10 @@ secret*
 .claude-isolated/
 .remember/
 
-# Runtime state dirs
-.opencode/
+# Runtime state dirs — include code, exclude generated data
+.opencode/*.json
+.opencode/*.txt
+!/.opencode/ownership-map.json
 .taskmaster/
 .aws/
 .appwrite/
@@ -36,8 +38,6 @@ secret*
 .fcc-tmp/
 .gemini/
 .local/
-.omo/
-.opencode/
 .pi/
 .serena/
 .cargo/
@@ -45,6 +45,11 @@ secret*
 .npm/
 .pnpm-store/
 .cache/
+
+# Provider configs — include source code, exclude key files
+/providers/*.key
+/providers/*.txt
+/providers/*.env
 
 # Other projects/dirs
 spotify-ai/
@@ -81,5 +86,4 @@ test-results/
 __pycache__/
 *.pyc
 
-# Configs with secrets
-providers/
+# Configs with secrets — use per-type patterns above

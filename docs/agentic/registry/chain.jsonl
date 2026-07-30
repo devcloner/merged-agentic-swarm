@@ -1,0 +1,1 @@
+{"entry_id": "CHAIN-COLD-1785418247286", "source_learning_id": "LEARN-0001", "spawned_agent_id": "agent-swarm_concurrency-cold-1785418247286", "agent_type": "cold_durable", "trigger_reason": "Repeated swarm_concurrency pattern (4 instances) triggered cold-path promotion", "timestamp": 1785418247.2863393, "promotion_phase": "wave_2"}

@@ -1,0 +1,69 @@
+{
+  "_comment": "This environment has TWO proxy services. See docs/agentic/PROXY_GUIDE.md for details.",
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8085,
+    "max_concurrent_connections": 100,
+    "keep_alive_timeout_sec": 60,
+    "implementation": "proxy/claude_proxy_server.py",
+    "description": "Python-based multi-provider fabric proxy with key pools. NOT the ANTHROPIC_BASE_URL target."
+  },
+  "primary_proxy": {
+    "host": "127.0.0.1",
+    "port": 8080,
+    "implementation": "fcc-server (free-claude-code)",
+    "description": "Handles actual ANTHROPIC_BASE_URL traffic. Authenticates with ANTHROPIC_AUTH_TOKEN=freecc.",
+    "type": "openai_compatible"
+  },
+  "load_balancing": {
+    "strategy": "round_robin_weighted",
+    "retry_on_status": [429, 500, 502, 503, 504],
+    "max_retries": 8,
+    "initial_backoff_ms": 250,
+    "max_backoff_ms": 10000
+  },
+  "key_pool": [
+    {
+      "id": "opencode-main",
+      "provider": "opencode",
+      "api_key_env": "OPENCODE_API_KEY",
+      "weight": 10,
+      "rate_limit_rpm": 4000
+    }
+  ],
+  "presented_models": {
+    "claude-3-opus": {
+      "routing_tier": "deep",
+      "backend": "opencode",
+      "backend_model": "opencode_go/deepseek-v4-flash"
+    },
+    "claude-3-7-sonnet": {
+      "routing_tier": "main",
+      "backend": "opencode",
+      "backend_model": "opencode_go/deepseek-v4-flash"
+    },
+    "claude-3-5-haiku": {
+      "routing_tier": "fast",
+      "backend": "opencode",
+      "backend_model": "opencode_go/deepseek-4-flash"
+    }
+  },
+  "backends": {
+    "opencode": {
+      "type": "openai_compatible",
+      "base_url": "https://opencode.ai/v1/chat/completions",
+      "auth_env": "OPENCODE_API_KEY",
+      "status": "available"
+    }
+  },
+  "request_header_overrides": {
+    "x-app-name": "Merged-Agentic-Swarm",
+    "anthropic-beta": "prompt-caching-2024-07-25"
+  },
+  "logging": {
+    "level": "info",
+    "file": ".opencode/proxy.log",
+    "log_metrics": true,
+    "log_backend_route": true
+  }
+}

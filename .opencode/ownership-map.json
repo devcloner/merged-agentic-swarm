@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "description": "Worker pool file ownership boundaries to prevent conflicting edits.",
+  "default_owner": "cc-orchestrator",
+  "pools": [
+    {
+      "pool_id": "domain-module-workers",
+      "owned_paths": [
+        "services/**",
+        "providers/**",
+        "models/**"
+      ],
+      "forbidden_paths": [
+        ".claude/**",
+        "docs/**",
+        "proxy/**"
+      ]
+    },
+    {
+      "pool_id": "ast-type-hardening-workers",
+      "owned_paths": [
+        "tools/**",
+        "models/**"
+      ],
+      "forbidden_paths": [
+        "services/**",
+        "proxy/**",
+        ".claude/**"
+      ]
+    },
+    {
+      "pool_id": "test-coverage-engineers",
+      "owned_paths": [
+        "tests/**",
+        "scripts/**"
+      ],
+      "forbidden_paths": [
+        "proxy/**",
+        ".claude/**",
+        "docs/**"
+      ]
+    },
+    {
+      "pool_id": "security-a11y-auditors",
+      "owned_paths": [
+        "proxy/**"
+      ],
+      "forbidden_paths": [
+        ".claude/**",
+        "docs/**",
+        "services/**"
+      ]
+    }
+  ],
+  "control_plane_paths": {
+    "description": "Paths owned exclusively by Claude Code control agents (cc-orchestrator, tm-operator, spawn-gate)",
+    "paths": [
+      ".claude/**",
+      "docs/**",
+      "opencode-swarm.json",
+      "claude-code-proxy.json",
+      ".env",
+      ".taskmaster/**"
+    ]
+  },
+  "notes": [
+    "Ownership is enforced by the wave gate controller and progress ledger.",
+    "A worker editing a file outside its owned_paths will be flagged and blocked.",
+    "Forbidden paths are strict \u2014 no worker pool may touch them.",
+    "Control plane paths are reserved for Claude Code supervisory agents only."
+  ]
+}

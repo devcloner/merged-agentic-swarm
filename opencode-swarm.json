@@ -1,0 +1,145 @@
+{
+  "$schema": "https://example.local/schemas/opencode-swarm.schema.json",
+  "version": "3.0.0",
+  "project": {
+    "name": "Merged-Agentic-Codebase-Swarm",
+    "description": "Claude Code governed, Task Master spine, OpenCode worker swarm, provider-aware proxy routing.",
+    "root_dir": "/home/ubuntu",
+    "knowledge_graph_path": ".opencode/knowledge_cache.json",
+    "task_master_state": ".taskmaster/tasks/tasks.json",
+    "ownership_map": ".opencode/ownership-map.json",
+    "progress_report": "docs/agentic/registry/progress.json",
+    "provider_registry": "docs/agentic/providers/PROVIDER_REGISTRY.json"
+  },
+  "orchestrator": {
+    "runner": "opencode-architect",
+    "control_plane": "claude-code",
+    "max_concurrency": 40,
+    "ramp_sequence": [4, 8, 16, 24, 40],
+    "proxy_endpoint": "http://127.0.0.1:8085/v1",
+    "telemetry_enabled": true,
+    "heartbeat_interval_ms": 1000,
+    "retry_policy": {
+      "max_retries": 5,
+      "backoff_factor": 1.5,
+      "jitter": true
+    },
+    "phase_gates": {
+      "phase_1_required": true,
+      "phase_2_required": true,
+      "human_gate_before_full_concurrency": true
+    }
+  },
+  "role_allocations": {
+    "master_architect": 1,
+    "codebase_mapper": 4,
+    "spec_gap_closer": 4,
+    "core_engineer": 18,
+    "refactor_specialist": 4,
+    "unit_tester": 5,
+    "security_verifier": 4
+  },
+  "control_agents": [
+    {
+      "id": "cc-orchestrator",
+      "runtime": "claude-code",
+      "goal": "Own phases, gates, promotions, and progress reporting.",
+      "model_tier": "deep"
+    },
+    {
+      "id": "tm-operator",
+      "runtime": "claude-code",
+      "goal": "Ensure all work is mapped to Task Master ids and statuses.",
+      "model_tier": "main"
+    },
+    {
+      "id": "spawn-gate",
+      "runtime": "claude-code",
+      "goal": "Promote validated knowledge into durable agent specs and chain entries.",
+      "model_tier": "main"
+    },
+    {
+      "id": "budget-route-auditor",
+      "runtime": "claude-code",
+      "goal": "Track routing, cost, retries, and provider drift.",
+      "model_tier": "fast"
+    }
+  ],
+  "phase_1_agents": [
+    {
+      "id": "prd-decomposer",
+      "runtime": "claude-code",
+      "goal": "Parse and normalize PRD content into Task Master-friendly atomic tasks.",
+      "task_master_required": true
+    },
+    {
+      "id": "codebase-ast-mapper",
+      "runtime": "opencode",
+      "goal": "Map repo structure, imports, edges, and critical modules."
+    },
+    {
+      "id": "spec-gap-detector",
+      "runtime": "claude-code",
+      "goal": "Compare Task Master tasks against mapped codebase reality and block unsafe progression."
+    }
+  ],
+  "agent_pools": [
+    {
+      "pool_id": "domain-module-workers",
+      "phase": 3,
+      "instances": 10,
+      "id_prefix": "domain-worker-",
+      "runtime": "opencode",
+      "model_tier": "main",
+      "task_tags": ["domain", "feature", "api"],
+      "owned_paths": ["services/**", "providers/**", "models/**", "tools/**"]
+    },
+    {
+      "pool_id": "ast-type-hardening-workers",
+      "phase": 3,
+      "instances": 10,
+      "id_prefix": "type-hardening-",
+      "runtime": "opencode",
+      "model_tier": "fast",
+      "task_tags": ["types", "imports", "lint"],
+      "owned_paths": ["services/**/*.py", "models/**/*.py", "providers/**/*.py"]
+    },
+    {
+      "pool_id": "test-coverage-engineers",
+      "phase": 3,
+      "instances": 10,
+      "id_prefix": "test-engineer-",
+      "runtime": "opencode",
+      "model_tier": "main",
+      "task_tags": ["test", "integration", "perf"],
+      "owned_paths": ["tests/**", "tools/**/*.py"]
+    },
+    {
+      "pool_id": "security-a11y-auditors",
+      "phase": 3,
+      "instances": 10,
+      "id_prefix": "sec-a11y-auditor-",
+      "runtime": "opencode",
+      "model_tier": "deep",
+      "task_tags": ["security", "a11y", "compliance"],
+      "owned_paths": ["proxy/**", "opencode-swarm.json", "claude-code-proxy.json"]
+    }
+  ],
+  "dynamic_learning_loop": {
+    "hot_cache": ".opencode/knowledge_cache.json",
+    "cold_registry": "docs/agentic/registry/knowledge.jsonl",
+    "chain_registry": "docs/agentic/registry/chain.jsonl",
+    "agent_registry": "docs/agentic/registry/agents.jsonl",
+    "progress_report": "docs/agentic/registry/progress.json",
+    "micro_spawn_policy": {
+      "max_lifespan_sec": 300,
+      "severity_threshold": "HIGH"
+    },
+    "promotion_policy": {
+      "require_evidence": true,
+      "require_claim": true,
+      "require_task_link": true,
+      "write_durable_agent": true
+    }
+  }
+}
