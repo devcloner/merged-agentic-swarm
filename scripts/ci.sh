@@ -43,7 +43,12 @@ echo "--- CLI smoke test ---"
 python3 tools/agentic_cli.py config 2>&1 | grep 'Key Pool\|Route:\|Swarm:'
 echo ""
 
-# 3. Import chain test
+# 3. Pytest suite
+echo "--- Pytest suite ---"
+uv run pytest -v --tb=short --timeout=120 2>&1
+echo ""
+
+# 4. Import chain test
 echo "--- Import chain test ---"
 python3 << 'PYEOF'
 from providers.key_pool import default_key_pool
