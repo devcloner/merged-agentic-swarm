@@ -11,8 +11,9 @@ from typing import Dict, Any, List, Optional
 logger = logging.getLogger("knowledge_cache")
 
 class KnowledgeCache:
-    def __init__(self, cache_file: str = "/home/ubuntu/.opencode/knowledge_cache.json"):
+    def __init__(self, cache_file: str = "/home/ubuntu/.opencode/knowledge_cache.json", max_learnings: int = 200):
         self.cache_file = cache_file
+        self.max_learnings = max_learnings
         self.learnings: Dict[str, Dict[str, Any]] = {}
         self.symbol_cache: Dict[str, Any] = {}
         self.load_cache()
@@ -37,12 +38,27 @@ class KnowledgeCache:
         with open(self.cache_file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
 
-    def add_learning(self, title: str, category: str, pattern_solution: str, tags: Optional[List[str]] = None) -> str:
-        # Dedup: skip if identical title+category already exists
+    def add_learning(self, title: str, category: str, pattern_solution: str, tags: Optional[List[str]] = None, ttl_sec: Optional[float] = None) -> str:
+        # Dedup via content hash: title + category + solution (prevents semantic duplicates
+        # like LEARN-0001 through LEARN-0005 that share identical content under different IDs)
         for existing in self.learnings.values():
-            if existing.get("title") == title and existing.get("category") == category:
-                logger.info(f"Skipped duplicate learning (title+category): {existing['id']}")
+            if existing.get("title") == title and existing.get("category") == category and existing.get("solution") == pattern_solution:
+                logger.info(f"Skipped duplicate learning (content match): {existing['id']}")
                 return existing["id"]
+
+        # Evict expired learnings first
+        now = time.time()
+        expired_ids = [
+            lid for lid, l in self.learnings.items()
+            if l.get("ttl_sec") is not None and l.get("created_at", 0) + l["ttl_sec"] < now
+        ]
+        for lid in expired_ids:
+            self.learnings.pop(lid, None)
+
+        # Enforce max learnings — remove oldest if at capacity
+        if len(self.learnings) >= self.max_learnings:
+            oldest_id = min(self.learnings, key=lambda lid: self.learnings[lid].get("created_at", 0))
+            self.learnings.pop(oldest_id, None)
 
         learning_id = f"LEARN-{len(self.learnings)+1:04d}"
         self.learnings[learning_id] = {
@@ -51,7 +67,8 @@ class KnowledgeCache:
             "category": category,
             "solution": pattern_solution,
             "tags": tags or [],
-            "created_at": time.time()
+            "created_at": time.time(),
+            "ttl_sec": ttl_sec,
         }
         self.save_cache()
         logger.info(f"Added validated learning {learning_id}: {title}")

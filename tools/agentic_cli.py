@@ -19,7 +19,7 @@ def cmd_run(args):
     """Run the full orchestrator workflow."""
     from tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
 
-    prd_path = args.prd or ".taskmaster/docs/prd_agentic_codebase_optimization.md"
+    prd_path = args.prd or os.path.join(os.path.dirname(__file__), "..", ".taskmaster", "docs", "prd_agentic_codebase_optimization.md")
     if not os.path.exists(prd_path):
         print(f"ERROR: PRD file not found at {prd_path}")
         sys.exit(1)
@@ -54,7 +54,7 @@ def cmd_run(args):
 
 def cmd_status(args):
     """Show current system status."""
-    progress_path = args.progress or "docs/agentic/registry/progress.json"
+    progress_path = args.progress or os.path.join(os.path.dirname(__file__), "..", "docs", "agentic", "registry", "progress.json")
     if os.path.exists(progress_path):
         with open(progress_path) as f:
             progress = json.load(f)
@@ -76,13 +76,13 @@ def cmd_status(args):
         print("No progress.json found. Run the orchestrator first.")
 
     for reg in ["knowledge.jsonl", "agents.jsonl", "chain.jsonl"]:
-        path = f"docs/agentic/registry/{reg}"
+        path = os.path.join(os.path.dirname(__file__), "..", "docs", "agentic", "registry", reg)
         if os.path.exists(path):
             with open(path) as f:
                 count = sum(1 for l in f if l.strip())
             print(f"  {reg}: {count} entries")
 
-    chain_path = ".taskmaster/tasks/spawn_chain_registry.json"
+    chain_path = os.path.join(os.path.dirname(__file__), "..", ".taskmaster", "tasks", "spawn_chain_registry.json")
     if os.path.exists(chain_path):
         with open(chain_path) as f:
             chain = json.load(f)
@@ -100,7 +100,7 @@ def cmd_promote(args):
     print(f"Promoted: {result.get('promoted_knowledge', 0)} knowledge, "
           f"{result.get('promoted_agents', 0)} agents")
     for reg in ["knowledge.jsonl", "agents.jsonl", "chain.jsonl"]:
-        path = f"docs/agentic/registry/{reg}"
+        path = os.path.join(os.path.dirname(__file__), "..", "docs", "agentic", "registry", reg)
         if os.path.exists(path):
             with open(path) as f:
                 count = sum(1 for l in f if l.strip())

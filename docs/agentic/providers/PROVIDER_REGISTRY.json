@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "description": "Provider registry for the merged agentic swarm — mirrors routes defined in providers/multi_provider_fabric.py",
+  "tiers": {
+    "deep": [
+      "opencode_go/deepseek-v4-flash",
+      "gemini-2.5-pro",
+      "codestral-latest"
+    ],
+    "main": [
+      "opencode_go/deepseek-v4-flash",
+      "gemini-2.5-flash",
+      "llama-3.3-70b-versatile",
+      "mistral-large-latest"
+    ],
+    "fast": [
+      "opencode_go/deepseek-4-flash",
+      "gemini-2.5-flash-lite",
+      "qwen3.6-flash"
+    ]
+  },
+  "policy": {
+    "default_tier_by_role": {
+      "cc-orchestrator": "deep",
+      "tm-operator": "main",
+      "spawn-gate": "main",
+      "prd-decomposer": "deep",
+      "spec-gap-detector": "main",
+      "budget-route-auditor": "fast",
+      "domain-module-worker": "main",
+      "type-hardening-worker": "fast",
+      "test-engineer": "main",
+      "sec-a11y-auditor": "deep"
+    },
+    "fallback_order": ["main", "fast", "deep"],
+    "degrade_on_rate_limit": true,
+    "degrade_on_budget_pressure": true
+  },
+  "backends": {
+    "litellm": {
+      "type": "openai_compatible",
+      "base_url": "http://localhost:4000/v1/chat/completions",
+      "auth_env": "LITELLM_PROXY_KEY",
+      "status": "available"
+    },
+    "opencode": {
+      "type": "openai_compatible",
+      "base_url": "https://api.opencode.ai/v1/chat/completions",
+      "auth_env": "OPENCODE_API_KEY",
+      "status": "unavailable"
+    },
+    "gemini": {
+      "type": "openai_compatible",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+      "auth_env": "GEMINI_API_KEY",
+      "status": "available"
+    },
+    "groq": {
+      "type": "openai_compatible",
+      "base_url": "https://api.groq.com/openai/v1/chat/completions",
+      "auth_env": "GROQ_API_KEY",
+      "status": "available"
+    },
+    "mistral": {
+      "type": "openai_compatible",
+      "base_url": "https://api.mistral.ai/v1/chat/completions",
+      "auth_env": "MISTRAL_API_KEY",
+      "status": "available"
+    },
+    "openrouter": {
+      "type": "openai_compatible",
+      "base_url": "https://openrouter.ai/api/v1/chat/completions",
+      "auth_env": "OPENROUTER_API_KEY",
+      "status": "available"
+    },
+    "alibabacloud": {
+      "type": "openai_compatible",
+      "base_url": "https://ws-os3nbzniaeck95yo.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "auth_env": "ALIBABACLOUD_API_KEY",
+      "status": "available"
+    },
+    "digitalocean": {
+      "type": "openai_compatible",
+      "base_url": "https://inference.do-ai.run/v1/chat/completions",
+      "auth_env": "DO_API_KEY",
+      "status": "available"
+    },
+    "amazonaws": {
+      "type": "aws_bedrock",
+      "base_url": "https://bedrock-runtime.us-east-1.amazonaws.com/model/invoke",
+      "auth_env": "AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY",
+      "auth_method": "sigv4",
+      "status": "misconfigured"
+    }
+  },
+  "notes": [
+    "Real routing table defined in providers/multi_provider_fabric.py MODEL_FABRIC_ROUTES",
+    "fcc-server on port 8080 handles ANTHROPIC_BASE_URL traffic via settings.local.json",
+    "Python proxy on port 8085 provides Anthropic + OpenAI compatible endpoints with key-pool rotation",
+    "Multi-provider fabric falls back to offline simulation payload when all keys are exhausted"
+  ]
+}

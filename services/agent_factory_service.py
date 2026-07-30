@@ -7,6 +7,7 @@ import sys
 import time
 import json
 import logging
+from datetime import datetime
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from typing import Dict, Any, List, Optional
@@ -43,8 +44,11 @@ class ChainRegistry:
 
     def save_registry(self):
         os.makedirs(os.path.dirname(self.registry_file), exist_ok=True)
-        with open(self.registry_file, "w", encoding="utf-8") as f:
-            json.dump([e.to_dict() for e in self.entries], f, indent=2)
+        try:
+            with open(self.registry_file, "w", encoding="utf-8") as f:
+                json.dump([e.to_dict() for e in self.entries], f, indent=2)
+        except Exception as e:
+            logger.error(f"Failed saving spawn chain registry: {e}")
 
     def register_spawn(self, source_learning_id: str, spawned_agent_id: str, agent_type: AgentType, trigger_reason: str, parent_entry_id: Optional[str] = None) -> SpawnChainEntry:
         entry = SpawnChainEntry(
@@ -66,10 +70,118 @@ class DurableAgentFactory:
         self.active_hot_specialists: Dict[str, AgentSpec] = {}
         self.active_cold_agents: Dict[str, AgentSpec] = {}
 
+    def purge_expired(self) -> int:
+        """Remove and return count of expired HOT micro-specialists (FIX-09)."""
+        now = time.time()
+        expired_ids = [
+            aid for aid, spec in self.active_hot_specialists.items()
+            if spec.is_expired
+        ]
+        for aid in expired_ids:
+            expired = self.active_hot_specialists.pop(aid, None)
+            if expired:
+                logger.info(f"Purged expired HOT agent {aid} (lived {now - expired.created_at:.1f}s)")
+        return len(expired_ids)
+
+    def _write_agent_spec_file(self, agent_spec: Dict[str, Any]) -> Optional[str]:
+        """Write an agent spec .md file from a JSONL entry.
+
+        Returns the file path, or None if the file already exists (skipped).
+        """
+        agent_id = agent_spec.get("id", "")
+        agents_dir = os.path.join(os.path.expanduser("~"), ".claude", "agents")
+        file_path = os.path.join(agents_dir, f"{agent_id}.md")
+
+        if os.path.exists(file_path):
+            logger.info(f"Agent spec file already exists, skipping: {file_path}")
+            return None
+
+        os.makedirs(agents_dir, exist_ok=True)
+
+        name = agent_spec.get("name", agent_id)
+        category = agent_spec.get("category", "uncategorized")
+        agent_type = agent_spec.get("type", "cold_durable")
+        promoted_at = agent_spec.get("promoted_at", 0.0)
+        try:
+            created_str = datetime.fromtimestamp(promoted_at).strftime("%Y-%m-%d %H:%M:%S UTC")
+        except (OSError, ValueError):
+            created_str = str(promoted_at)
+
+        derived = agent_spec.get("derived_from_learnings", [])
+        if isinstance(derived, list):
+            derived_str = ", ".join(derived)
+        else:
+            derived_str = str(derived)
+
+        system_prompt = agent_spec.get("system_prompt", "")
+
+        task_tags = agent_spec.get("task_tags")
+        if task_tags is None:
+            task_tags = "none"
+
+        ttl_sec = agent_spec.get("ttl_sec", "null")
+        ttl_display = f"{ttl_sec} (null = permanent / no expiry)" if ttl_sec is None or ttl_sec == "null" else str(ttl_sec)
+
+        content = f"""# Agent: {name}
+
+- **ID:** {agent_id}
+- **Category:** {category}
+- **Type:** {agent_type}
+- **Created:** {created_str}
+- **Derived from learnings:** {derived_str}
+
+## System Prompt
+{system_prompt}
+
+## Owned Tasks
+- {task_tags}
+
+## TTL
+{ttl_display}
+"""
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(content)
+
+        logger.info(f"Wrote agent spec file: {file_path}")
+        return file_path
+
+    def sync_agent_specs(self) -> int:
+        """Read agents.jsonl and write spec files for every entry.
+
+        Returns the count of files actually created (skipped pre-existing files
+        are not counted).
+        """
+        registry_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "docs", "agentic", "registry", "agents.jsonl",
+        )
+        count = 0
+        if not os.path.exists(registry_path):
+            logger.warning(f"Agent registry not found: {registry_path}")
+            return count
+
+        with open(registry_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                except json.JSONDecodeError as e:
+                    logger.error(f"Failed to parse JSONL line: {e}")
+                    continue
+                result = self._write_agent_spec_file(entry)
+                if result is not None:
+                    count += 1
+
+        logger.info(f"synced {count} new agent spec file(s)")
+        return count
+
     def spawn_from_learning(self, learning_id: str, trigger_reason: str, force_type: Optional[AgentType] = None) -> AgentSpec:
         """Evaluates validated learning from Knowledge-Box and spawns HOT or COLD agent."""
         learning = default_knowledge_cache.get_learning(learning_id)
-        
+
         # Decide agent type
         if force_type:
             agent_type = force_type
@@ -96,6 +208,7 @@ Directives:
             role=role,
             agent_type=agent_type,
             system_prompt=system_prompt,
+            ttl_sec=300.0 if agent_type == AgentType.HOT_MICRO_SPECIALIST else None,
             validated_learnings_applied=[learning_id]
         )
 

@@ -4,12 +4,15 @@ Enforces gated phase boundaries (Wave 0 to Wave 3) with pre-condition and post-c
 """
 import os
 import sys
+import json
 import time
+import fnmatch
 import logging
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from typing import Dict, Any, List, Optional, Tuple
-from models.wave_models import WavePhase, WaveStatus, WaveGateCriteria, WaveExecutionState
+from models.wave_models import WaveStatus, WaveGateCriteria, WaveExecutionState
+from models.prd_models import SubTask
 from services.task_master_service import default_task_master
 from services.codebase_map_service import default_codebase_mapper
 
@@ -46,6 +49,67 @@ class WaveGateController:
     def get_wave_state(self, wave_id: int) -> WaveExecutionState:
         return self.waves.get(wave_id, self.waves[0])
 
+    def _check_ownership(self, subtasks: List[SubTask], pool_id: str) -> List[str]:
+        """Verify each subtask's output paths against the ownership map for pool_id.
+
+        Checks that every output_artifact falls within the pool's owned_paths
+        and does not match any forbidden_paths. Returns a list of violation
+        descriptions (empty = all valid).
+        """
+        # Locate ownership-map.json
+        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        candidates = [
+            os.path.join(base, ".opencode", "ownership-map.json"),
+            os.path.join(base, "docs", "agentic", "registry", "ownership-map.json"),
+        ]
+        ownership_map = None
+        for path in candidates:
+            if os.path.exists(path):
+                try:
+                    with open(path, "r", encoding="utf-8") as f:
+                        ownership_map = json.load(f)
+                except Exception as exc:
+                    return [f"Failed to read ownership map at {path}: {exc}"]
+                break
+
+        if ownership_map is None:
+            return ["Ownership map not found (checked .opencode/ and docs/agentic/registry/)"]
+
+        # Find the pool config
+        pool_config = None
+        for pool in ownership_map.get("pools", []):
+            if pool.get("pool_id") == pool_id:
+                pool_config = pool
+                break
+
+        if pool_config is None:
+            return [f"Pool '{pool_id}' not found in ownership map"]
+
+        owned_paths = pool_config.get("owned_paths", [])
+        forbidden_paths = pool_config.get("forbidden_paths", [])
+
+        violations: List[str] = []
+        for subtask in subtasks:
+            for output_path in subtask.output_artifacts:
+                # Check forbidden paths first
+                for pattern in forbidden_paths:
+                    if fnmatch.fnmatch(output_path, pattern):
+                        violations.append(
+                            f"Subtask '{subtask.id}' output '{output_path}' matches "
+                            f"forbidden path '{pattern}' for pool '{pool_id}'"
+                        )
+
+                # Check that output falls within owned paths (if pool has any defined)
+                if owned_paths and not any(
+                    fnmatch.fnmatch(output_path, p) for p in owned_paths
+                ):
+                    violations.append(
+                        f"Subtask '{subtask.id}' output '{output_path}' is outside "
+                        f"owned paths for pool '{pool_id}'"
+                    )
+
+        return violations
+
     def evaluate_gate_criteria(self, wave_id: int) -> Tuple[bool, List[str]]:
         """Evaluates whether all criteria for a wave gate are met."""
         state = self.waves.get(wave_id)
@@ -67,6 +131,20 @@ class WaveGateController:
             incomplete = [t for t in wave_tasks if t.status.value != "completed"]
             if incomplete:
                 reasons.append(f"{len(incomplete)} epic tasks still incomplete in Wave {wave_id}.")
+
+            # Ownership enforcement: verify subtask output paths against ownership map
+            wave_pool_map = {
+                1: "domain-module-workers",
+                2: "ast-type-hardening-workers",
+                3: "security-a11y-auditors",
+            }
+            pool_id = wave_pool_map.get(wave_id)
+            if pool_id:
+                subtasks = []
+                for epic in wave_tasks:
+                    subtasks.extend(epic.subtasks)
+                violations = self._check_ownership(subtasks, pool_id)
+                reasons.extend(violations)
 
         passed = len(reasons) == 0
         return passed, reasons

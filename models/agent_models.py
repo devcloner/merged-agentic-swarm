@@ -31,10 +31,18 @@ class AgentSpec:
     system_prompt: str
     model_alias: str = "claude-3-7-sonnet"
     max_concurrency: int = 1
+    ttl_sec: Optional[float] = None  # None = durable (no expiry); HOT specialists get 300s
     validated_learnings_applied: List[str] = field(default_factory=list)
     memory_context: Dict[str, Any] = field(default_factory=dict)
     parent_agent_id: Optional[str] = None
     created_at: float = field(default_factory=time.time)
+
+    @property
+    def is_expired(self) -> bool:
+        """Return True if this agent has a TTL and has exceeded it."""
+        if self.ttl_sec is None:
+            return False  # durable — never expires
+        return (time.time() - self.created_at) > self.ttl_sec
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
@@ -78,6 +86,26 @@ class WorkerPoolState:
     completed_tasks: int = 0
     failed_tasks: int = 0
     workers_by_role: Dict[str, List[str]] = field(default_factory=dict)
+    pool_health: Dict[str, Dict] = field(default_factory=dict)
+
+    def record_pool_success(self, pool_id: str) -> None:
+        """Increment the completed counter for the given pool."""
+        if pool_id not in self.pool_health:
+            self.pool_health[pool_id] = {"active": 0, "completed": 0, "failed": 0, "rate_limited": 0}
+        self.pool_health[pool_id]["completed"] += 1
+
+    def record_pool_failure(self, pool_id: str, is_rate_limit: bool = False) -> None:
+        """Increment the failed or rate_limited counter for the given pool."""
+        if pool_id not in self.pool_health:
+            self.pool_health[pool_id] = {"active": 0, "completed": 0, "failed": 0, "rate_limited": 0}
+        if is_rate_limit:
+            self.pool_health[pool_id]["rate_limited"] += 1
+        else:
+            self.pool_health[pool_id]["failed"] += 1
+
+    def get_pool_summary(self) -> Dict[str, Dict]:
+        """Return a copy of the pool_health dict."""
+        return dict(self.pool_health)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

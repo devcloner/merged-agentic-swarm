@@ -31,6 +31,12 @@ class APIKeyInfo:
     last_used_at: float = 0.0
     avg_latency_ms: float = 0.0
 
+    def __repr__(self):
+        """Avoid leaking the secret value in logs/debug output."""
+        return (f"APIKeyInfo(key_id='{self.key_id}', provider='{self.provider}', "
+                f"status='{self.status.value}', failure_count={self.failure_count}, "
+                f"total_requests={self.total_requests})")
+
 class KeyPoolManager:
     def __init__(self, env_file_path: str = "/home/ubuntu/env.txt"):
         self.env_file_path = env_file_path
@@ -56,9 +62,14 @@ class KeyPoolManager:
         if env_vars.get("GEMINI_API_KEY") and env_vars["GEMINI_API_KEY"] not in gemini_keys:
             gemini_keys.append(env_vars["GEMINI_API_KEY"])
         
-        # Load from gemlni-keys/working-keys.txt if available
-        working_keys_file = "/home/ubuntu/gemlni-keys/working-keys.txt"
-        if os.path.exists(working_keys_file):
+        # Load from gemini-keys/working-keys.txt if available (also check misspelled legacy path)
+        for candidate in ("/home/ubuntu/gemini-keys/working-keys.txt", "/home/ubuntu/gemlni-keys/working-keys.txt"):
+            if os.path.exists(candidate):
+                working_keys_file = candidate
+                break
+        else:
+            working_keys_file = None
+        if working_keys_file and os.path.exists(working_keys_file):
             with open(working_keys_file, "r", encoding="utf-8") as f:
                 for line in f:
                     k = line.strip()
@@ -103,10 +114,11 @@ class KeyPoolManager:
         if do_key:
             self.add_key("digitalocean", do_key, key_id="digitalocean-main")
 
-        # 10. AWS Bedrock Keys / Credentials (amazonaws)
-        aws_key = env_vars.get("AWS_SECRET_ACCESS_KEY") or os.environ.get("AWS_SECRET_ACCESS_KEY")
-        if aws_key:
-            self.add_key("amazonaws", aws_key, key_id="aws-bedrock-main")
+        # 10. AWS Bedrock — needs access key + secret (SigV4), store as compound
+        aws_access_key = env_vars.get("AWS_ACCESS_KEY_ID") or os.environ.get("AWS_ACCESS_KEY_ID")
+        aws_secret_key = env_vars.get("AWS_SECRET_ACCESS_KEY") or os.environ.get("AWS_SECRET_ACCESS_KEY")
+        if aws_access_key and aws_secret_key:
+            self.add_key("amazonaws", f"{aws_access_key}:{aws_secret_key}", key_id="aws-bedrock-main")
 
         # 10. liteLLM Proxy (local, fast, low-latency)
         litellm_key = env_vars.get("LITELLM_PROXY_KEY")

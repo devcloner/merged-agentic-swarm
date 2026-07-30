@@ -9,12 +9,48 @@ import time
 import logging
 import urllib.request
 import urllib.error
+import threading
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from typing import Dict, Any, List, Optional, Tuple
-from providers.key_pool import default_key_pool, APIKeyInfo
+from typing import Dict, Any, List, Optional
+from providers.key_pool import default_key_pool
 
 logger = logging.getLogger("model_fabric")
+
+# ── Module-level circuit breaker state (shared across all fabric instances) ──
+_circuit_breaker: Dict[str, int] = {}
+_circuit_open_until: Dict[str, float] = {}
+_permanently_dead: Dict[str, float] = {}  # provider -> ban-expiry timestamp
+_last_successful_provider: Optional[str] = None
+CIRCUIT_BREAKER_THRESHOLD = 3
+CIRCUIT_BREAKER_COOLDOWN = 120.0
+PERMA_BAN_DURATION = 86400.0  # 24h — don't re-try auth-failed providers for a day
+_fabric_lock = threading.Lock()
+
+
+def _record_failure(provider: str, http_code: Optional[int] = None):
+    """Record a provider failure — perma-ban on auth errors, circuit-break on others."""
+    with _fabric_lock:
+        if http_code in (401, 403):
+            _permanently_dead[provider] = time.time() + PERMA_BAN_DURATION
+            logger.warning(f"Provider {provider} permanently blacklisted (HTTP {http_code}).")
+            return
+        _circuit_breaker[provider] = _circuit_breaker.get(provider, 0) + 1
+        if _circuit_breaker[provider] >= CIRCUIT_BREAKER_THRESHOLD:
+            _circuit_open_until[provider] = time.time() + CIRCUIT_BREAKER_COOLDOWN
+            logger.warning(
+                f"Circuit breaker tripped for {provider} "
+                f"({_circuit_breaker[provider]} consecutive failures)."
+            )
+
+
+def _record_success(provider: str):
+    """Record a provider success — reset circuit breaker and update last-working cache."""
+    global _last_successful_provider
+    with _fabric_lock:
+        _circuit_breaker[provider] = 0
+        _circuit_open_until.pop(provider, None)
+        _last_successful_provider = provider
 
 # Fallback Routing Table
 MODEL_FABRIC_ROUTES: Dict[str, List[Dict[str, str]]] = {
@@ -52,11 +88,6 @@ MODEL_FABRIC_ROUTES: Dict[str, List[Dict[str, str]]] = {
 class MultiProviderFabric:
     def __init__(self, key_pool=None):
         self.key_pool = key_pool or default_key_pool
-        # Circuit breaker: provider -> consecutive failures
-        self._circuit_breaker: Dict[str, int] = {}
-        self._circuit_open_until: Dict[str, float] = {}
-        self.CIRCUIT_BREAKER_THRESHOLD = 3
-        self.CIRCUIT_BREAKER_COOLDOWN = 120.0  # seconds
 
     def format_anthropic_to_openai(self, messages: List[Dict[str, Any]], system_prompt: Optional[str] = None) -> List[Dict[str, Any]]:
         openai_messages = []
@@ -112,25 +143,39 @@ class MultiProviderFabric:
             }
         }
 
+    def _build_route_list(self, model_alias: str) -> List[Dict[str, str]]:
+        """Build route list, promoting the last successful provider to the front."""
+        routes = list(MODEL_FABRIC_ROUTES.get(model_alias, MODEL_FABRIC_ROUTES["claude-3-7-sonnet"]))
+        if _last_successful_provider:
+            idx = next((i for i, r in enumerate(routes) if r["provider"] == _last_successful_provider), None)
+            if idx is not None and idx > 0:
+                routes.insert(0, routes.pop(idx))
+        return routes
+
     def dispatch_request(self, model_alias: str, messages: List[Dict[str, Any]], system_prompt: Optional[str] = None, max_tokens: int = 4096, temperature: float = 0.7) -> Dict[str, Any]:
         """Dispatches request across multi-backend provider fallback cascade."""
-        routes = MODEL_FABRIC_ROUTES.get(model_alias, MODEL_FABRIC_ROUTES["claude-3-7-sonnet"])
-        
+        routes = self._build_route_list(model_alias)
+
         last_error = None
         for route in routes:
             provider = route["provider"]
             target_model = route["model"]
             target_url = route["url"]
 
-            # Circuit breaker: skip provider under cooldown
-            if provider in self._circuit_open_until:
-                if time.time() < self._circuit_open_until[provider]:
-                    logger.debug(f"Circuit breaker open for {provider}, skipping.")
+            # Skip permanently-dead providers (401/403)
+            if provider in _permanently_dead:
+                if time.time() < _permanently_dead[provider]:
                     continue
                 else:
-                    # Cooldown expired, reset
-                    del self._circuit_open_until[provider]
-                    self._circuit_breaker[provider] = 0
+                    _permanently_dead.pop(provider, None)
+
+            # Circuit breaker — skip provider under cooldown
+            if provider in _circuit_open_until:
+                if time.time() < _circuit_open_until[provider]:
+                    continue
+                else:
+                    _circuit_open_until.pop(provider, None)
+                    _circuit_breaker[provider] = 0
 
             key_info = self.key_pool.get_key(provider)
             if not key_info:
@@ -149,51 +194,39 @@ class MultiProviderFabric:
             try:
                 headers = {
                     "Content-Type": "application/json",
-                    "Authorization": f"Bearer {key_info.secret_value}"
+                    "Authorization": f"Bearer {key_info.secret_value}",
+                    "User-Agent": "MergedAgenticSwarm/1.0",
                 }
-                # Specific provider header tweaks
-                if provider == "gemini":
-                    headers["Authorization"] = f"Bearer {key_info.secret_value}"
 
                 req_data = json.dumps(payload).encode("utf-8")
                 req = urllib.request.Request(target_url, data=req_data, headers=headers, method="POST")
-                
-                timeout = 15.0 if any(host in target_url for host in ["localhost", "127.0.0.1"]) else 0.8
+
+                is_local = any(host in target_url for host in ["localhost", "127.0.0.1"])
+                timeout = 5.0 if is_local else 10.0
                 with urllib.request.urlopen(req, timeout=timeout) as response:
                     res_body = response.read().decode("utf-8")
                     resp_json = json.loads(res_body)
                     latency = (time.time() - start_time) * 1000
                     tokens = resp_json.get("usage", {}).get("total_tokens", 0)
-                    
+
                     self.key_pool.mark_success(key_info, latency_ms=latency, tokens=tokens)
-                    # Circuit breaker: reset on success
-                    self._circuit_breaker[provider] = 0
-                    if provider in self._circuit_open_until:
-                        del self._circuit_open_until[provider]
+                    _record_success(provider)
                     return self.format_openai_to_anthropic_response(resp_json, model_alias)
 
             except urllib.error.HTTPError as e:
                 err_text = e.read().decode("utf-8", errors="ignore") if hasattr(e, "read") else str(e)
                 logger.warning(f"HTTPError {e.code} on provider {provider} (model {target_model}): {err_text[:200]}")
-                if e.code in (429, 403, 503):
+                if e.code in (429, 503):
                     self.key_pool.mark_rate_limited(key_info, cooldown_seconds=60.0)
                 last_error = f"HTTP {e.code}: {err_text[:200]}"
-                # Circuit breaker: count failures
-                self._circuit_breaker[provider] = self._circuit_breaker.get(provider, 0) + 1
-                if self._circuit_breaker[provider] >= self.CIRCUIT_BREAKER_THRESHOLD:
-                    self._circuit_open_until[provider] = time.time() + self.CIRCUIT_BREAKER_COOLDOWN
-                    logger.warning(f"Circuit breaker tripped for {provider} after {self._circuit_breaker[provider]} failures. Cooling down for {self.CIRCUIT_BREAKER_COOLDOWN}s.")
+                _record_failure(provider, http_code=e.code)
             except Exception as e:
                 logger.warning(f"Error calling provider {provider}: {e}")
                 last_error = str(e)
-                # Circuit breaker: count failures
-                self._circuit_breaker[provider] = self._circuit_breaker.get(provider, 0) + 1
-                if self._circuit_breaker[provider] >= self.CIRCUIT_BREAKER_THRESHOLD:
-                    self._circuit_open_until[provider] = time.time() + self.CIRCUIT_BREAKER_COOLDOWN
-                    logger.warning(f"Circuit breaker tripped for {provider} after {self._circuit_breaker[provider]} failures. Cooling down for {self.CIRCUIT_BREAKER_COOLDOWN}s.")
+                _record_failure(provider)
 
-        # Fallback offline simulation if no live API keys connect
-        logger.warning(f"All live API providers unreachable or unconfigured for {model_alias}. Using local self-healing simulation payload.")
+        # Fallback offline simulation
+        logger.warning(f"All live API providers unreachable or unconfigured for {model_alias}. Using simulation fallback (last error: {last_error}).")
         return {
             "id": f"msg_sim_{int(time.time()*1000)}",
             "type": "message",
@@ -202,12 +235,13 @@ class MultiProviderFabric:
             "content": [
                 {
                     "type": "text",
-                    "text": f"[AGENTIC FABRIC RESPONSE - Model: {model_alias}]\nTask request processed via offline backup synthesis. Ready to execute wave steps."
+                    "text": f"[SIMULATION — Model: {model_alias}]\nRequest processed via offline backup synthesis. All live providers failed."
                 }
             ],
             "stop_reason": "end_turn",
             "stop_sequence": None,
-            "usage": {"input_tokens": 100, "output_tokens": 50}
+            "usage": {"input_tokens": 0, "output_tokens": 0},
+            "simulation_fallback": True,  # flag for callers to detect synthetic responses
         }
 
 # Global Singleton

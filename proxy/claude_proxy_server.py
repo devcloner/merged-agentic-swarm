@@ -12,7 +12,7 @@ from socketserver import ThreadingMixIn
 import threading
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from providers.key_pool import default_key_pool
 from providers.multi_provider_fabric import default_fabric
 

@@ -1,0 +1,17 @@
+[project]
+name = "merged-agentic-swarm"
+version = "1.1.0"
+description = "Multi-agent orchestration system with 5-phase workflow, 40-worker pools, and cold-path knowledge promotion"
+requires-python = ">=3.11"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+target-version = "py314"
+line-length = 120
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

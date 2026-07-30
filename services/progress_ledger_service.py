@@ -7,14 +7,12 @@ import sys
 import re
 import json
 import time
-import subprocess
 import logging
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from typing import Dict, Any, List, Optional
 from models.ledger_models import ProgressLogEntry, SuccessMarker, ObstaclePlaybookEntry, TaskMasterStateSnapshot
 from services.task_master_service import default_task_master
-from providers.key_pool import default_key_pool
 
 logger = logging.getLogger("progress_ledger")
 
@@ -89,13 +87,16 @@ class ProgressLedgerService:
 
     def save_ledger(self):
         os.makedirs(os.path.dirname(self.ledger_file), exist_ok=True)
-        data = {
-            "logs": [e.to_dict() for e in self.log_entries],
-            "success_markers": [sm.to_dict() for sm in self.success_markers],
-            "task_master_snapshot": default_task_master.current_analysis.to_dict() if default_task_master.current_analysis else {}
-        }
-        with open(self.ledger_file, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
+        try:
+            data = {
+                "logs": [e.to_dict() for e in self.log_entries],
+                "success_markers": [sm.to_dict() for sm in self.success_markers],
+                "task_master_snapshot": default_task_master.current_analysis.to_dict() if default_task_master.current_analysis else {}
+            }
+            with open(self.ledger_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+        except Exception as e:
+            logger.error(f"Failed saving progress ledger: {e}")
 
     def log_progress(self, task_id: str, subtask_id: Optional[str], worker_id: str, wave_id: int, action: str, status: str, tokens_used: int = 0, learning_generated: Optional[str] = None, details: Optional[Dict[str, Any]] = None) -> ProgressLogEntry:
         entry = ProgressLogEntry(

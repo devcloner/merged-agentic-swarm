@@ -10,8 +10,7 @@ import logging
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from typing import Dict, Any, List, Optional
-from models.prd_models import SpecGap, TaskStatus
-from services.task_master_service import default_task_master
+from models.prd_models import SpecGap
 
 logger = logging.getLogger("codebase_map_service")
 
@@ -35,15 +34,19 @@ class CodebaseMapService:
 
         for root, dirs, files in os.walk(self.repo_root):
             dirs[:] = [d for d in dirs if d not in ignore_dirs and not d.startswith(".")]
-            for file in files:
-                rel_path = os.path.relpath(os.path.join(root, file), self.repo_root)
-                file_tree.append(rel_path)
+            try:
+                for file in files:
+                    rel_path = os.path.relpath(os.path.join(root, file), self.repo_root)
+                    file_tree.append(rel_path)
 
-                if file.endswith(".py"):
-                    full_path = os.path.join(root, file)
-                    symbols = self._parse_python_ast(full_path)
-                    if symbols:
-                        symbol_index[rel_path] = symbols
+                    if file.endswith(".py"):
+                        full_path = os.path.join(root, file)
+                        symbols = self._parse_python_ast(full_path)
+                        if symbols:
+                            symbol_index[rel_path] = symbols
+            except PermissionError:
+                logger.debug(f"Permission denied scanning {root}, skipping.")
+                continue
 
         self.symbol_cache = {
             "total_files": len(file_tree),
