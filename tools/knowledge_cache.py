@@ -38,6 +38,12 @@ class KnowledgeCache:
             json.dump(data, f, indent=2)
 
     def add_learning(self, title: str, category: str, pattern_solution: str, tags: Optional[List[str]] = None) -> str:
+        # Dedup: skip if identical title+category already exists
+        for existing in self.learnings.values():
+            if existing.get("title") == title and existing.get("category") == category:
+                logger.info(f"Skipped duplicate learning (title+category): {existing['id']}")
+                return existing["id"]
+
         learning_id = f"LEARN-{len(self.learnings)+1:04d}"
         self.learnings[learning_id] = {
             "id": learning_id,

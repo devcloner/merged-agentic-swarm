@@ -20,7 +20,7 @@ logger = logging.getLogger("model_fabric")
 MODEL_FABRIC_ROUTES: Dict[str, List[Dict[str, str]]] = {
     "claude-3-7-sonnet": [
         {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions"},
-        {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://opencode.ai/v1/chat/completions"},
+        {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://api.opencode.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "groq", "model": "llama-3.3-70b-versatile", "url": "https://api.groq.com/openai/v1/chat/completions"},
         {"provider": "alibabacloud", "model": "qwen3.6-plus", "url": "https://ws-os3nbzniaeck95yo.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions"},
@@ -30,7 +30,7 @@ MODEL_FABRIC_ROUTES: Dict[str, List[Dict[str, str]]] = {
     "claude-3-5-sonnet": [
         {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
-        {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://opencode.ai/v1/chat/completions"},
+        {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://api.opencode.ai/v1/chat/completions"},
         {"provider": "groq", "model": "llama-3.3-70b-versatile", "url": "https://api.groq.com/openai/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-large-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "openrouter", "model": "anthropic/claude-3.5-sonnet", "url": "https://openrouter.ai/api/v1/chat/completions"}
@@ -143,7 +143,7 @@ class MultiProviderFabric:
                 req_data = json.dumps(payload).encode("utf-8")
                 req = urllib.request.Request(target_url, data=req_data, headers=headers, method="POST")
                 
-                timeout = 5.0 if "localhost" in target_url or "127.0.0.1" in target_url else 0.8
+                timeout = 15.0 if any(host in target_url for host in ["localhost", "127.0.0.1"]) else 0.8
                 with urllib.request.urlopen(req, timeout=timeout) as response:
                     res_body = response.read().decode("utf-8")
                     resp_json = json.loads(res_body)
