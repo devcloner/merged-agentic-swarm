@@ -23,8 +23,25 @@ class KnowledgeCache:
             try:
                 with open(self.cache_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                    self.learnings = data.get("learnings", {})
+                    raw_learnings = data.get("learnings", {})
                     self.symbol_cache = data.get("symbols", {})
+
+                # Compact pre-existing duplicates by content hash (title+category+solution).
+                # Prevents LEARN-0001..0005 dupes from persisting across restarts.
+                seen: Dict[str, str] = {}  # content hash -> surviving learning ID
+                deduped: Dict[str, Dict[str, Any]] = {}
+                dupes_removed = 0
+                for lid, entry in raw_learnings.items():
+                    key = f"{entry.get('title','')}|{entry.get('category','')}|{entry.get('solution','')}"
+                    if key in seen:
+                        dupes_removed += 1
+                    else:
+                        seen[key] = lid
+                        deduped[lid] = entry
+                self.learnings = deduped
+                if dupes_removed:
+                    logger.info(f"Compacted {dupes_removed} duplicate learning(s) on load")
+                    self.save_cache()  # persist the compaction
             except Exception as e:
                 logger.error(f"Failed to load knowledge cache: {e}")
 

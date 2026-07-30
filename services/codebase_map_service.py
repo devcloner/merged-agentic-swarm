@@ -19,6 +19,8 @@ class CodebaseMapService:
         self.repo_root = repo_root
         self.symbol_cache: Dict[str, Any] = {}
         self.spec_gaps: List[SpecGap] = []
+        self._state_file: str = os.path.join(repo_root, ".opencode", "codebase_cache.json")
+        self._load_state()
 
     def scan_repository(self) -> Dict[str, Any]:
         """Scans workspace repository files and parses AST definitions."""
@@ -54,6 +56,7 @@ class CodebaseMapService:
             "file_list": file_tree[:200], # top sample
             "symbols": symbol_index
         }
+        self._save_state()
         logger.info(f"Codebase map completed: {len(file_tree)} total files, {len(symbol_index)} python modules parsed.")
         return self.symbol_cache
 
@@ -119,6 +122,28 @@ class CodebaseMapService:
         self.spec_gaps = gaps
         logger.info(f"Detected {len(gaps)} spec gaps during codebase pre-mapping.")
         return gaps
+
+    def _load_state(self) -> None:
+        """Load persisted codebase map state from disk."""
+        if os.path.exists(self._state_file):
+            try:
+                with open(self._state_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                self.symbol_cache = data.get("symbol_cache", {})
+                logger.info(f"Loaded codebase map from cache: {self.symbol_cache.get('total_files', 0)} files, "
+                           f"{self.symbol_cache.get('python_files', 0)} modules")
+            except Exception as e:
+                logger.warning(f"Could not load codebase map state: {e}")
+
+    def _save_state(self) -> None:
+        """Persist codebase map state so restart doesn't require re-scan."""
+        try:
+            os.makedirs(os.path.dirname(self._state_file), exist_ok=True)
+            with open(self._state_file, "w", encoding="utf-8") as f:
+                json.dump({"symbol_cache": self.symbol_cache}, f, indent=2)
+            logger.info(f"Saved codebase map state to {self._state_file}")
+        except Exception as e:
+            logger.warning(f"Could not save codebase map state: {e}")
 
     def close_spec_gap(self, gap_id: str, resolution_note: str) -> bool:
         """Closes a specific spec gap after verifying fixes."""
