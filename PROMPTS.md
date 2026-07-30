@@ -125,6 +125,148 @@ Report a final summary table with pass/fail per check.
 
 ---
 
+## Natural-language prompts
+
+Same jobs, said how you'd actually talk. These embed the full loop — learn, remember, promote, specialize — into everyday language.
+
+### Models & providers
+
+```md
+Talk to the model fabric and tell me which providers are alive, which are on cooldown, and which are permanently dead. If gemini keeps carrying the load, that's useful to know — write it down as a learning so the system can route around failures smarter next time.
+```
+
+```md
+Open the key pool and tell me what's actually usable. I want active keys per provider, what's cooling down, and whether any provider is quietly failing without us noticing. If you see a pattern in the failures, capture it.
+```
+
+```md
+Send a real message through the fabric. Try liteLLM first, then fall through the routes if it fails. I want to see the circuit breaker work — if a provider is down, it should skip it, not crash. If the whole chain falls through to simulation, tell me that too.
+```
+
+```md
+Run a quick dispatch test against claude-3-5-sonnet through all available routes. Which provider actually answers? Was it a real model or simulation? Capture the latency and route ordering so we know where the traffic really flows.
+```
+
+### Proxy
+
+```md
+Spin up the proxy daemon on its standard port and keep it alive. Ping /health to confirm it's up, then /status to see the live key pool state. Send one message through /v1/messages as a real caller would. Log everything and stop cleanly when done.
+```
+
+```md
+Start the proxy, send a chat completions request through it, and verify it converts the response back to OpenAI format properly. If the proxy is the gateway, I want to know it handles both Claude-style and OpenAI-style callers without losing data.
+```
+
+### Knowledge & learning
+
+```md
+Look at what's in the hot cache right now. How many learnings are there, what categories dominate, and is anything expired or about to expire? If the cache is full of noise, tell me. If there's something valuable that hasn't been promoted yet, flag it.
+```
+
+```md
+Run the cold-path promotion manually. Take whatever's in the hot cache that hasn't been promoted yet and push it through: hot cache → knowledge.jsonl → agents.jsonl → chain.jsonl. Tell me how many new entries each registry got and whether any category hit the agent-creation threshold. Run it again after and confirm it's idempotent.
+```
+
+```md
+Add a new learning to the cache about something we just figured out. If it's a duplicate of something already there, I want it to quietly return the existing ID instead of duplicating. If the cache is full, evict the oldest entry first. And if this is a time-sensitive insight, give it a TTL so it cleans itself up later.
+```
+
+### Wave gates & progress
+
+```md
+Check the wave gate status. Are we still in Wave 0, or have we progressed? What does each wave's gate criteria actually check, and have we satisfied the current one? If we're stuck on a gate, tell me why rather than letting us spin.
+```
+
+```md
+Read the progress ledger from start to finish. Show me the success markers, the failures, the obstacles that triggered playbooks, and how each one was resolved. I want to see the system recovering from its own problems, not just a log of wins.
+```
+
+```md
+Advance to the next wave if the current gate passes. Don't force it — if the gate criteria aren't met, tell me exactly what's missing so we can fix it before moving on.
+```
+
+### Agent factory & spawning
+
+```md
+Look at the active agents. Which HOT specialists are alive, and are any of them expired and ready to be purged? Which COLD durables exist? If the HOT pool is stale, purge the dead ones. If a category is missing a durable agent but has enough learnings to justify one, promote it.
+```
+
+```md
+Spawn an agent from a learning. Pick one from the hot cache that looks important, turn it into a HOT micro-specialist for immediate work and a COLD durable for long-term memory. Register the spawn chain so we can trace why this agent exists later.
+```
+
+### Full orchestrator run
+
+```md
+Start the full orchestrator workflow. Don't rush it — let it go through all four waves properly. After it finishes, audit everything: which epics completed, which failed, how many success markers were recorded, what cold-path promotion happened, and whether the registries got compacted. If anything errored, I want to know what was learned from it.
+```
+
+```md
+Run the orchestrator end to end, but watch it closely. Every time it hits a wave gate, pause and show me the gate result. Every time it creates a learning or spawns an agent, show me what and why. At the end, give me the full cold-path state and tell me if the system is measurably smarter than before the run.
+```
+
+### Test suite & CI
+
+```md
+Run the full test suite and tell me which 224 tests pass and which don't. If something fails, don't just report it — investigate whether it's a real regression or just a test that needs better isolation from the live environment.
+```
+
+```md
+Run the full CI pipeline from scratch. Syntax check, CLI smoke test, all 224 pytest cases, and the import chain test. Every step must pass before the next one starts. If CI is green, we ship. If not, stop and explain the first failure.
+```
+
+### Resilience & chaos
+
+```md
+Poke the circuit breaker. Simulate a few failures against one of the providers and watch it trip into cooldown after three strikes. Then simulate a 401 to see it get permanently banned. Then call success and confirm it resets. I want to trust that when a real provider goes down, the system doesn't fall apart.
+```
+
+```md
+Force the system into simulation fallback. Ban all the providers temporarily and send a dispatch request. It should return a valid-looking response with the simulation flag set, not crash or hang. That's the last line of defence and I need to know it works.
+```
+
+### Quick everyday versions
+
+```md
+Show me the live provider status.
+```
+
+```md
+Promote any new learnings from the hot cache.
+```
+
+```md
+Run the test suite and tell me if CI is green.
+```
+
+```md
+Start the proxy, ping it, send a message, stop it.
+```
+
+```md
+Sweep the hot cache for expired entries and purge them.
+```
+
+```md
+Check the wave gate and advance if clear.
+```
+
+```md
+Run the orchestrator and audit the cold-path result.
+```
+
+```md
+Simulate a provider failure and verify the circuit breaker catches it.
+```
+
+```md
+Read me the latest progress ledger entries.
+```
+
+```md
+Verify cold-path promotion is idempotent — run it twice, second run should add nothing.
+```
+
 ## How to use these
 
 Open a Claude Code terminal and say one of these verbatim as a prompt. Each one is self-contained and references the system by its file paths and CLI commands.
