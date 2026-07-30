@@ -43,7 +43,7 @@ MODEL_FABRIC_ROUTES: Dict[str, List[Dict[str, str]]] = {
     ],
     "claude-3-opus": [
         {"provider": "litellm", "model": "gemini-2.5-pro", "url": "http://localhost:4000/v1/chat/completions"},
-        {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://opencode.ai/v1/chat/completions"},
+        {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://api.opencode.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-pro", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "mistral", "model": "codestral-latest", "url": "https://api.mistral.ai/v1/chat/completions"}
     ]
@@ -52,6 +52,11 @@ MODEL_FABRIC_ROUTES: Dict[str, List[Dict[str, str]]] = {
 class MultiProviderFabric:
     def __init__(self, key_pool=None):
         self.key_pool = key_pool or default_key_pool
+        # Circuit breaker: provider -> consecutive failures
+        self._circuit_breaker: Dict[str, int] = {}
+        self._circuit_open_until: Dict[str, float] = {}
+        self.CIRCUIT_BREAKER_THRESHOLD = 3
+        self.CIRCUIT_BREAKER_COOLDOWN = 120.0  # seconds
 
     def format_anthropic_to_openai(self, messages: List[Dict[str, Any]], system_prompt: Optional[str] = None) -> List[Dict[str, Any]]:
         openai_messages = []
@@ -117,6 +122,16 @@ class MultiProviderFabric:
             target_model = route["model"]
             target_url = route["url"]
 
+            # Circuit breaker: skip provider under cooldown
+            if provider in self._circuit_open_until:
+                if time.time() < self._circuit_open_until[provider]:
+                    logger.debug(f"Circuit breaker open for {provider}, skipping.")
+                    continue
+                else:
+                    # Cooldown expired, reset
+                    del self._circuit_open_until[provider]
+                    self._circuit_breaker[provider] = 0
+
             key_info = self.key_pool.get_key(provider)
             if not key_info:
                 logger.debug(f"No key available for provider {provider}, trying next in fabric chain.")
@@ -151,6 +166,10 @@ class MultiProviderFabric:
                     tokens = resp_json.get("usage", {}).get("total_tokens", 0)
                     
                     self.key_pool.mark_success(key_info, latency_ms=latency, tokens=tokens)
+                    # Circuit breaker: reset on success
+                    self._circuit_breaker[provider] = 0
+                    if provider in self._circuit_open_until:
+                        del self._circuit_open_until[provider]
                     return self.format_openai_to_anthropic_response(resp_json, model_alias)
 
             except urllib.error.HTTPError as e:
@@ -159,9 +178,19 @@ class MultiProviderFabric:
                 if e.code in (429, 403, 503):
                     self.key_pool.mark_rate_limited(key_info, cooldown_seconds=60.0)
                 last_error = f"HTTP {e.code}: {err_text[:200]}"
+                # Circuit breaker: count failures
+                self._circuit_breaker[provider] = self._circuit_breaker.get(provider, 0) + 1
+                if self._circuit_breaker[provider] >= self.CIRCUIT_BREAKER_THRESHOLD:
+                    self._circuit_open_until[provider] = time.time() + self.CIRCUIT_BREAKER_COOLDOWN
+                    logger.warning(f"Circuit breaker tripped for {provider} after {self._circuit_breaker[provider]} failures. Cooling down for {self.CIRCUIT_BREAKER_COOLDOWN}s.")
             except Exception as e:
                 logger.warning(f"Error calling provider {provider}: {e}")
                 last_error = str(e)
+                # Circuit breaker: count failures
+                self._circuit_breaker[provider] = self._circuit_breaker.get(provider, 0) + 1
+                if self._circuit_breaker[provider] >= self.CIRCUIT_BREAKER_THRESHOLD:
+                    self._circuit_open_until[provider] = time.time() + self.CIRCUIT_BREAKER_COOLDOWN
+                    logger.warning(f"Circuit breaker tripped for {provider} after {self._circuit_breaker[provider]} failures. Cooling down for {self.CIRCUIT_BREAKER_COOLDOWN}s.")
 
         # Fallback offline simulation if no live API keys connect
         logger.warning(f"All live API providers unreachable or unconfigured for {model_alias}. Using local self-healing simulation payload.")
