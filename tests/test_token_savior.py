@@ -4,7 +4,7 @@ Tests for tools/token_savior.py
 Coverage: TokenSavior — compact_code_snippet, compact_bash_output,
 compress_prose_output.
 """
-from tools.token_savior import TokenSavior
+from merged_agentic_swarm.tools.token_savior import TokenSavior
 
 
 class TestTokenSavior:

@@ -6,7 +6,7 @@ WorkerRole, AgentType enums.
 """
 import time
 
-from models.agent_models import (
+from merged_agentic_swarm.models.agent_models import (
     AgentSpec,
     AgentType,
     SpawnChainEntry,

@@ -10,7 +10,7 @@ import os
 
 class TestObstaclePlaybookEngine:
     def setup_method(self):
-        from services.progress_ledger_service import ObstaclePlaybookEngine
+        from merged_agentic_swarm.services.progress_ledger_service import ObstaclePlaybookEngine
         self.engine = ObstaclePlaybookEngine()
 
     def test_match_rate_limit(self):
@@ -51,14 +51,14 @@ class TestObstaclePlaybookEngine:
 
 class TestProgressLedgerService:
     def test_empty_ledger(self, temp_dir):
-        from services.progress_ledger_service import ProgressLedgerService
+        from merged_agentic_swarm.services.progress_ledger_service import ProgressLedgerService
         ledger_file = os.path.join(temp_dir, "ledger.json")
         ledger = ProgressLedgerService(ledger_file=ledger_file)
         assert ledger.log_entries == []
         assert ledger.success_markers == []
 
     def test_log_progress(self, temp_dir):
-        from services.progress_ledger_service import ProgressLedgerService
+        from merged_agentic_swarm.services.progress_ledger_service import ProgressLedgerService
         ledger_file = os.path.join(temp_dir, "ledger.json")
         ledger = ProgressLedgerService(ledger_file=ledger_file)
         entry = ledger.log_progress(
@@ -71,7 +71,7 @@ class TestProgressLedgerService:
         assert len(ledger.log_entries) == 1
 
     def test_log_progress_persists(self, temp_dir):
-        from services.progress_ledger_service import ProgressLedgerService
+        from merged_agentic_swarm.services.progress_ledger_service import ProgressLedgerService
         ledger_file = os.path.join(temp_dir, "ledger.json")
         ledger1 = ProgressLedgerService(ledger_file=ledger_file)
         ledger1.log_progress("T-01", "ST-01", "w1", 1, "act", "completed")
@@ -80,7 +80,7 @@ class TestProgressLedgerService:
         assert len(ledger2.log_entries) == 1
 
     def test_record_success_marker(self, temp_dir):
-        from services.progress_ledger_service import ProgressLedgerService
+        from merged_agentic_swarm.services.progress_ledger_service import ProgressLedgerService
         ledger_file = os.path.join(temp_dir, "ledger.json")
         ledger = ProgressLedgerService(ledger_file=ledger_file)
         marker = ledger.record_success_marker(
@@ -94,7 +94,7 @@ class TestProgressLedgerService:
         assert marker.command_executed == "test command"
 
     def test_record_success_with_command_executed(self, temp_dir):
-        from services.progress_ledger_service import ProgressLedgerService
+        from merged_agentic_swarm.services.progress_ledger_service import ProgressLedgerService
         ledger_file = os.path.join(temp_dir, "ledger.json")
         ledger = ProgressLedgerService(ledger_file=ledger_file)
         marker = ledger.record_success_marker(
@@ -107,7 +107,7 @@ class TestProgressLedgerService:
         assert marker.command_executed == "custom_cmd"
 
     def test_handle_task_failure(self, temp_dir):
-        from services.progress_ledger_service import ProgressLedgerService
+        from merged_agentic_swarm.services.progress_ledger_service import ProgressLedgerService
         ledger_file = os.path.join(temp_dir, "ledger.json")
         ledger = ProgressLedgerService(ledger_file=ledger_file)
         result = ledger.handle_task_failure("TASK-01", "429: rate limited")
@@ -116,7 +116,7 @@ class TestProgressLedgerService:
         assert len(ledger.log_entries) == 1
 
     def test_load_corrupted_ledger(self, temp_dir):
-        from services.progress_ledger_service import ProgressLedgerService
+        from merged_agentic_swarm.services.progress_ledger_service import ProgressLedgerService
         ledger_file = os.path.join(temp_dir, "ledger.json")
         with open(ledger_file, "w") as f:
             f.write("not valid json")
@@ -124,7 +124,7 @@ class TestProgressLedgerService:
         assert ledger.log_entries == []
 
     def test_save_and_load_success_markers(self, temp_dir):
-        from services.progress_ledger_service import ProgressLedgerService
+        from merged_agentic_swarm.services.progress_ledger_service import ProgressLedgerService
         ledger_file = os.path.join(temp_dir, "ledger.json")
         ledger1 = ProgressLedgerService(ledger_file=ledger_file)
         ledger1.record_success_marker("T-01", "V1", exit_code=0)

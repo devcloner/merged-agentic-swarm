@@ -1,8 +1,8 @@
 {
   "workflow": "smoke-test",
   "version": "1.0.0",
-  "started_at": "2026-07-31T12:31:13Z",
-  "completed_at": "2026-07-31T12:31:35Z",
+  "started_at": "2026-07-31T21:05:23Z",
+  "completed_at": "2026-07-31T21:05:47Z",
   "verdict": "pass",
   "counts": {
     "total": 8,
@@ -27,6 +27,6 @@
   "skipped": [
   ""
 ],
-  "steps": [{"step":"discover","status":"passed","critical":true,"duration_sec":1},{"step":"proxy","status":"passed","critical":true,"duration_sec":6},{"step":"spine","status":"passed","critical":true,"duration_sec":6},{"step":"worker1","status":"passed","critical":true,"duration_sec":4},{"step":"worker2","status":"passed","critical":false,"duration_sec":4},{"step":"learning","status":"passed","critical":false,"duration_sec":0},{"step":"durable","status":"passed","critical":false,"duration_sec":1},{"step":"report","status":"passed","critical":false,"duration_sec":0}],
+  "steps": [{"step":"discover","status":"passed","critical":true,"duration_sec":2},{"step":"proxy","status":"passed","critical":true,"duration_sec":5},{"step":"spine","status":"passed","critical":true,"duration_sec":6},{"step":"worker1","status":"passed","critical":true,"duration_sec":5},{"step":"worker2","status":"passed","critical":false,"duration_sec":5},{"step":"learning","status":"passed","critical":false,"duration_sec":0},{"step":"durable","status":"passed","critical":false,"duration_sec":1},{"step":"report","status":"passed","critical":false,"duration_sec":0}],
   "results_file": "/home/ubuntu/config/runtime/smoke-test-results.json"
 }

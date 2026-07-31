@@ -79,10 +79,10 @@ import time
 import uuid
 
 # Point to the repo root so imports work
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
-from models.agent_models import AgentSpec, WorkerRole
-from services.worker_runtime_adapter import get_runtime_adapter
+from merged_agentic_swarm.models.agent_models import AgentSpec, WorkerRole
+from merged_agentic_swarm.services.worker_runtime_adapter import get_runtime_adapter
 
 WORKERS = int(sys.argv[1]) if len(sys.argv) > 1 else 1
 

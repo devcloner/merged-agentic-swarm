@@ -10,7 +10,7 @@ import os
 
 class TestApplyWorkerOutputs:
     def setup_method(self):
-        from tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+        from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
         self.orch = MultiLayeredAgenticOrchestrator()
 
     def test_empty_results(self):
@@ -41,7 +41,7 @@ class TestApplyWorkerOutputs:
 
 class TestCompactRegistries:
     def setup_method(self):
-        from tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+        from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
         self.orch = MultiLayeredAgenticOrchestrator()
 
     def test_no_registries_no_crash(self):
@@ -53,7 +53,7 @@ class TestCompactRegistries:
 
 class TestAppendJSONL:
     def setup_method(self):
-        from tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+        from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
         self.orch = MultiLayeredAgenticOrchestrator()
 
     def test_append_to_new_file(self, temp_dir):
@@ -75,7 +75,7 @@ class TestAppendJSONL:
 
 class TestRunSyntaxVerification:
     def setup_method(self):
-        from tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+        from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
         self.orch = MultiLayeredAgenticOrchestrator()
 
     def test_syntax_verification_runs(self):
@@ -87,12 +87,12 @@ class TestRunSyntaxVerification:
 
 class TestPromoteColdPath:
     def setup_method(self):
-        from tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+        from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
         self.orch = MultiLayeredAgenticOrchestrator()
         # Clear persisted IDs and cache for test isolation
         self.orch.promoted_learning_ids = set()
 
-        from tools.knowledge_cache import default_knowledge_cache
+        from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
         self.cache = default_knowledge_cache
         self.cache.learnings = {}
 
@@ -131,7 +131,7 @@ class TestPromoteColdPath:
         self.orch._save_promoted_ids()
 
         # Load into new orchestrator
-        from tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+        from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
         orch2 = MultiLayeredAgenticOrchestrator()
         orch2.promoted_ids_file = self.orch.promoted_ids_file
         orch2._load_promoted_ids()
@@ -141,7 +141,7 @@ class TestPromoteColdPath:
 class TestInitializeSystem:
     def test_initialize_system(self):
         """initialize_system should return ready status."""
-        from tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+        from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
         orch = MultiLayeredAgenticOrchestrator()
         result = orch.initialize_system(start_proxy_port=0)
         assert result["status"] == "ready"

@@ -9,11 +9,10 @@ import os
 import sys
 import time
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from models.prd_models import SubTask
-from models.wave_models import WaveExecutionState, WaveGateCriteria, WaveStatus
-from services.codebase_map_service import default_codebase_mapper
-from services.task_master_service import default_task_master
+from merged_agentic_swarm.models.prd_models import SubTask
+from merged_agentic_swarm.models.wave_models import WaveExecutionState, WaveGateCriteria, WaveStatus
+from merged_agentic_swarm.services.codebase_map_service import default_codebase_mapper
+from merged_agentic_swarm.services.task_master_service import default_task_master
 
 logger = logging.getLogger("wave_gate")
 

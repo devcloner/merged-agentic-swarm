@@ -8,9 +8,8 @@ import os
 import sys
 import time
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from models.prd_models import EpicTask, PRDAnalysisResult, SpecGap, SubTask, TaskPriority, TaskStatus
-from providers.multi_provider_fabric import default_fabric
+from merged_agentic_swarm.models.prd_models import EpicTask, PRDAnalysisResult, SpecGap, SubTask, TaskPriority, TaskStatus
+from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric
 
 logger = logging.getLogger("task_master_service")
 

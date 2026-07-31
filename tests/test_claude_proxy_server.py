@@ -8,7 +8,7 @@ import json
 
 import pytest
 
-from proxy.claude_proxy_server import (
+from merged_agentic_swarm.proxy.claude_proxy_server import (
     ProxyServerDaemon,
 )
 

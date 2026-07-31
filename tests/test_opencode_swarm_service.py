@@ -5,12 +5,12 @@ Coverage: ConcurrencyRampController, OpenCodeSwarmManager
 (_initialize_worker_pool, get_available_worker, _get_pool_id,
 execute_subtask_with_worker, execute_subtask_batch_parallel).
 """
-from models.agent_models import WorkerRole
+from merged_agentic_swarm.models.agent_models import WorkerRole
 
 
 class TestConcurrencyRampController:
     def setup_method(self):
-        from services.opencode_swarm_service import ConcurrencyRampController
+        from merged_agentic_swarm.services.opencode_swarm_service import ConcurrencyRampController
         self.ctrl = ConcurrencyRampController()
 
     def test_ramp_sequence_length(self):
@@ -42,7 +42,7 @@ class TestConcurrencyRampController:
 
 class TestOpenCodeSwarmManager:
     def setup_method(self):
-        from services.opencode_swarm_service import OpenCodeSwarmManager
+        from merged_agentic_swarm.services.opencode_swarm_service import OpenCodeSwarmManager
         self.manager = OpenCodeSwarmManager()
 
     def test_initializes_40_workers(self):
@@ -77,8 +77,8 @@ class TestOpenCodeSwarmManager:
     def test_get_available_worker_fallback_to_core_engineer(self):
         """Getting a role with zero allocation should fall back to core engineer."""
         # Create config without HOT_MICRO_SPECIALIST (not in defaults)
-        from models.agent_models import WorkerPoolConfig
-        from services.opencode_swarm_service import OpenCodeSwarmManager, WorkerPoolConfig
+        from merged_agentic_swarm.models.agent_models import WorkerPoolConfig
+        from merged_agentic_swarm.services.opencode_swarm_service import OpenCodeSwarmManager, WorkerPoolConfig
         config = WorkerPoolConfig()
         manager = OpenCodeSwarmManager(config=config)
         # HOT_MICRO_SPECIALIST has no dedicated allocation

@@ -9,11 +9,10 @@ import sys
 import time
 from datetime import datetime
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from typing import Any
 
-from models.agent_models import AgentSpec, AgentType, SpawnChainEntry, WorkerRole
-from tools.knowledge_cache import default_knowledge_cache
+from merged_agentic_swarm.models.agent_models import AgentSpec, AgentType, SpawnChainEntry, WorkerRole
+from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
 
 logger = logging.getLogger("agent_factory")
 

@@ -9,11 +9,10 @@ import re
 import sys
 import time
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from typing import Any
 
-from models.ledger_models import ObstaclePlaybookEntry, ProgressLogEntry, SuccessMarker
-from services.task_master_service import default_task_master
+from merged_agentic_swarm.models.ledger_models import ObstaclePlaybookEntry, ProgressLogEntry, SuccessMarker
+from merged_agentic_swarm.services.task_master_service import default_task_master
 
 logger = logging.getLogger("progress_ledger")
 

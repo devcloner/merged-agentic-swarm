@@ -15,12 +15,11 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from typing import Any
 
-from models.agent_models import AgentSpec, AgentType, WorkerPoolConfig, WorkerPoolState, WorkerRole
-from models.prd_models import SubTask, TaskStatus
-from providers.multi_provider_fabric import default_fabric
+from merged_agentic_swarm.models.agent_models import AgentSpec, AgentType, WorkerPoolConfig, WorkerPoolState, WorkerRole
+from merged_agentic_swarm.models.prd_models import SubTask, TaskStatus
+from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric
 
 logger = logging.getLogger("opencode_swarm")
 

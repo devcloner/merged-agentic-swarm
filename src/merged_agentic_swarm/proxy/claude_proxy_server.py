@@ -13,13 +13,12 @@ import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from typing import Any
 
 import requests
 
-from providers.key_pool import default_key_pool
-from providers.multi_provider_fabric import default_fabric
+from merged_agentic_swarm.providers.key_pool import default_key_pool
+from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric
 
 logger = logging.getLogger("claude_proxy")
 

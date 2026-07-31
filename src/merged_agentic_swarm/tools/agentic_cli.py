@@ -6,9 +6,6 @@ import argparse
 import json
 import logging
 import os
-import sys
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(message)s")
 logger = logging.getLogger("agentic_cli")
@@ -16,7 +13,7 @@ logger = logging.getLogger("agentic_cli")
 
 def cmd_run(args):
     """Run the full orchestrator workflow."""
-    from tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+    from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
 
     prd_path = args.prd or os.path.join(os.path.dirname(__file__), "..", ".taskmaster", "docs", "prd_agentic_codebase_optimization.md")
     if not os.path.exists(prd_path):
@@ -91,8 +88,8 @@ def cmd_status(args):
 
 def cmd_promote(args):
     """Force cold-path promotion without running full orchestrator."""
-    from tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
-    from tools.knowledge_cache import default_knowledge_cache
+    from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+    from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
 
     orch = MultiLayeredAgenticOrchestrator()
     result = orch._promote_cold_path(phase_label="manual_cli")
@@ -112,20 +109,20 @@ def cmd_config(args):
     print("=" * 60)
     print("CONFIGURATION STATE")
     print("=" * 60)
-    from providers.key_pool import default_key_pool
+    from merged_agentic_swarm.providers.key_pool import default_key_pool
     summary = default_key_pool.get_summary()
     print(f"Key Pool ({len(summary)} providers):")
     for provider, info in summary.items():
         print(f"  {provider}: {info.get('active_keys', '?')}/{info.get('total_keys', '?')} active, "
               f"{info.get('total_requests', 0)} requests")
 
-    from providers.multi_provider_fabric import MODEL_FABRIC_ROUTES
+    from merged_agentic_swarm.providers.multi_provider_fabric import MODEL_FABRIC_ROUTES
     for alias, routes in MODEL_FABRIC_ROUTES.items():
         print(f"Route: {alias}")
         for r in routes:
             print(f"  → {r['provider']:15s} {r['model']}")
 
-    from models.agent_models import WorkerPoolConfig
+    from merged_agentic_swarm.models.agent_models import WorkerPoolConfig
     cfg = WorkerPoolConfig()
     print(f"Swarm: {cfg.max_total_workers} max workers, roles={list(cfg.role_allocations.keys())}")
 

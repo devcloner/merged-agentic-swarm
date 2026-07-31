@@ -7,20 +7,19 @@ import os
 import sys
 import time
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from typing import Any
 
-from models.agent_models import AgentType, WorkerRole
-from models.prd_models import TaskStatus
-from proxy.claude_proxy_server import ProxyServerDaemon
-from services.agent_factory_service import default_agent_factory
-from services.codebase_map_service import default_codebase_mapper
-from services.opencode_swarm_service import default_swarm_manager
-from services.progress_ledger_service import default_progress_ledger
-from services.task_master_service import default_task_master
-from services.wave_gate_service import default_wave_controller
-from tools.knowledge_cache import default_knowledge_cache
+from merged_agentic_swarm.models.agent_models import AgentType, WorkerRole
+from merged_agentic_swarm.models.prd_models import TaskStatus
+from merged_agentic_swarm.proxy.claude_proxy_server import ProxyServerDaemon
+from merged_agentic_swarm.services.agent_factory_service import default_agent_factory
+from merged_agentic_swarm.services.codebase_map_service import default_codebase_mapper
+from merged_agentic_swarm.services.opencode_swarm_service import default_swarm_manager
+from merged_agentic_swarm.services.progress_ledger_service import default_progress_ledger
+from merged_agentic_swarm.services.task_master_service import default_task_master
+from merged_agentic_swarm.services.wave_gate_service import default_wave_controller
+from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
 
 logger = logging.getLogger("agentic_orchestrator")
 

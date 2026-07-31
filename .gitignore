@@ -1,89 +1,46 @@
-# Python
+# ── Junk / tool debris ──────────────────────────────────────────
+.claude-code-ui/
+.claude-mem/
+.claude-upstream/
+.claude.json
+.cloudcli-workspace-scheduled-prompts/
+.fcc/
+.lesshsQ
+.npmrc
+.omo/
+termix/
+deployments/
+docs/archive/
+tools/token-savior/
+.opencode/bin/
+
+# ── Python ──────────────────────────────────────────────────────
 __pycache__/
+*.pyc
 *.py[cod]
+*.egg
 *.egg-info/
+dist/
 .venv/
 venv/
-*.egg
 
-# Environment & Secrets
+# ── Runtime / temp ──────────────────────────────────────────────
+/tmp/
+*.log
+logs/
+
+# ── Environment & secrets ───────────────────────────────────────
 .env
 .env.*
-env.txt
-.key
-*-keys/
-.ssh/
+*.key
 *.pem
 secret*
 
-# Claude & AI internal state
-.claude/
-.claude-isolated/
-.remember/
+# ── OS ──────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
 
-# Runtime state dirs — include code, exclude generated data
-.opencode/*.json
-.opencode/*.txt
-!/.opencode/ownership-map.json
-.taskmaster/
-.aws/
-.appwrite/
-.bun/
-.cloudcli/
-.codegraph/
-.codex/
-.config/
-.cursor/
-.docker/
-.fcc-tmp/
-.gemini/
-.local/
-.pi/
-.serena/
-.cargo/
-.rustup/
-.npm/
-.pnpm-store/
-.cache/
-
-# Provider configs — include source code, exclude key files
-/providers/*.key
-/providers/*.txt
-/providers/*.env
-
-# Other projects/dirs
-spotify-ai/
-fcc-gh-clone/
-claudecodeui/
-cliproxyapi-dashboard/
-Spotify-project-main/
-gemlni-keys/
-snap/
-
-# System files
-.bash_history
-.bashrc
-.bash_logout
-.bash_profile
-.profile
-.lesshst
-.wget-hsts
-.sudo_as_admin_successful
-.welcome_msg
-.git-credentials
-.gitconfig
-.tmux.conf
-.viminfo
-
-# Generated files
-*.log
-*.tmp
+# ── Editor / system droppings ───────────────────────────────────
 *.swp
 *.swo
-*.zip
-*.tar.gz
-test-results/
-__pycache__/
-*.pyc
-
-# Configs with secrets — use per-type patterns above
+*.tmp

@@ -8,7 +8,7 @@ import json
 import os
 import time
 
-from tools.knowledge_cache import KnowledgeCache
+from merged_agentic_swarm.tools.knowledge_cache import KnowledgeCache
 
 
 class TestKnowledgeCache:

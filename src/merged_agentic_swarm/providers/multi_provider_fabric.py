@@ -11,10 +11,9 @@ import time
 import urllib.error
 import urllib.request
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from typing import Any
 
-from providers.key_pool import default_key_pool
+from merged_agentic_swarm.providers.key_pool import default_key_pool
 
 logger = logging.getLogger("model_fabric")
 

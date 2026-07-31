@@ -7,7 +7,7 @@ import os
 
 import pytest
 
-from tools.agentic_cli import cmd_config
+from merged_agentic_swarm.tools.agentic_cli import cmd_config
 
 
 class TestCmdConfig:
@@ -29,7 +29,7 @@ class TestCmdConfig:
         """Verify argparse setup works for each subcommand."""
         import sys
 
-        from tools.agentic_cli import main
+        from merged_agentic_swarm.tools.agentic_cli import main
         # Test that unknown commands exit
         with pytest.raises(SystemExit):
             sys.argv = ["agentic_cli.py", "unknown"]
@@ -41,14 +41,14 @@ class TestCLIStringFunctions:
 
     def test_cmd_promote_without_orchestrator_state(self):
         """cmd_promote should not crash when called directly (uses fresh orchestrator)."""
-        from tools.agentic_cli import cmd_promote
+        from merged_agentic_swarm.tools.agentic_cli import cmd_promote
         # We can't easily test this without mocking because it writes to real registry
         # Just verify it imports correctly
         assert callable(cmd_promote)
 
     def test_cmd_status_no_progress_file(self, capsys, temp_dir):
         """cmd_status should handle missing progress.json gracefully."""
-        from tools.agentic_cli import cmd_status
+        from merged_agentic_swarm.tools.agentic_cli import cmd_status
         # Create a mock args object
         class Args:
             progress = os.path.join(temp_dir, "nonexistent.json")

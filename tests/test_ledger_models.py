@@ -4,7 +4,7 @@ Tests for models/ledger_models.py
 Coverage: SuccessMarker, ObstaclePlaybookEntry, ProgressLogEntry,
 TaskMasterStateSnapshot.
 """
-from models.ledger_models import (
+from merged_agentic_swarm.models.ledger_models import (
     ObstaclePlaybookEntry,
     ProgressLogEntry,
     SuccessMarker,

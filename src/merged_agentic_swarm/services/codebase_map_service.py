@@ -6,12 +6,9 @@ import ast
 import json
 import logging
 import os
-import sys
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from typing import Any
 
-from models.prd_models import SpecGap
+from merged_agentic_swarm.models.prd_models import SpecGap
 
 logger = logging.getLogger("codebase_map_service")
 

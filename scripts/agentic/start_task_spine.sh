@@ -140,7 +140,7 @@ fi
 #       the file exists even if we later switch to Task Master) ───────
 mkdir -p "$TM_STATE_DIR"
 
-if python3 "$ROOT/services/task_spine_adapter.py" --init 2>/dev/null; then
+if python3 "$ROOT/src/merged_agentic_swarm/services/task_spine_adapter.py" --init 2>/dev/null; then
     ok "Local task spine adapter initialised at ${LOCAL_STATE}"
 else
     # Try absolute import-free path as a fallback

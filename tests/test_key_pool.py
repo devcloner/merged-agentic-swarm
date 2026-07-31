@@ -8,7 +8,7 @@ import time
 
 import pytest
 
-from providers.key_pool import APIKeyInfo, KeyPoolManager, KeyStatus
+from merged_agentic_swarm.providers.key_pool import APIKeyInfo, KeyPoolManager, KeyStatus
 
 
 class TestAPIKeyInfo:

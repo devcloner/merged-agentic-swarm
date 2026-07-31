@@ -6,7 +6,7 @@ PRDDocument, PRDAnalysisResult.
 """
 import time
 
-from models.prd_models import (
+from merged_agentic_swarm.models.prd_models import (
     EpicTask,
     PRDAnalysisResult,
     PRDDocument,

@@ -6,12 +6,12 @@ get_wave_state, _check_ownership.
 """
 import os
 
-from models.prd_models import SubTask
+from merged_agentic_swarm.models.prd_models import SubTask
 
 
 class TestWaveGateController:
     def setup_method(self):
-        from services.wave_gate_service import WaveGateController
+        from merged_agentic_swarm.services.wave_gate_service import WaveGateController
         self.controller = WaveGateController()
 
     def test_initial_state(self):
@@ -32,7 +32,7 @@ class TestWaveGateController:
     def test_evaluate_gate_wave_0_passes(self, temp_dir, isolated_codebase_mapper):
         """Wave 0 should pass when there are no unresolved spec gaps."""
         # Replace the singleton with our isolated one
-        from services import wave_gate_service as wgs
+        from merged_agentic_swarm.services import wave_gate_service as wgs
         original_mapper = wgs.default_codebase_mapper
         wgs.default_codebase_mapper = isolated_codebase_mapper
 
@@ -51,7 +51,7 @@ class TestWaveGateController:
 
     def test_advance_wave_passes(self, temp_dir, isolated_codebase_mapper):
         """advance_wave should move from wave 0 to wave 1 if gate criteria pass."""
-        from services import wave_gate_service as wgs
+        from merged_agentic_swarm.services import wave_gate_service as wgs
         original_mapper = wgs.default_codebase_mapper
         wgs.default_codebase_mapper = isolated_codebase_mapper
 
@@ -66,7 +66,7 @@ class TestWaveGateController:
 
     def test_advance_wave_beyond_all(self, temp_dir, isolated_codebase_mapper):
         """advance_wave should complete after wave 3."""
-        from services import wave_gate_service as wgs
+        from merged_agentic_swarm.services import wave_gate_service as wgs
         original_mapper = wgs.default_codebase_mapper
         wgs.default_codebase_mapper = isolated_codebase_mapper
 
@@ -83,7 +83,7 @@ class TestWaveGateController:
         """Subtasks producing output within owned paths should have no violations."""
         # Override base dir so it finds our owner map
         # Monkey-patch _check_ownership's base path resolution
-        import services.wave_gate_service as wave_mod
+        import merged_agentic_swarm.services.wave_gate_service as wave_mod
         original_dir = os.path.dirname(os.path.dirname(os.path.abspath(wave_mod.__file__)))
         # We can't easily mock os.path.dirname chain, so test the logic directly
         subtasks = [
@@ -119,7 +119,7 @@ class TestWaveGateController:
         assert isinstance(reasons, list)
 
     def test_advance_wave_sets_timestamps(self, temp_dir, isolated_codebase_mapper):
-        from services import wave_gate_service as wgs
+        from merged_agentic_swarm.services import wave_gate_service as wgs
         original_mapper = wgs.default_codebase_mapper
         wgs.default_codebase_mapper = isolated_codebase_mapper
         try:

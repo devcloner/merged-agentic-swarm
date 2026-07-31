@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-31T12:31:14Z",
+  "generated_at": "2026-07-31T21:05:24Z",
   "hostname": "hirtef",
   "script_version": "1.0.0",
   "os": {
@@ -24,11 +24,6 @@
       "port": "22653",
       "address": "127.0.0.1:22653",
       "process": "node"
-    },
-    {
-      "port": "6389",
-      "address": "127.0.0.1:6389",
-      "process": "agy"
     },
     {
       "port": "24099",
@@ -144,11 +139,6 @@
       "port": "9847",
       "address": "127.0.0.1:9847",
       "process": "node"
-    },
-    {
-      "port": "27623",
-      "address": "127.0.0.1:27623",
-      "process": "agy"
     },
     {
       "port": "27347",
@@ -393,19 +383,19 @@
       "command": "/home/ubuntu/.local/share/uv/tools/free-claude-code/bin/python /home/ubuntu/.local/bin/fcc-claude"
     },
     {
-      "pid": "1052844",
+      "pid": "1503036",
       "user": "ubuntu",
       "command": "/home/ubuntu/.local/share/uv/tools/free-claude-code/bin/python /home/ubuntu/.local/bin/fcc-claude"
     },
     {
-      "pid": "1070852",
+      "pid": "1526882",
       "user": "70",
-      "command": "postgres: cliproxyapi cliproxyapi 172.18.0.2(36736) idle"
+      "command": "postgres: cliproxyapi cliproxyapi 172.18.0.2(37448) idle"
     },
     {
-      "pid": "1070922",
+      "pid": "1526982",
       "user": "ubuntu",
-      "command": "/bin/bash -c source /home/ubuntu/fcc-gh-clone/.claude-isolated/shell-snapshots/snapshot-bash-1785500360942-x5bgfl.sh 2>/dev/null || true && shopt -u extglob 2>/dev/null || true && { \\builtin unalias -- 'unsetenv'; \\builtin unset -f -- 'unsetenv'; } >/dev/null 2>&1 || true && eval 'bash /home/ubuntu/scripts/agentic/run_smoke_workflow.sh 2>&1' < /dev/null && pwd -P >| /home/ubuntu/.fcc-tmp/claude-717d-cwd"
+      "command": "/bin/bash -c source /home/ubuntu/fcc-gh-clone/.claude-isolated/shell-snapshots/snapshot-bash-1785531270238-41davh.sh 2>/dev/null || true && shopt -u extglob 2>/dev/null || true && { \\builtin unalias -- 'unsetenv'; \\builtin unset -f -- 'unsetenv'; } >/dev/null 2>&1 || true && eval 'bash scripts/agentic/run_smoke_workflow.sh 2>&1' < /dev/null && pwd -P >| /home/ubuntu/.fcc-tmp/claude-de57-cwd"
     }
   ],
   "opencode": {
@@ -436,9 +426,9 @@
   },
   "registries": {
     "directory": "/home/ubuntu/docs/agentic/registry",
-    "knowledge_jsonl_lines": 44,
-    "agents_jsonl_lines": 13,
-    "chain_jsonl_lines": 11,
+    "knowledge_jsonl_lines": 34,
+    "agents_jsonl_lines": 8,
+    "chain_jsonl_lines": 10,
     "progress_json_lines": 274
   },
   "sub_agent_mcp": {

@@ -9,7 +9,7 @@ import json
 import time
 from unittest.mock import MagicMock, patch
 
-from providers.multi_provider_fabric import (
+from merged_agentic_swarm.providers.multi_provider_fabric import (
     MultiProviderFabric,
     _circuit_breaker,
     _circuit_open_until,
@@ -59,8 +59,8 @@ class TestFormatConversion:
 
 class TestRouteBuilding:
     def setup_method(self):
-        import providers.multi_provider_fabric
-        providers.multi_provider_fabric._last_successful_provider = None
+        import merged_agentic_swarm.providers.multi_provider_fabric
+        merged_agentic_swarm.providers.multi_provider_fabric._last_successful_provider = None
         self.fabric = MultiProviderFabric()
 
     def test_build_route_list_default(self):
@@ -69,7 +69,7 @@ class TestRouteBuilding:
         assert routes[0]["provider"] == "fcc-proxy"  # default first
 
     def test_build_route_list_promotes_last_successful(self):
-        import providers.multi_provider_fabric as mpf
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
         mpf._last_successful_provider = "groq"
         routes = self.fabric._build_route_list("claude-3-5-sonnet")
         assert routes[0]["provider"] == "groq"
@@ -110,7 +110,7 @@ class TestCircuitBreaker:
 
     def test_perma_ban_expiry_clears(self):
         """Provider should be retried after perma-ban duration expires."""
-        import providers.multi_provider_fabric as mpf
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
         mpf._permanently_dead.clear()
         mpf._circuit_open_until.clear()
         mpf._circuit_breaker.clear()
@@ -132,7 +132,7 @@ class TestDispatchRequest:
 
     def _block_all_providers(self):
         """Block all real providers so dispatch falls to simulation."""
-        import providers.multi_provider_fabric as mpf
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
         for route in mpf.MODEL_FABRIC_ROUTES.get("claude-3-7-sonnet", []):
             mpf._permanently_dead[route["provider"]] = time.time() + 86400
 
@@ -168,7 +168,7 @@ class TestDispatchRequest:
         mock_urlopen.return_value = mock_response
 
         _permanently_dead.clear()
-        import providers.multi_provider_fabric as mpf
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
         mpf._permanently_dead.clear()
         mpf._circuit_breaker.clear()
         mpf._circuit_open_until.clear()

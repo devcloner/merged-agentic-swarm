@@ -9,7 +9,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-ADAPTER="$ROOT/services/task_spine_adapter.py"
+ADAPTER="$ROOT/src/merged_agentic_swarm/services/task_spine_adapter.py"
 LOCAL_STATE="${TASK_SPINE_STATE:-$HOME/.taskmaster/tasks/task_spine.json}"
 
 # Colours
@@ -55,9 +55,9 @@ adapter_call() {
         args="${args}${arg}"
     done
     python3 -c "
-import json, sys
-sys.path.insert(0, '${ROOT}')
-from services.task_spine_adapter import TaskSpineStore
+import json, os, sys
+sys.path.insert(0, os.path.join('${ROOT}', 'src'))
+from merged_agentic_swarm.services.task_spine_adapter import TaskSpineStore
 a = TaskSpineStore('${LOCAL_STATE}')
 result = a.${method}(${args})
 print(json.dumps(result, indent=2))
@@ -155,9 +155,9 @@ fi
 banner "Step 5 — Verify persistence (fresh load)"
 
 PERSIST_JSON=$(python3 -c "
-import json, sys
-sys.path.insert(0, '${ROOT}')
-from services.task_spine_adapter import TaskSpineStore
+import json, os, sys
+sys.path.insert(0, os.path.join('${ROOT}', 'src'))
+from merged_agentic_swarm.services.task_spine_adapter import TaskSpineStore
 a2 = TaskSpineStore('${LOCAL_STATE}')
 t = a2.inspect('${TASK_ID}')
 print(json.dumps(t, indent=2))

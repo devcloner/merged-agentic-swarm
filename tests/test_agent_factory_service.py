@@ -7,18 +7,18 @@ Coverage: ChainRegistry (load, save, register_spawn), DurableAgentFactory
 import os
 import time
 
-from models.agent_models import AgentSpec, AgentType, WorkerRole
+from merged_agentic_swarm.models.agent_models import AgentSpec, AgentType, WorkerRole
 
 
 class TestChainRegistry:
     def test_default_registry(self, temp_dir):
-        from services.agent_factory_service import ChainRegistry
+        from merged_agentic_swarm.services.agent_factory_service import ChainRegistry
         reg_file = os.path.join(temp_dir, "chain.json")
         reg = ChainRegistry(registry_file=reg_file)
         assert reg.entries == []
 
     def test_register_spawn(self, temp_dir):
-        from services.agent_factory_service import ChainRegistry
+        from merged_agentic_swarm.services.agent_factory_service import ChainRegistry
         reg_file = os.path.join(temp_dir, "chain.json")
         reg = ChainRegistry(registry_file=reg_file)
         entry = reg.register_spawn(
@@ -31,7 +31,7 @@ class TestChainRegistry:
         assert len(reg.entries) == 1
 
     def test_persists_across_loads(self, temp_dir):
-        from services.agent_factory_service import ChainRegistry
+        from merged_agentic_swarm.services.agent_factory_service import ChainRegistry
         reg_file = os.path.join(temp_dir, "chain.json")
         reg1 = ChainRegistry(registry_file=reg_file)
         reg1.register_spawn("L-001", "a-001", AgentType.HOT_MICRO_SPECIALIST, "test")
@@ -40,7 +40,7 @@ class TestChainRegistry:
         assert len(reg2.entries) == 1
 
     def test_register_spawn_with_parent(self, temp_dir):
-        from services.agent_factory_service import ChainRegistry
+        from merged_agentic_swarm.services.agent_factory_service import ChainRegistry
         reg_file = os.path.join(temp_dir, "chain.json")
         reg = ChainRegistry(registry_file=reg_file)
         parent = reg.register_spawn("L-001", "a-001", AgentType.COLD_DURABLE, "parent")
@@ -51,7 +51,7 @@ class TestChainRegistry:
         assert child.parent_entry_id == parent.entry_id
 
     def test_load_corrupted_file(self, temp_dir):
-        from services.agent_factory_service import ChainRegistry
+        from merged_agentic_swarm.services.agent_factory_service import ChainRegistry
         reg_file = os.path.join(temp_dir, "chain.json")
         with open(reg_file, "w") as f:
             f.write("not valid json")
@@ -61,7 +61,7 @@ class TestChainRegistry:
 
 class TestDurableAgentFactory:
     def test_purge_expired_removes_hot_agents(self, temp_dir, isolated_knowledge_cache, isolated_chain_registry):
-        from services.agent_factory_service import DurableAgentFactory
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
         factory = DurableAgentFactory(chain_registry=isolated_chain_registry)
 
         # Manually add an expired HOT agent
@@ -80,7 +80,7 @@ class TestDurableAgentFactory:
         assert "hot-expired" not in factory.active_hot_specialists
 
     def test_purge_expired_durable_untouched(self, temp_dir, isolated_chain_registry):
-        from services.agent_factory_service import DurableAgentFactory
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
         factory = DurableAgentFactory(chain_registry=isolated_chain_registry)
         durable = AgentSpec(
             id="cold-permanent", name="Durable",
@@ -95,8 +95,8 @@ class TestDurableAgentFactory:
         assert "cold-permanent" in factory.active_cold_agents
 
     def test_spawn_from_learning_cold(self, temp_dir, isolated_knowledge_cache, isolated_chain_registry):
-        import services.agent_factory_service as afs_mod
-        from services.agent_factory_service import DurableAgentFactory
+        import merged_agentic_swarm.services.agent_factory_service as afs_mod
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
         orig_cache = afs_mod.default_knowledge_cache
         afs_mod.default_knowledge_cache = isolated_knowledge_cache
         try:
@@ -111,8 +111,8 @@ class TestDurableAgentFactory:
             afs_mod.default_knowledge_cache = orig_cache
 
     def test_spawn_from_learning_hot(self, temp_dir, isolated_knowledge_cache, isolated_chain_registry):
-        import services.agent_factory_service as afs_mod
-        from services.agent_factory_service import DurableAgentFactory
+        import merged_agentic_swarm.services.agent_factory_service as afs_mod
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
         orig_cache = afs_mod.default_knowledge_cache
         afs_mod.default_knowledge_cache = isolated_knowledge_cache
         try:
@@ -126,8 +126,8 @@ class TestDurableAgentFactory:
             afs_mod.default_knowledge_cache = orig_cache
 
     def test_spawn_from_learning_with_force_type(self, temp_dir, isolated_knowledge_cache, isolated_chain_registry):
-        import services.agent_factory_service as afs_mod
-        from services.agent_factory_service import DurableAgentFactory
+        import merged_agentic_swarm.services.agent_factory_service as afs_mod
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
         orig_cache = afs_mod.default_knowledge_cache
         afs_mod.default_knowledge_cache = isolated_knowledge_cache
         try:
@@ -140,8 +140,8 @@ class TestDurableAgentFactory:
             afs_mod.default_knowledge_cache = orig_cache
 
     def test_spawn_from_learning_registers_in_chain(self, temp_dir, isolated_knowledge_cache, isolated_chain_registry):
-        import services.agent_factory_service as afs_mod
-        from services.agent_factory_service import DurableAgentFactory
+        import merged_agentic_swarm.services.agent_factory_service as afs_mod
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
         orig_cache = afs_mod.default_knowledge_cache
         afs_mod.default_knowledge_cache = isolated_knowledge_cache
         try:
@@ -153,7 +153,7 @@ class TestDurableAgentFactory:
             afs_mod.default_knowledge_cache = orig_cache
 
     def test_write_agent_spec_file_creates_md(self, temp_dir, isolated_knowledge_cache, isolated_chain_registry, monkeypatch):
-        from services.agent_factory_service import DurableAgentFactory
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
 
         # Point .claude/agents to temp dir
         monkeypatch.setattr("os.path.expanduser", lambda p: temp_dir)
@@ -180,7 +180,7 @@ class TestDurableAgentFactory:
         assert "LEARN-001" in content
 
     def test_write_agent_spec_file_skips_existing(self, temp_dir, isolated_chain_registry, monkeypatch):
-        from services.agent_factory_service import DurableAgentFactory
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
         monkeypatch.setattr("os.path.expanduser", lambda p: temp_dir)
 
         factory = DurableAgentFactory(chain_registry=isolated_chain_registry)
@@ -203,7 +203,7 @@ class TestDurableAgentFactory:
 
     def test_sync_agent_specs_missing_registry(self, isolated_chain_registry, monkeypatch, temp_dir):
         """sync_agent_specs should handle missing agents.jsonl gracefully."""
-        from services.agent_factory_service import DurableAgentFactory
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
         factory = DurableAgentFactory(chain_registry=isolated_chain_registry)
 
         # Mock os.path.exists so agents.jsonl looks missing to sync_agent_specs

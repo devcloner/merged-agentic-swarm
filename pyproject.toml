@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = []
 
 [tool.hatch.build.targets.wheel]
-packages = ["models/", "providers/", "proxy/", "services/", "tools/", "tests/"]
+packages = ["src/merged_agentic_swarm"]
 
 [build-system]
 requires = ["hatchling"]
@@ -26,3 +26,4 @@ line-length = 120
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]

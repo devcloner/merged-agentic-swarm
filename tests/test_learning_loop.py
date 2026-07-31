@@ -366,7 +366,7 @@ class TestRecordStep:
     """Step 2: RECORD — Write to hot cache (knowledge_cache.json)."""
 
     def test_record_to_knowledge_cache(self, temp_dir):
-        from tools.knowledge_cache import KnowledgeCache
+        from merged_agentic_swarm.tools.knowledge_cache import KnowledgeCache
 
         cache_file = os.path.join(temp_dir, "knowledge_cache.json")
         cache = KnowledgeCache(cache_file=cache_file, max_learnings=10)
@@ -392,7 +392,7 @@ class TestRecordStep:
         assert lid in data["learnings"]
 
     def test_record_dedup_identical_content(self, temp_dir):
-        from tools.knowledge_cache import KnowledgeCache
+        from merged_agentic_swarm.tools.knowledge_cache import KnowledgeCache
 
         cache_file = os.path.join(temp_dir, "knowledge_cache.json")
         cache = KnowledgeCache(cache_file=cache_file, max_learnings=10)
@@ -742,7 +742,7 @@ class TestFullLifecycle:
 
         # Step 2: Record (hot cache)
         cache_file = os.path.join(temp_dir, "hot_cache.json")
-        from tools.knowledge_cache import KnowledgeCache
+        from merged_agentic_swarm.tools.knowledge_cache import KnowledgeCache
         cache = KnowledgeCache(cache_file=cache_file, max_learnings=10)
         learning_id = cache.add_learning(
             title=entry["title"],
