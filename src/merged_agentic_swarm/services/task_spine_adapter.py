@@ -19,10 +19,9 @@ import json
 import os
 import sys
 import tempfile
-import time
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 # ---------------------------------------------------------------------------
@@ -56,7 +55,7 @@ class TaskRecord:
     blocks: list[str] = field(default_factory=list)
 
     def __post_init__(self):
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         if self.created_at is None:
             self.created_at = now
         if self.updated_at is None:
@@ -81,7 +80,7 @@ class TaskRecord:
         }
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "TaskRecord":
+    def from_dict(cls, d: dict[str, Any]) -> TaskRecord:
         return cls(
             id=d["id"],
             title=d["title"],
@@ -159,7 +158,7 @@ class TaskSpineStore:
         self._ensure_dir()
         with self._locked():
             if not os.path.exists(self.state_path):
-                self._write_atomic({"tasks": {}, "updated_at": datetime.now(timezone.utc).isoformat()})
+                self._write_atomic({"tasks": {}, "updated_at": datetime.now(UTC).isoformat()})
             return {"ok": True, "state_path": self.state_path, "exists": True}
 
     def create(self, title: str, description: str, priority: str = "P2",
@@ -172,7 +171,7 @@ class TaskSpineStore:
                 return {"ok": True, "task": data["tasks"][tid], "created": False, "message": "already exists"}
             task = TaskRecord(id=tid, title=title, description=description, priority=priority)
             data["tasks"][tid] = task.to_dict()
-            data["updated_at"] = datetime.now(timezone.utc).isoformat()
+            data["updated_at"] = datetime.now(UTC).isoformat()
             self._write_atomic(data)
             return {"ok": True, "task": task.to_dict(), "created": True}
 
@@ -191,11 +190,11 @@ class TaskSpineStore:
                     return {"ok": False, "error": f"Task '{task_id}' is blocked by unresovled tasks: {unresolved}"}
             task.status = "in_progress"
             task.worker_id = worker_id
-            task.updated_at = datetime.now(timezone.utc).isoformat()
+            task.updated_at = datetime.now(UTC).isoformat()
             if owned_paths:
                 task.owned_paths = owned_paths
             data["tasks"][task_id] = task.to_dict()
-            data["updated_at"] = datetime.now(timezone.utc).isoformat()
+            data["updated_at"] = datetime.now(UTC).isoformat()
             self._write_atomic(data)
             return {"ok": True, "task": task.to_dict()}
 
@@ -209,9 +208,9 @@ class TaskSpineStore:
             if evidence:
                 task.evidence_refs.append(evidence)
             task.status = "completed"
-            task.updated_at = datetime.now(timezone.utc).isoformat()
+            task.updated_at = datetime.now(UTC).isoformat()
             data["tasks"][task_id] = task.to_dict()
-            data["updated_at"] = datetime.now(timezone.utc).isoformat()
+            data["updated_at"] = datetime.now(UTC).isoformat()
             self._write_atomic(data)
             return {"ok": True, "task": task.to_dict()}
 
@@ -223,10 +222,10 @@ class TaskSpineStore:
                 return {"ok": False, "error": f"Task '{task_id}' not found"}
             task = TaskRecord.from_dict(data["tasks"][task_id])
             task.status = "failed"
-            task.evidence_refs.append({"error": error_message, "at": datetime.now(timezone.utc).isoformat()})
-            task.updated_at = datetime.now(timezone.utc).isoformat()
+            task.evidence_refs.append({"error": error_message, "at": datetime.now(UTC).isoformat()})
+            task.updated_at = datetime.now(UTC).isoformat()
             data["tasks"][task_id] = task.to_dict()
-            data["updated_at"] = datetime.now(timezone.utc).isoformat()
+            data["updated_at"] = datetime.now(UTC).isoformat()
             self._write_atomic(data)
             return {"ok": True, "task": task.to_dict()}
 
@@ -244,13 +243,13 @@ class TaskSpineStore:
                 for bid in blocked_by:
                     if bid in data["tasks"]:
                         bt = TaskRecord.from_dict(data["tasks"][bid])
-                        bt.updated_at = datetime.now(timezone.utc).isoformat()
+                        bt.updated_at = datetime.now(UTC).isoformat()
                         if task_id not in bt.blocks:
                             bt.blocks.append(task_id)
                             data["tasks"][bid] = bt.to_dict()
-            task.updated_at = datetime.now(timezone.utc).isoformat()
+            task.updated_at = datetime.now(UTC).isoformat()
             data["tasks"][task_id] = task.to_dict()
-            data["updated_at"] = datetime.now(timezone.utc).isoformat()
+            data["updated_at"] = datetime.now(UTC).isoformat()
             self._write_atomic(data)
             return {"ok": True, "task": task.to_dict()}
 
@@ -265,9 +264,9 @@ class TaskSpineStore:
             for k, v in fields.items():
                 if k in allowed and hasattr(task, k):
                     setattr(task, k, v)
-            task.updated_at = datetime.now(timezone.utc).isoformat()
+            task.updated_at = datetime.now(UTC).isoformat()
             data["tasks"][task_id] = task.to_dict()
-            data["updated_at"] = datetime.now(timezone.utc).isoformat()
+            data["updated_at"] = datetime.now(UTC).isoformat()
             self._write_atomic(data)
             return {"ok": True, "task": task.to_dict()}
 
@@ -297,16 +296,16 @@ class TaskSpineStore:
                 return {"ok": False, "error": f"Task '{task_id}' not found"}
             task = TaskRecord.from_dict(data["tasks"][task_id])
             task.evidence_refs.append(evidence)
-            task.updated_at = datetime.now(timezone.utc).isoformat()
+            task.updated_at = datetime.now(UTC).isoformat()
             data["tasks"][task_id] = task.to_dict()
-            data["updated_at"] = datetime.now(timezone.utc).isoformat()
+            data["updated_at"] = datetime.now(UTC).isoformat()
             self._write_atomic(data)
             return {"ok": True, "task": task.to_dict()}
 
     # ---- context manager ---------------------------------------------------
 
     class _LockedScope:
-        def __init__(self, store: "TaskSpineStore"):
+        def __init__(self, store: TaskSpineStore):
             self.store = store
 
         def __enter__(self):
@@ -316,7 +315,7 @@ class TaskSpineStore:
         def __exit__(self, *args):
             self.store._release_lock()
 
-    def _locked(self) -> "_LockedScope":
+    def _locked(self) -> _LockedScope:
         return self._LockedScope(self)
 
 

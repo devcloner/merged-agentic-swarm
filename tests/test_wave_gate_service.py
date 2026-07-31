@@ -64,7 +64,7 @@ class TestWaveGateController:
         finally:
             wgs.default_codebase_mapper = original_mapper
 
-    def test_advance_wave_beyond_all(self, temp_dir, isolated_codebase_mapper):
+    def test_advance_wave_beyond_all(self, temp_dir, isolated_codebase_mapper, owner_map_file):
         """advance_wave should complete after wave 3."""
         from merged_agentic_swarm.services import wave_gate_service as wgs
         original_mapper = wgs.default_codebase_mapper
@@ -84,7 +84,7 @@ class TestWaveGateController:
         # Override base dir so it finds our owner map
         # Monkey-patch _check_ownership's base path resolution
         import merged_agentic_swarm.services.wave_gate_service as wave_mod
-        original_dir = os.path.dirname(os.path.dirname(os.path.abspath(wave_mod.__file__)))
+        os.path.dirname(os.path.dirname(os.path.abspath(wave_mod.__file__)))
         # We can't easily mock os.path.dirname chain, so test the logic directly
         subtasks = [
             SubTask(id="ST-01", title="T", description="D",

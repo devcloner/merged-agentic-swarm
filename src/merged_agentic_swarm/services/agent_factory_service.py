@@ -5,10 +5,9 @@ Turns validated learnings into HOT micro-specialists or COLD durable agents, mai
 import json
 import logging
 import os
-import sys
 import time
-from datetime import datetime
-
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 from merged_agentic_swarm.models.agent_models import AgentSpec, AgentType, SpawnChainEntry, WorkerRole
@@ -105,7 +104,7 @@ class DurableAgentFactory:
         agent_type = agent_spec.get("type", "cold_durable")
         promoted_at = agent_spec.get("promoted_at", 0.0)
         try:
-            created_str = datetime.fromtimestamp(promoted_at).strftime("%Y-%m-%d %H:%M:%S UTC")
+            created_str = datetime.fromtimestamp(promoted_at, tz=UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
         except (OSError, ValueError):
             created_str = str(promoted_at)
 
@@ -154,10 +153,8 @@ class DurableAgentFactory:
         Returns the count of files actually created (skipped pre-existing files
         are not counted).
         """
-        registry_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "docs", "agentic", "registry", "agents.jsonl",
-        )
+        _repo_root = Path(__file__).resolve().parents[3]
+        registry_path = str(_repo_root / "docs" / "agentic" / "registry" / "agents.jsonl")
         count = 0
         if not os.path.exists(registry_path):
             logger.warning(f"Agent registry not found: {registry_path}")

@@ -6,9 +6,8 @@ import json
 import logging
 import os
 import re
-import sys
+import threading
 import time
-
 from typing import Any
 
 from merged_agentic_swarm.models.ledger_models import ObstaclePlaybookEntry, ProgressLogEntry, SuccessMarker
@@ -75,6 +74,7 @@ class ProgressLedgerService:
         self.log_entries: list[ProgressLogEntry] = []
         self.success_markers: list[SuccessMarker] = []
         self.playbook_engine = ObstaclePlaybookEngine()
+        self._lock = threading.Lock()
         self.load_ledger()
 
     def load_ledger(self):
@@ -95,45 +95,50 @@ class ProgressLedgerService:
                 "success_markers": [sm.to_dict() for sm in self.success_markers],
                 "task_master_snapshot": default_task_master.current_analysis.to_dict() if default_task_master.current_analysis else {}
             }
-            with open(self.ledger_file, "w", encoding="utf-8") as f:
+            # Atomic write: temp file → rename to avoid corruption on concurrent writes
+            tmp = self.ledger_file + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
+            os.replace(tmp, self.ledger_file)
         except Exception as e:
             logger.error(f"Failed saving progress ledger: {e}")
 
     def log_progress(self, task_id: str, subtask_id: str | None, worker_id: str, wave_id: int, action: str, status: str, tokens_used: int = 0, learning_generated: str | None = None, details: dict[str, Any] | None = None) -> ProgressLogEntry:
-        entry = ProgressLogEntry(
-            entry_id=f"LOG-{len(self.log_entries)+1:05d}",
-            timestamp=time.time(),
-            task_id=task_id,
-            subtask_id=subtask_id,
-            worker_id=worker_id,
-            wave_id=wave_id,
-            action=action,
-            status=status,
-            tokens_used=tokens_used,
-            learning_generated=learning_generated,
-            details=details or {}
-        )
-        self.log_entries.append(entry)
-        self.save_ledger()
-        logger.info(f"Progress Ledger logged: [{task_id}] {action} -> {status}")
-        return entry
+        with self._lock:
+            entry = ProgressLogEntry(
+                entry_id=f"LOG-{len(self.log_entries)+1:05d}",
+                timestamp=time.time(),
+                task_id=task_id,
+                subtask_id=subtask_id,
+                worker_id=worker_id,
+                wave_id=wave_id,
+                action=action,
+                status=status,
+                tokens_used=tokens_used,
+                learning_generated=learning_generated,
+                details=details or {}
+            )
+            self.log_entries.append(entry)
+            self.save_ledger()
+            logger.info(f"Progress Ledger logged: [{task_id}] {action} -> {status}")
+            return entry
 
     def record_success_marker(self, task_id: str, verifier_name: str, command: str | None = None, exit_code: int = 0, output_summary: str = "", command_executed: str | None = None) -> SuccessMarker:
-        cmd = command or command_executed
-        marker = SuccessMarker(
-            id=f"MARKER-{len(self.success_markers)+1:04d}",
-            task_id=task_id,
-            verifier_name=verifier_name,
-            command_executed=cmd,
-            exit_code=exit_code,
-            output_summary=output_summary,
-            timestamp=time.time()
-        )
-        self.success_markers.append(marker)
-        self.save_ledger()
-        logger.info(f"Recorded Success Marker {marker.id} for task {task_id}")
-        return marker
+        with self._lock:
+            cmd = command or command_executed
+            marker = SuccessMarker(
+                id=f"MARKER-{len(self.success_markers)+1:04d}",
+                task_id=task_id,
+                verifier_name=verifier_name,
+                command_executed=cmd,
+                exit_code=exit_code,
+                output_summary=output_summary,
+                timestamp=time.time()
+            )
+            self.success_markers.append(marker)
+            self.save_ledger()
+            logger.info(f"Recorded Success Marker {marker.id} for task {task_id}")
+            return marker
 
     def handle_task_failure(self, task_id: str, error_message: str) -> dict[str, Any]:
         """Processes a task failure through self-healing playbooks."""

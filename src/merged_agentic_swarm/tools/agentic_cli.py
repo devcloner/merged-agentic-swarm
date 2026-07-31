@@ -6,83 +6,103 @@ import argparse
 import json
 import logging
 import os
+import sys
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(message)s")
 logger = logging.getLogger("agentic_cli")
+
+# Resolve repo root relative to this file (tools/ → merged_agentic_swarm/ → src/ → repo_root)
+_REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def cmd_run(args):
     """Run the full orchestrator workflow."""
     from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
 
-    prd_path = args.prd or os.path.join(os.path.dirname(__file__), "..", ".taskmaster", "docs", "prd_agentic_codebase_optimization.md")
+    prd_path = args.prd or str(_REPO_ROOT / ".taskmaster" / "docs" / "prd_agentic_codebase_optimization.md")
     if not os.path.exists(prd_path):
         print(f"ERROR: PRD file not found at {prd_path}")
         sys.exit(1)
 
-    with open(prd_path) as f:
-        prd = f.read()
+    try:
+        with open(prd_path) as f:
+            prd = f.read()
 
-    orch = MultiLayeredAgenticOrchestrator(prd_title=args.title or "Merged Agentic Swarm OS")
-    result = orch.run_full_agentic_workflow(prd)
+        orch = MultiLayeredAgenticOrchestrator(prd_title=args.title or "Merged Agentic Swarm OS")
+        result = orch.run_full_agentic_workflow(prd)
 
-    print()
-    print("=" * 60)
-    print("ORCHESTRATOR RESULT")
-    print("=" * 60)
-    print(f"  Status:          {result.get('status', '?')}")
-    print(f"  Waves completed: {result.get('waves_completed', '?')}")
-    print(f"  Epics completed: {result.get('epics_completed', '?')}")
-    print(f"  Success markers: {result.get('total_success_markers', '?')}")
-    print(f"  Chain entries:   {result.get('chain_registry_entries', '?')}")
-    cp = result.get("cold_path", {})
-    if cp:
-        print(f"  Cold-path:       {cp.get('total_knowledge_records', 0)} knowledge, "
-              f"{cp.get('total_durable_agents', 0)} agents promoted")
-    print()
-
-    if args.verbose:
-        print("Full result:")
-        print(json.dumps(result, indent=2, default=str))
         print()
-    return result
+        print("=" * 60)
+        print("ORCHESTRATOR RESULT")
+        print("=" * 60)
+        print(f"  Status:          {result.get('status', '?')}")
+        print(f"  Waves completed: {result.get('waves_completed', '?')}")
+        print(f"  Epics completed: {result.get('epics_completed', '?')}")
+        print(f"  Success markers: {result.get('total_success_markers', '?')}")
+        print(f"  Chain entries:   {result.get('chain_registry_entries', '?')}")
+        cp = result.get("cold_path", {})
+        if cp:
+            print(f"  Cold-path:       {cp.get('total_knowledge_records', 0)} knowledge, "
+                  f"{cp.get('total_durable_agents', 0)} agents promoted")
+        print()
+
+        if args.verbose:
+            print("Full result:")
+            print(json.dumps(result, indent=2, default=str))
+            print()
+        return result
+    except Exception as e:
+        logger.exception("Orchestrator workflow failed")
+        print(f"ERROR: Workflow failed: {e}")
+        sys.exit(1)
 
 
 def cmd_status(args):
     """Show current system status."""
-    progress_path = args.progress or os.path.join(os.path.dirname(__file__), "..", "docs", "agentic", "registry", "progress.json")
+    reg_dir = _REPO_ROOT / "docs" / "agentic" / "registry"
+    progress_path = args.progress or str(reg_dir / "progress.json")
     if os.path.exists(progress_path):
-        with open(progress_path) as f:
-            progress = json.load(f)
-        print("=" * 60)
-        print("SYSTEM STATUS")
-        print("=" * 60)
-        print(f"  Overall completion: {progress.get('overall_completion_pct', '?')}%")
-        for phase, status in progress.get("phase_status", {}).items():
-            print(f"  {phase}: {status.get('completion_pct', '?')}% "
-                  f"[{status.get('color', '?')}] — {status.get('status', '?')}")
-        print(f"  Blockers: {len(progress.get('blockers', []))}")
-        for i, b in enumerate(progress.get("blockers", []), 1):
-            print(f"    {i}. {b[:110]}...")
-        milestones = progress.get("milestone_history", [])
-        print(f"  Milestones ({len(milestones)}):")
-        for m in milestones:
-            print(f"    • {m.get('milestone', '?')} — {m.get('status', '?')}")
+        try:
+            with open(progress_path) as f:
+                progress = json.load(f)
+            print("=" * 60)
+            print("SYSTEM STATUS")
+            print("=" * 60)
+            print(f"  Overall completion: {progress.get('overall_completion_pct', '?')}%")
+            for phase, status in progress.get("phase_status", {}).items():
+                print(f"  {phase}: {status.get('completion_pct', '?')}% "
+                      f"[{status.get('color', '?')}] — {status.get('status', '?')}")
+            print(f"  Blockers: {len(progress.get('blockers', []))}")
+            for i, b in enumerate(progress.get("blockers", []), 1):
+                print(f"    {i}. {b[:110]}...")
+            milestones = progress.get("milestone_history", [])
+            print(f"  Milestones ({len(milestones)}):")
+            for m in milestones:
+                print(f"    • {m.get('milestone', '?')} — {m.get('status', '?')}")
+        except Exception as e:
+            print(f"ERROR reading progress.json: {e}")
     else:
         print("No progress.json found. Run the orchestrator first.")
 
     for reg in ["knowledge.jsonl", "agents.jsonl", "chain.jsonl"]:
-        path = os.path.join(os.path.dirname(__file__), "..", "docs", "agentic", "registry", reg)
-        if os.path.exists(path):
-            with open(path) as f:
-                count = sum(1 for l in f if l.strip())
-            print(f"  {reg}: {count} entries")
+        path = reg_dir / reg
+        if path.exists():
+            try:
+                with open(path) as f:
+                    count = sum(1 for l in f if l.strip())
+                print(f"  {reg}: {count} entries")
+            except Exception as e:
+                print(f"  {reg}: ERROR ({e})")
 
-    chain_path = os.path.join(os.path.dirname(__file__), "..", ".taskmaster", "tasks", "spawn_chain_registry.json")
-    if os.path.exists(chain_path):
-        with open(chain_path) as f:
-            chain = json.load(f)
-        print(f"  spawn_chain_registry: {len(chain)} entries")
+    chain_path = _REPO_ROOT / ".taskmaster" / "tasks" / "spawn_chain_registry.json"
+    if chain_path.exists():
+        try:
+            with open(chain_path) as f:
+                chain = json.load(f)
+            print(f"  spawn_chain_registry: {len(chain)} entries")
+        except Exception as e:
+            print(f"  spawn_chain_registry: ERROR ({e})")
     print()
 
 
@@ -91,17 +111,23 @@ def cmd_promote(args):
     from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
     from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
 
-    orch = MultiLayeredAgenticOrchestrator()
-    result = orch._promote_cold_path(phase_label="manual_cli")
-    print(f"Promoted: {result.get('promoted_knowledge', 0)} knowledge, "
-          f"{result.get('promoted_agents', 0)} agents")
-    for reg in ["knowledge.jsonl", "agents.jsonl", "chain.jsonl"]:
-        path = os.path.join(os.path.dirname(__file__), "..", "docs", "agentic", "registry", reg)
-        if os.path.exists(path):
-            with open(path) as f:
-                count = sum(1 for l in f if l.strip())
-            print(f"  {reg}: {count} entries")
-    print(f"  hot cache: {len(default_knowledge_cache.learnings)} learnings")
+    reg_dir = _REPO_ROOT / "docs" / "agentic" / "registry"
+    try:
+        orch = MultiLayeredAgenticOrchestrator()
+        result = orch._promote_cold_path(phase_label="manual_cli")
+        print(f"Promoted: {result.get('promoted_knowledge', 0)} knowledge, "
+              f"{result.get('promoted_agents', 0)} agents")
+        for reg in ["knowledge.jsonl", "agents.jsonl", "chain.jsonl"]:
+            path = reg_dir / reg
+            if path.exists():
+                with open(path) as f:
+                    count = sum(1 for l in f if l.strip())
+                print(f"  {reg}: {count} entries")
+        print(f"  hot cache: {len(default_knowledge_cache.learnings)} learnings")
+    except Exception as e:
+        logger.exception("Promotion failed")
+        print(f"ERROR: Promotion failed: {e}")
+        sys.exit(1)
 
 
 def cmd_config(args):
@@ -132,11 +158,11 @@ def main():
         description="Merged Agentic Swarm CLI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""Examples:
-  python3 tools/agentic_cli.py run
-  python3 tools/agentic_cli.py run --verbose
-  python3 tools/agentic_cli.py status
-  python3 tools/agentic_cli.py promote
-  python3 tools/agentic_cli.py config
+  agentic-cli run
+  agentic-cli run --verbose
+  agentic-cli status
+  agentic-cli promote
+  agentic-cli config
         """)
     sub = parser.add_subparsers(dest="command")
     p_run = sub.add_parser("run", help="Run full orchestrator workflow")

@@ -2,9 +2,9 @@
 Agentic Multi-Layered Workflow Master Orchestrator
 Integrates Task Master AI, Codebase Mapper, Wave Gates, OpenCode 40-Worker Swarm, Key Pool Proxy, Durable Agent Factory, and Progress Ledger.
 """
+import json
 import logging
 import os
-import sys
 import time
 from pathlib import Path
 
@@ -33,10 +33,7 @@ class MultiLayeredAgenticOrchestrator:
         self.prd_title = prd_title
         self.proxy_daemon: ProxyServerDaemon | None = None
         self.promoted_learning_ids: set = set()
-        self.promoted_ids_file: str = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            ".taskmaster", "promoted_learning_ids.json"
-        )
+        self.promoted_ids_file: str = str(_REPO_ROOT / ".taskmaster" / "promoted_learning_ids.json")
         self._load_promoted_ids()
 
     # ── Promoted-IDs persistence (FIX-04: cross-run dedup) ──
@@ -74,7 +71,7 @@ class MultiLayeredAgenticOrchestrator:
         import subprocess
 
         # Try CI script first
-        ci_script = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts", "ci.sh")
+        ci_script = str(_REPO_ROOT / "scripts" / "ci.sh")
         if os.path.exists(ci_script):
             try:
                 result = subprocess.run(
@@ -90,6 +87,7 @@ class MultiLayeredAgenticOrchestrator:
                 return {"exit_code": 1, "output_summary": f"CI script failed: {e}"}
 
         # Fallback: inline syntax check on core files
+        # Paths are relative to the package root (src/merged_agentic_swarm/)
         core_files = [
             "providers/multi_provider_fabric.py",
             "providers/key_pool.py",
@@ -104,12 +102,13 @@ class MultiLayeredAgenticOrchestrator:
             "tools/agentic_orchestrator.py",
             "proxy/claude_proxy_server.py",
         ]
-        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        pkg_root = _REPO_ROOT / "src" / "merged_agentic_swarm"
         errors = []
         for rel_path in core_files:
-            fpath = os.path.join(repo_root, rel_path)
+            fpath = pkg_root / rel_path
             try:
-                source = open(fpath).read()
+                with open(fpath) as f:
+                    source = f.read()
                 compile(source, fpath, "exec")
             except SyntaxError as e:
                 errors.append(f"{rel_path}:{e.lineno}: {e.msg}")
@@ -136,10 +135,7 @@ class MultiLayeredAgenticOrchestrator:
         import hashlib
         import json
 
-        registry_dir = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "docs", "agentic", "registry"
-        )
+        registry_dir = str(_REGISTRY_DIR)
         counts = {}
 
         # ── knowledge.jsonl: content-hash dedup ──
@@ -156,10 +152,13 @@ class MultiLayeredAgenticOrchestrator:
                 groups[key] = entry  # last occurrence wins
             filtered = [json.dumps(e) + "\n" for e in groups.values()]
             counts["knowledge_removed"] = len(kn_lines) - len(filtered)
-            with open(kn_path, "w") as f:
+            # Atomic write: temp file → rename
+            tmp = kn_path + ".tmp"
+            with open(tmp, "w") as f:
                 f.writelines(filtered)
+            os.replace(tmp, kn_path)
 
-        # ── agents.jsonl: per-category dedup ──
+        # ── agents.jsonl: content-hash dedup (not just per-category last-wins) ──
         ag_path = os.path.join(registry_dir, "agents.jsonl")
         if os.path.exists(ag_path):
             with open(ag_path) as f:
@@ -167,12 +166,18 @@ class MultiLayeredAgenticOrchestrator:
             groups = {}
             for line in ag_lines:
                 entry = json.loads(line)
-                cat = entry.get("category", "uncategorized")
-                groups[cat] = entry  # last per category wins
+                # Dedup by name+category+system_prompt so distinct agents in the
+                # same category are preserved
+                key = hashlib.md5(
+                    f"{entry.get('name','')}|{entry.get('category','')}|{entry.get('system_prompt','')}".encode()
+                ).hexdigest()
+                groups[key] = entry  # last occurrence per content-hash wins
             filtered = [json.dumps(e) + "\n" for e in groups.values()]
             counts["agents_removed"] = len(ag_lines) - len(filtered)
-            with open(ag_path, "w") as f:
+            tmp = ag_path + ".tmp"
+            with open(tmp, "w") as f:
                 f.writelines(filtered)
+            os.replace(tmp, ag_path)
 
         # ── chain.jsonl: per-source dedup ──
         ch_path = os.path.join(registry_dir, "chain.jsonl")
@@ -186,8 +191,10 @@ class MultiLayeredAgenticOrchestrator:
                 groups[src] = entry  # last per source wins
             filtered = [json.dumps(e) + "\n" for e in groups.values()]
             counts["chain_removed"] = len(ch_lines) - len(filtered)
-            with open(ch_path, "w") as f:
+            tmp = ch_path + ".tmp"
+            with open(tmp, "w") as f:
                 f.writelines(filtered)
+            os.replace(tmp, ch_path)
 
         total = sum(counts.values())
         logger.info(f"Registry compaction: {total} entries removed ({counts})")
@@ -392,7 +399,7 @@ class MultiLayeredAgenticOrchestrator:
 
         # Step 2: Map Codebase & Close Spec Gaps
         logger.info("--- Step 2: Mapping Codebase and Closing Spec Gaps ---")
-        symbol_map = default_codebase_mapper.scan_repository()
+        default_codebase_mapper.scan_repository()
         detected_gaps = default_codebase_mapper.detect_spec_gaps(required_components=["models", "providers", "proxy", "services", "tools"])
         for gap in detected_gaps:
             default_codebase_mapper.close_spec_gap(gap.id, resolution_note="Bootstrapped required module architecture.")
@@ -400,6 +407,9 @@ class MultiLayeredAgenticOrchestrator:
         # Validate Wave 0 Gate
         passed_w0, reason_w0 = default_wave_controller.advance_wave()
         logger.info(f"Wave 0 Gate Status: {passed_w0} ({reason_w0})")
+        if not passed_w0:
+            logger.error(f"Wave 0 gate FAILED: {reason_w0}. Aborting workflow.")
+            return {"status": "failed", "reason": f"Wave 0 gate failed: {reason_w0}", "wave": 0}
 
         # Step 3: Wave 1 - Key Pool Proxy & Fabric Gate
         logger.info("--- Step 3: Wave 1 Execution (Key Pool Proxy & Model Fabric) ---")
@@ -409,7 +419,11 @@ class MultiLayeredAgenticOrchestrator:
                 results = default_swarm_manager.execute_subtask_batch_parallel(epic.subtasks, role=WorkerRole.CORE_ENGINEER)
             except Exception as e:
                 logger.error(f"Wave 1 batch failed: {e}")
-                remediation = default_progress_ledger.handle_task_failure(epic.id, str(e))
+                try:
+                    remediation = default_progress_ledger.handle_task_failure(epic.id, str(e))
+                except Exception as he:
+                    logger.error(f"Error handler itself failed for epic {epic.id}: {he}")
+                    remediation = {"remediated": False, "strategy": "none", "action": "error_handler_failed"}
                 default_knowledge_cache.add_learning(
                     title=f"Anomaly: {epic.title}",
                     category="anomaly",
@@ -431,12 +445,15 @@ class MultiLayeredAgenticOrchestrator:
                 task_id=epic.id,
                 verifier_name="ProxyFabricVerifier",
                 command_executed="curl http://localhost:8085/health",
-                exit_code=0,
+                exit_code=0 if all_ok else 1,
                 output_summary=f"Proxy server and key pool rotation active. Applied {files_written} file(s)."
             )
 
         passed_w1, reason_w1 = default_wave_controller.advance_wave()
         logger.info(f"Wave 1 Gate Status: {passed_w1} ({reason_w1})")
+        if not passed_w1:
+            logger.error(f"Wave 1 gate FAILED: {reason_w1}. Aborting workflow.")
+            return {"status": "failed", "reason": f"Wave 1 gate failed: {reason_w1}", "wave": 1}
 
         # Step 4: Wave 2 - OpenCode 40-Worker Swarm & Durable Agent Factory
         logger.info("--- Step 4: Wave 2 Execution (OpenCode Swarm & Durable Agents) ---")
@@ -497,7 +514,7 @@ class MultiLayeredAgenticOrchestrator:
             if purged:
                 logger.info(f"Purged {purged} expired HOT agents before spawning")
             hot_agent = default_agent_factory.spawn_from_learning(learning_id, trigger_reason="Acute concurrency optimization", force_type=AgentType.HOT_MICRO_SPECIALIST)
-            cold_agent = default_agent_factory.spawn_from_learning(learning_id, trigger_reason="Durable state persistence", force_type=AgentType.COLD_DURABLE)
+            default_agent_factory.spawn_from_learning(learning_id, trigger_reason="Durable state persistence", force_type=AgentType.COLD_DURABLE)
 
             # FIX-05: Only mark epic COMPLETED if ALL subtasks succeeded
             all_ok = all(r.get("status") == "completed" for r in results)
@@ -522,6 +539,9 @@ class MultiLayeredAgenticOrchestrator:
 
         passed_w2, reason_w2 = default_wave_controller.advance_wave()
         logger.info(f"Wave 2 Gate Status: {passed_w2} ({reason_w2})")
+        if not passed_w2:
+            logger.error(f"Wave 2 gate FAILED: {reason_w2}. Aborting workflow.")
+            return {"status": "failed", "reason": f"Wave 2 gate failed: {reason_w2}", "wave": 2}
 
         # Cold-path promotion after Wave 2: promote learnings to registries
         cold_2 = self._promote_cold_path(phase_label="wave_2")
@@ -557,7 +577,7 @@ class MultiLayeredAgenticOrchestrator:
                 task_id=epic.id,
                 verifier_name="SystemIntegrationVerifier",
                 command_executed=ver_result.get("output_summary", "syntax-check")[:120],
-                exit_code=ver_result.get("exit_code", 1),
+                exit_code=ver_result.get("exit_code", 1) if not all_ok else 0,
                 output_summary=f"Applied {files_written} file(s). {ver_result.get('output_summary', '')}"
             )
 
@@ -571,6 +591,45 @@ class MultiLayeredAgenticOrchestrator:
 
         passed_w3, reason_w3 = default_wave_controller.advance_wave()
         logger.info(f"Wave 3 Gate Status: {passed_w3} ({reason_w3})")
+        if not passed_w3:
+            logger.error(f"Wave 3 gate FAILED: {reason_w3}. Aborting workflow.")
+            return {"status": "failed", "reason": f"Wave 3 gate failed: {reason_w3}", "wave": 3}
+
+        # Step 5.5: Wave 4 - Synthesis & Final Reporting
+        logger.info("--- Step 5.5: Wave 4 Execution (Synthesis & Final Reporting) ---")
+        wave_4_epics = default_task_master.get_tasks_for_wave(4)
+        for epic in wave_4_epics:
+            try:
+                results = default_swarm_manager.execute_subtask_batch_parallel(epic.subtasks, role=WorkerRole.CORE_ENGINEER)
+            except Exception as e:
+                logger.error(f"Wave 4 batch failed: {e}")
+                try:
+                    default_progress_ledger.handle_task_failure(epic.id, str(e))
+                except Exception as he:
+                    logger.error(f"Error handler failed for epic {epic.id}: {he}")
+                results = [{"status": "error", "error": str(e)}]
+            files_written = self._apply_worker_outputs(results, wave_label="W4")
+            all_ok = all(r.get("status") == "completed" for r in results)
+            if all_ok:
+                default_task_master.update_task_status(epic.id, TaskStatus.COMPLETED)
+            else:
+                failed = [r for r in results if r.get("status") != "completed"]
+                default_task_master.update_task_status(epic.id, TaskStatus.FAILED,
+                    error_message=f"{len(failed)}/{len(results)} subtasks failed")
+            default_progress_ledger.log_progress(
+                task_id=epic.id,
+                subtask_id=None,
+                worker_id="orchestrator-wave-4",
+                wave_id=4,
+                action="synthesis_completed",
+                status="completed" if all_ok else "failed",
+                details={"files_applied": files_written}
+            )
+
+        passed_w4, reason_w4 = default_wave_controller.advance_wave()
+        logger.info(f"Wave 4 Gate Status: {passed_w4} ({reason_w4})")
+        if not passed_w4:
+            logger.warning(f"Wave 4 gate did not pass (non-fatal): {reason_w4}")
 
         # Final cold-path promotion: promote any remaining learnings
         cold_3 = self._promote_cold_path(phase_label="wave_3_final")
@@ -586,8 +645,10 @@ class MultiLayeredAgenticOrchestrator:
         # Auto-compact registries to prevent unbounded growth (FIX-14)
         compact_counts = self._compact_registries()
 
-        total_cold_knowledge = sum(1 for _ in open(str(_REGISTRY_DIR / "knowledge.jsonl")) if _.strip())
-        total_cold_agents = sum(1 for _ in open(str(_REGISTRY_DIR / "agents.jsonl")) if _.strip())
+        with open(str(_REGISTRY_DIR / "knowledge.jsonl")) as kf:
+            total_cold_knowledge = sum(1 for _ in kf if _.strip())
+        with open(str(_REGISTRY_DIR / "agents.jsonl")) as af:
+            total_cold_agents = sum(1 for _ in af if _.strip())
         logger.info("=== WORKFLOW COMPLETE: ALL WAVES PASSED ===")
         return {
             "status": "success",

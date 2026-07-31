@@ -3,7 +3,6 @@ pytest fixtures and shared test utilities for Merged Agentic Swarm.
 """
 import json
 import os
-import sys
 import tempfile
 import time
 
@@ -126,11 +125,22 @@ def owner_map_file(temp_dir):
                 "pool_id": "domain-module-workers",
                 "owned_paths": ["services/*", "models/*"],
                 "forbidden_paths": ["external/*"],
-            }
+            },
+            {
+                "pool_id": "ast-type-hardening-workers",
+                "owned_paths": ["src/*"],
+                "forbidden_paths": ["external/*"],
+            },
+            {
+                "pool_id": "security-a11y-auditors",
+                "owned_paths": ["src/*"],
+                "forbidden_paths": ["external/*"],
+            },
         ]
     }
-    path = os.path.join(temp_dir, "ownership-map.json")
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    target_dir = os.path.join(temp_dir, ".opencode")
+    os.makedirs(target_dir, exist_ok=True)
+    path = os.path.join(target_dir, "ownership-map.json")
     with open(path, "w") as f:
         json.dump(owner_map, f, indent=2)
     return path

@@ -5,10 +5,17 @@ PRD optimization, task parsing, dependency resolution, and single source of trut
 import json
 import logging
 import os
-import sys
+import threading
 import time
 
-from merged_agentic_swarm.models.prd_models import EpicTask, PRDAnalysisResult, SpecGap, SubTask, TaskPriority, TaskStatus
+from merged_agentic_swarm.models.prd_models import (
+    EpicTask,
+    PRDAnalysisResult,
+    SpecGap,
+    SubTask,
+    TaskPriority,
+    TaskStatus,
+)
 from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric
 
 logger = logging.getLogger("task_master_service")
@@ -29,6 +36,7 @@ class TaskMasterService:
             state_file_path = os.path.expanduser("~/.taskmaster/tasks/tasks.json")
         self.state_file_path = state_file_path
         self.current_analysis: PRDAnalysisResult | None = None
+        self._lock = threading.Lock()
         self.load_state()
 
     def load_state(self):
@@ -62,8 +70,11 @@ class TaskMasterService:
         """Saves Task Master state as the authoritative single source of truth."""
         os.makedirs(os.path.dirname(self.state_file_path), exist_ok=True)
         if self.current_analysis:
-            with open(self.state_file_path, "w", encoding="utf-8") as f:
+            # Atomic write: temp file → rename to avoid corruption
+            tmp = self.state_file_path + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
                 json.dump(self.current_analysis.to_dict(), f, indent=2)
+            os.replace(tmp, self.state_file_path)
             logger.info(f"Saved Task Master state to {self.state_file_path}")
 
     def _estimate_turns(self, task_description: str) -> int:
@@ -227,8 +238,8 @@ Identify any missing requirements or spec gaps.
         analysis = PRDAnalysisResult(
             title=title,
             summary=f"PRD parsed into {len(epics)} epics with {sum(len(e.subtasks) for e in epics)} subtasks, "
-                    f"{total_turns} estimated turns. Fabric response was"
-                    f" {'used' if fabric_response_text else 'unavailable (fallback to structured baseline)'}.",
+                    f"{total_turns} estimated turns."
+                    f"{' Fabric AI response preview: ' + fabric_response_text[:300] if fabric_response_text else ' (fabric unavailable — using structured baseline).'}",
             epics=epics,
             spec_gaps=spec_gaps,
             total_estimated_turns=total_turns,
@@ -236,28 +247,32 @@ Identify any missing requirements or spec gaps.
         )
         if fabric_response_text:
             analysis.fabric_response_preview = fabric_response_text
+            # Store structured notes from AI for traceability; future phases
+            # will use this to drive dynamic epic generation instead of the
+            # current hardcoded baseline (see CLAUDE.md roadmap).
         self.current_analysis = analysis
         self.save_state()
         return analysis
 
     def update_task_status(self, task_id: str, new_status: TaskStatus, error_message: str | None = None):
         """Updates task status in state and syncs to file."""
-        if not self.current_analysis:
-            return
-        for epic in self.current_analysis.epics:
-            if epic.id == task_id:
-                epic.status = new_status
-                epic.updated_at = time.time()
-                break
-            for st in epic.subtasks:
-                if st.id == task_id:
-                    st.status = new_status
-                    if error_message:
-                        st.error_message = error_message
-                    if new_status == TaskStatus.COMPLETED:
-                        st.completed_at = time.time()
+        with self._lock:
+            if not self.current_analysis:
+                return
+            for epic in self.current_analysis.epics:
+                if epic.id == task_id:
+                    epic.status = new_status
+                    epic.updated_at = time.time()
                     break
-        self.save_state()
+                for st in epic.subtasks:
+                    if st.id == task_id:
+                        st.status = new_status
+                        if error_message:
+                            st.error_message = error_message
+                        if new_status == TaskStatus.COMPLETED:
+                            st.completed_at = time.time()
+                        break
+            self.save_state()
 
     def get_tasks_for_wave(self, wave_id: int) -> list[EpicTask]:
         if not self.current_analysis:

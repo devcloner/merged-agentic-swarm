@@ -7,12 +7,10 @@ import json
 import logging
 import os
 import re
-import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
-
 from typing import Any
 
 import requests

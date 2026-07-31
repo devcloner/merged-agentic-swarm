@@ -65,7 +65,7 @@ class TestSubTask:
 
 class TestEpicTask:
     def test_default_creation(self):
-        st1 = SubTask(id="ST-001", title="Sub 1", description="D")
+        SubTask(id="ST-001", title="Sub 1", description="D")
         epic = EpicTask(id="EPIC-01", title="Main Epic", description="Big work", wave_id=1)
         assert epic.priority == TaskPriority.P1_HIGH
         assert epic.status == TaskStatus.PENDING

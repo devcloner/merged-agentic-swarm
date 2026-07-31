@@ -78,7 +78,7 @@ class TestOpenCodeSwarmManager:
         """Getting a role with zero allocation should fall back to core engineer."""
         # Create config without HOT_MICRO_SPECIALIST (not in defaults)
         from merged_agentic_swarm.models.agent_models import WorkerPoolConfig
-        from merged_agentic_swarm.services.opencode_swarm_service import OpenCodeSwarmManager, WorkerPoolConfig
+        from merged_agentic_swarm.services.opencode_swarm_service import OpenCodeSwarmManager
         config = WorkerPoolConfig()
         manager = OpenCodeSwarmManager(config=config)
         # HOT_MICRO_SPECIALIST has no dedicated allocation

@@ -12,11 +12,6 @@ Covers:
 import json
 import os
 import time
-from pathlib import Path
-from unittest.mock import patch
-
-import pytest
-
 
 # ── Test Helpers ──────────────────────────────────────────────────────────────
 
@@ -218,7 +213,7 @@ None (null = permanent / no expiry)
         with open(progress_path) as f:
             try:
                 progress = json.load(f)
-            except (json.JSONDecodeError, IOError):
+            except (OSError, json.JSONDecodeError):
                 pass
     milestones = progress.get("milestone_history", [])
     milestones.append({
@@ -633,7 +628,7 @@ class TestRouteAndReuse:
             solution="Inspect type annotations, verify against runtime types, add missing casts.",
             tags=["types", "annotation", "runtime"],
         )
-        artifacts = _promote_learning(entry, "LEARN-1000", temp_dir)
+        _promote_learning(entry, "LEARN-1000", temp_dir)
         agents = _load_agents_from_registry(temp_dir)
 
         result = _simulate_reuse(agents[0], "Fix TypeError in services/wave_gate_service.py")
@@ -711,7 +706,7 @@ class TestDedup:
             tags=["async"],
         )
 
-        cold_path = os.path.join(temp_dir, "docs", "agentic", "registry", "knowledge.jsonl")
+        os.path.join(temp_dir, "docs", "agentic", "registry", "knowledge.jsonl")
         _promote_learning(entry_a, "LEARN-ALPHA-1", temp_dir)
         knowledge_path = os.path.join(temp_dir, "docs", "agentic", "registry", "knowledge.jsonl")
 

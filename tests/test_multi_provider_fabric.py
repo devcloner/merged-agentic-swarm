@@ -60,7 +60,7 @@ class TestFormatConversion:
 class TestRouteBuilding:
     def setup_method(self):
         import merged_agentic_swarm.providers.multi_provider_fabric
-        merged_agentic_swarm.providers.multi_provider_fabric._last_successful_provider = None
+        merged_agentic_swarm.providers.multi_provider_fabric._last_successful_provider.clear()
         self.fabric = MultiProviderFabric()
 
     def test_build_route_list_default(self):
@@ -70,7 +70,7 @@ class TestRouteBuilding:
 
     def test_build_route_list_promotes_last_successful(self):
         import merged_agentic_swarm.providers.multi_provider_fabric as mpf
-        mpf._last_successful_provider = "groq"
+        mpf._last_successful_provider = {"claude-3-5-sonnet": "groq"}
         routes = self.fabric._build_route_list("claude-3-5-sonnet")
         assert routes[0]["provider"] == "groq"
 
@@ -114,7 +114,7 @@ class TestCircuitBreaker:
         mpf._permanently_dead.clear()
         mpf._circuit_open_until.clear()
         mpf._circuit_breaker.clear()
-        mpf._last_successful_provider = None
+        mpf._last_successful_provider.clear()
 
         # Set expired perma-ban on litellm (past timestamp)
         mpf._permanently_dead["litellm"] = time.time() - 1
@@ -172,7 +172,7 @@ class TestDispatchRequest:
         mpf._permanently_dead.clear()
         mpf._circuit_breaker.clear()
         mpf._circuit_open_until.clear()
-        mpf._last_successful_provider = None
+        mpf._last_successful_provider.clear()
         fabric = MultiProviderFabric()
         result = fabric.dispatch_request("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
 

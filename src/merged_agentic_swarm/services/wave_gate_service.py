@@ -6,7 +6,6 @@ import fnmatch
 import json
 import logging
 import os
-import sys
 import time
 
 from merged_agentic_swarm.models.prd_models import SubTask
@@ -39,7 +38,13 @@ class WaveGateController:
                 name="Wave 3: Integration & Verification Gate",
                 gate_criteria=WaveGateCriteria(3, "Full Verification & Zero Defect", zero_syntax_errors=True, tests_passing=True)
             ),
+            4: WaveExecutionState(
+                wave_id=4,
+                name="Wave 4: Synthesis & Final Reporting Gate",
+                gate_criteria=WaveGateCriteria(4, "Synthesis & Reporting Complete", required_tasks_completed=True)
+            ),
         }
+        self._max_wave = 4
         self.current_wave: int = 0
         self.waves[0].status = WaveStatus.IN_PROGRESS
         self.waves[0].started_at = time.time()
@@ -54,8 +59,8 @@ class WaveGateController:
         and does not match any forbidden_paths. Returns a list of violation
         descriptions (empty = all valid).
         """
-        # Locate ownership-map.json
-        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # Locate ownership-map.json — use codebase mapper's repo root so tests can isolate
+        base = default_codebase_mapper.repo_root
         candidates = [
             os.path.join(base, ".opencode", "ownership-map.json"),
             os.path.join(base, "docs", "agentic", "registry", "ownership-map.json"),
@@ -164,7 +169,7 @@ class WaveGateController:
         logger.info(f"Gate PASSED for {curr_state.name}")
 
         # Advance to next wave if available
-        if self.current_wave < 3:
+        if self.current_wave < self._max_wave:
             self.current_wave += 1
             next_state = self.waves[self.current_wave]
             next_state.status = WaveStatus.IN_PROGRESS

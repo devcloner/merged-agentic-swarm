@@ -4,6 +4,7 @@ Supports multi-provider key rotation, quota handling, cooldown tracking, and hea
 """
 import logging
 import os
+import threading
 import time
 from dataclasses import dataclass
 from enum import Enum
@@ -42,6 +43,7 @@ class KeyPoolManager:
             env_file_path = os.path.expanduser("~/env.txt")
         self.env_file_path = env_file_path
         self.keys_by_provider: dict[str, list[APIKeyInfo]] = {}
+        self._lock = threading.Lock()
         self.load_keys()
 
     def load_keys(self):
@@ -148,6 +150,11 @@ class KeyPoolManager:
 
     def get_key(self, provider: str) -> APIKeyInfo | None:
         """Gets an active API key using round-robin / least-used strategy."""
+        with self._lock:
+            return self._get_key_unlocked(provider)
+
+    def _get_key_unlocked(self, provider: str) -> APIKeyInfo | None:
+        """Internal: must be called while holding self._lock."""
         now = time.time()
         keys = self.keys_by_provider.get(provider, [])
         if not keys:
@@ -180,21 +187,27 @@ class KeyPoolManager:
         return selected
 
     def mark_success(self, key_info: APIKeyInfo, latency_ms: float = 0.0, tokens: int = 0):
-        key_info.status = KeyStatus.ACTIVE
-        key_info.failure_count = 0
-        key_info.total_tokens += tokens
-        if key_info.avg_latency_ms == 0.0:
-            key_info.avg_latency_ms = latency_ms
-        else:
-            key_info.avg_latency_ms = (key_info.avg_latency_ms * 0.8) + (latency_ms * 0.2)
+        with self._lock:
+            key_info.status = KeyStatus.ACTIVE
+            key_info.failure_count = 0
+            key_info.total_tokens += tokens
+            if key_info.avg_latency_ms == 0.0:
+                key_info.avg_latency_ms = latency_ms
+            else:
+                key_info.avg_latency_ms = (key_info.avg_latency_ms * 0.8) + (latency_ms * 0.2)
 
     def mark_rate_limited(self, key_info: APIKeyInfo, cooldown_seconds: float = 60.0):
-        key_info.status = KeyStatus.COOLDOWN
-        key_info.cooldown_until = time.time() + cooldown_seconds
-        key_info.failure_count += 1
-        logger.warning(f"Key {key_info.key_id} for provider {key_info.provider} rate-limited. Cooldown for {cooldown_seconds}s.")
+        with self._lock:
+            key_info.status = KeyStatus.COOLDOWN
+            key_info.cooldown_until = time.time() + cooldown_seconds
+            key_info.failure_count += 1
+            logger.warning(f"Key {key_info.key_id} for provider {key_info.provider} rate-limited. Cooldown for {cooldown_seconds}s.")
 
     def get_summary(self) -> dict[str, Any]:
+        with self._lock:
+            return self._get_summary_unlocked()
+
+    def _get_summary_unlocked(self) -> dict[str, Any]:
         summary = {}
         now = time.time()
         for provider, keys in self.keys_by_provider.items():

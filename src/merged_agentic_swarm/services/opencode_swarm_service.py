@@ -9,12 +9,11 @@ import json
 import logging
 import os
 import re
-import sys
+import threading
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-
 from typing import Any
 
 from merged_agentic_swarm.models.agent_models import AgentSpec, AgentType, WorkerPoolConfig, WorkerPoolState, WorkerRole
@@ -271,6 +270,7 @@ class OpenCodeSwarmManager:
         self.workers: dict[str, AgentSpec] = {}
         self.ramp_controller = ConcurrencyRampController()
         self._round_robin_index: dict[str, int] = {}  # role → next worker index (FIX-12)
+        self._worker_lock = threading.Lock()  # protects _round_robin_index under ThreadPoolExecutor
         self._initialize_worker_pool()
 
     def _initialize_worker_pool(self):
@@ -295,7 +295,15 @@ class OpenCodeSwarmManager:
         logger.info(f"Initialized OpenCode Swarm pool with {len(self.workers)} workers across 7 roles.")
 
     def get_available_worker(self, role: WorkerRole) -> AgentSpec | None:
-        """Gets an available worker matching the specified role using round-robin (FIX-12)."""
+        """Gets an available worker matching the specified role using round-robin (FIX-12).
+
+        Thread-safe: protected by _worker_lock for use under ThreadPoolExecutor.
+        """
+        with self._worker_lock:
+            return self._get_available_worker_unlocked(role)
+
+    def _get_available_worker_unlocked(self, role: WorkerRole) -> AgentSpec | None:
+        """Internal: must be called while holding self._worker_lock."""
         worker_ids = self.state.workers_by_role.get(role.value, [])
         if worker_ids:
             idx = self._round_robin_index.get(role.value, 0)
@@ -307,7 +315,7 @@ class OpenCodeSwarmManager:
             idx = self._round_robin_index.get("core_engineer_fallback", 0)
             self._round_robin_index["core_engineer_fallback"] = (idx + 1) % len(fallback_ids)
             return self.workers.get(fallback_ids[idx])
-        return list(self.workers.values())[0] if self.workers else None
+        return next(iter(self.workers.values())) if self.workers else None
 
     def _get_pool_id(self, role: WorkerRole) -> str:
         """Map a WorkerRole to a pool-health bucket key."""

@@ -79,7 +79,16 @@ class KnowledgeCache:
             oldest_id = min(self.learnings, key=lambda lid: self.learnings[lid].get("created_at", 0))
             self.learnings.pop(oldest_id, None)
 
-        learning_id = f"LEARN-{len(self.learnings)+1:04d}"
+        # Generate unique ID using a counter to avoid collisions after eviction
+        # (len+1 would collide with existing IDs when items were evicted)
+        max_idx = 0
+        for lid in self.learnings:
+            if lid.startswith("LEARN-"):
+                try:
+                    max_idx = max(max_idx, int(lid.split("-")[1]))
+                except (ValueError, IndexError):
+                    pass
+        learning_id = f"LEARN-{max_idx + 1:04d}"
         self.learnings[learning_id] = {
             "id": learning_id,
             "title": title,

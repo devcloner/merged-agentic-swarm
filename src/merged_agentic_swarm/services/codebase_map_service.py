@@ -31,7 +31,7 @@ class CodebaseMapService:
             ".git", "node_modules", ".cache", ".cargo", ".rustup", "__pycache__", ".npm",
             ".gemini", ".local", "snap", ".atomic", ".aws", ".cloudcli", ".codex", ".config",
             ".cursor", ".docker", ".fcc", ".fcc-tmp", ".omo", ".pi", ".remember", ".serena",
-            "fcc-gh-clone", "claudecodeui", "Spotify-project-main"
+            "claudecodeui", "Spotify-project-main"
         }
 
         for root, dirs, files in os.walk(self.repo_root):
@@ -50,10 +50,13 @@ class CodebaseMapService:
                 logger.debug(f"Permission denied scanning {root}, skipping.")
                 continue
 
+        # Store up to FILE_LIST_MAX entries so spec-gap detection has broad
+        # coverage; large repos won't miss components due to truncation.
+        FILE_LIST_MAX = 10_000
         self.symbol_cache = {
             "total_files": len(file_tree),
             "python_files": len(symbol_index),
-            "file_list": file_tree[:200], # top sample
+            "file_list": file_tree[:FILE_LIST_MAX],
             "symbols": symbol_index
         }
         self._save_state()
@@ -73,9 +76,8 @@ class CodebaseMapService:
                 if isinstance(node, ast.Import):
                     for alias in node.names:
                         imports.append(alias.name)
-                elif isinstance(node, ast.ImportFrom):
-                    if node.module:
-                        imports.append(node.module)
+                elif isinstance(node, ast.ImportFrom) and node.module:
+                    imports.append(node.module)
 
             return {
                 "classes": classes,

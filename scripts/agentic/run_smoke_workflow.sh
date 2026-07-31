@@ -137,10 +137,15 @@ should_run_step() {
 
 is_critical_step() {
     local key="$1"
-    case "$key" in
-        discover|proxy|spine|worker1) return 0 ;;
-        *) return 1 ;;
-    esac
+    # Derive criticality from the STEPS array instead of a hardcoded list
+    for entry in "${STEPS[@]}"; do
+        local ek ec
+        IFS='|' read -r ek ec _ <<< "$entry"
+        if [[ "$ek" == "$key" ]]; then
+            [[ "$ec" == "critical" ]] && return 0 || return 1
+        fi
+    done
+    return 1  # unknown key → not critical
 }
 
 # ---------------------------------------------------------------------------
@@ -155,8 +160,10 @@ preflight() {
     # Ensure results directory exists
     mkdir -p "$(dirname "$RESULTS_FILE")"
 
-    # Ensure all referenced scripts exist (warn, don't fail, for sub-scripts)
-    local missing=0
+    # Ensure all referenced scripts exist — fail on missing critical scripts,
+    # only warn for non-critical ones.
+    local missing_critical=0
+    local missing_noncritical=0
     for entry in "${STEPS[@]}"; do
         local key critical desc cmd
         IFS='|' read -r key critical desc cmd <<< "$entry"
@@ -164,15 +171,23 @@ preflight() {
         local first_script="${cmd%% *}"
         if [[ "$first_script" == "$SCRIPT_DIR"/* ]]; then
             if [[ ! -x "$first_script" ]]; then
-                warn "Script not found or not executable: $first_script (step: $key)"
-                missing=1
+                if [[ "$critical" == "critical" ]]; then
+                    fail "Critical script missing: $first_script (step: $key)"
+                    missing_critical=1
+                else
+                    warn "Script not found: $first_script (step: $key)"
+                    missing_noncritical=1
+                fi
             fi
         fi
     done
 
-    if [[ $missing -eq 1 ]]; then
-        warn "Some sub-scripts are missing. Those steps will produce FAIL results."
-        warn "This is expected on first setup — create the sub-scripts first."
+    if [[ $missing_critical -eq 1 ]]; then
+        fail "One or more critical scripts are missing. Aborting."
+        exit 2
+    fi
+    if [[ $missing_noncritical -eq 1 ]]; then
+        warn "Some non-critical sub-scripts are missing. Those steps will produce FAIL results."
     fi
 
     echo ""

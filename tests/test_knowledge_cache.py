@@ -54,12 +54,11 @@ class TestKnowledgeCache:
         cache = KnowledgeCache(cache_file=cache_file, max_learnings=3)
         cache.learnings = {}  # clear any pre-loaded from disk
         lid1 = cache.add_learning("L1", "general", "S1")
-        lid2 = cache.add_learning("L2", "general", "S2")
-        lid3 = cache.add_learning("L3", "general", "S3")
-        lid4 = cache.add_learning("L4", "general", "S4")
-        # After eviction, L4 reuses a freed ID because _next_id is len-based,
-        # so we end up with 2 entries instead of 3
-        assert len(cache.learnings) == 2
+        cache.add_learning("L2", "general", "S2")
+        cache.add_learning("L3", "general", "S3")
+        cache.add_learning("L4", "general", "S4")
+        # After eviction, 3 items survive (IDs are max-based, no collision)
+        assert len(cache.learnings) == 3
         # L1 should be evicted (oldest)
         assert cache.get_learning(lid1) is None
 
@@ -119,7 +118,7 @@ class TestKnowledgeCache:
         lid = cache.add_learning("Expiring", "hot", "Fix", ttl_sec=0.001)
         time.sleep(0.01)
         # Add a new learning to trigger expiry check
-        lid2 = cache.add_learning("New", "general", "New solution")
+        cache.add_learning("New", "general", "New solution")
         # The expired learning's ID may be reused by the new entry due to len-based ID
         # generation. Check that the "Expiring" content is gone.
         expired = cache.get_learning(lid)

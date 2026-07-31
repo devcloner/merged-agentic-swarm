@@ -4,13 +4,10 @@ Routes requests across providers with priority fallbacks, format normalization, 
 """
 import json
 import logging
-import os
-import sys
 import threading
 import time
 import urllib.error
 import urllib.request
-
 from typing import Any
 
 from merged_agentic_swarm.providers.key_pool import default_key_pool
@@ -21,7 +18,7 @@ logger = logging.getLogger("model_fabric")
 _circuit_breaker: dict[str, int] = {}
 _circuit_open_until: dict[str, float] = {}
 _permanently_dead: dict[str, float] = {}  # provider -> ban-expiry timestamp
-_last_successful_provider: str | None = None
+_last_successful_provider: dict[str, str] = {}  # model_alias -> provider
 CIRCUIT_BREAKER_THRESHOLD = 3
 CIRCUIT_BREAKER_COOLDOWN = 120.0
 PERMA_BAN_DURATION = 86400.0  # 24h — don't re-try auth-failed providers for a day
@@ -44,13 +41,13 @@ def _record_failure(provider: str, http_code: int | None = None):
             )
 
 
-def _record_success(provider: str):
+def _record_success(provider: str, model_alias: str | None = None):
     """Record a provider success — reset circuit breaker and update last-working cache."""
-    global _last_successful_provider
     with _fabric_lock:
         _circuit_breaker[provider] = 0
         _circuit_open_until.pop(provider, None)
-        _last_successful_provider = provider
+        if model_alias:
+            _last_successful_provider[model_alias] = provider
 
 # Fallback Routing Table
 MODEL_FABRIC_ROUTES: dict[str, list[dict[str, str]]] = {
@@ -148,10 +145,11 @@ class MultiProviderFabric:
         }
 
     def _build_route_list(self, model_alias: str) -> list[dict[str, str]]:
-        """Build route list, promoting the last successful provider to the front."""
+        """Build route list, promoting the last successful provider for this alias to the front."""
         routes = list(MODEL_FABRIC_ROUTES.get(model_alias, MODEL_FABRIC_ROUTES["claude-3-7-sonnet"]))
-        if _last_successful_provider:
-            idx = next((i for i, r in enumerate(routes) if r["provider"] == _last_successful_provider), None)
+        last_provider = _last_successful_provider.get(model_alias)
+        if last_provider:
+            idx = next((i for i, r in enumerate(routes) if r["provider"] == last_provider), None)
             if idx is not None and idx > 0:
                 routes.insert(0, routes.pop(idx))
         return routes
@@ -214,7 +212,7 @@ class MultiProviderFabric:
                     tokens = resp_json.get("usage", {}).get("total_tokens", 0)
 
                     self.key_pool.mark_success(key_info, latency_ms=latency, tokens=tokens)
-                    _record_success(provider)
+                    _record_success(provider, model_alias=model_alias)
 
                     # If the response is already in Anthropic Messages format (e.g. fcc-proxy), return it directly.
                     if resp_json.get("type") == "message":
