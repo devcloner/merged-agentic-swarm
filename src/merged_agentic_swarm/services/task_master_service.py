@@ -24,7 +24,9 @@ class TaskMasterService:
         generator for this environment. It delegates to the model fabric instead.
       - See docs/agentic/STATE_PATH_NOTES.md for the full divergence analysis.
     """
-    def __init__(self, state_file_path: str = "/home/ubuntu/.taskmaster/tasks/tasks.json"):
+    def __init__(self, state_file_path: str | None = None):
+        if state_file_path is None:
+            state_file_path = os.path.expanduser("~/.taskmaster/tasks/tasks.json")
         self.state_file_path = state_file_path
         self.current_analysis: PRDAnalysisResult | None = None
         self.load_state()

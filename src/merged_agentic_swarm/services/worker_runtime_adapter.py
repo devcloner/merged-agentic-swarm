@@ -29,7 +29,7 @@ from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric
 
 logger = logging.getLogger("worker_runtime_adapter")
 
-OPENCODE_BIN = "/home/ubuntu/.opencode/bin/opencode"
+OPENCODE_BIN = os.path.expanduser("~/.opencode/bin/opencode")
 
 # ── Mode auto-detection ────────────────────────────────────────────────
 

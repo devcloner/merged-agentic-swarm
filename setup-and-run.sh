@@ -3,7 +3,7 @@
 # Adapted from blueprint §4 to match this environment's actual binaries.
 set -euo pipefail
 
-REPO_ROOT="${REPO_ROOT:-/home/ubuntu}"
+REPO_ROOT="${REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 PRD_INPUT_PATH="${PRD_INPUT_PATH:-$REPO_ROOT/.taskmaster/docs/prd_agentic_codebase_optimization.md}"
 SWARM_MAX_CONCURRENCY="${SWARM_MAX_CONCURRENCY:-40}"
 HUMAN_GATE_REQUIRED="${HUMAN_GATE_REQUIRED:-true}"

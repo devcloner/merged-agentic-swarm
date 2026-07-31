@@ -4,7 +4,7 @@
   "project": {
     "name": "Merged-Agentic-Codebase-Swarm",
     "description": "Claude Code governed, Task Master spine, OpenCode worker swarm, provider-aware proxy routing.",
-    "root_dir": "/home/ubuntu",
+    "root_dir": ".",
     "knowledge_graph_path": ".opencode/knowledge_cache.json",
     "task_master_state": ".taskmaster/tasks/tasks.json",
     "ownership_map": ".opencode/ownership-map.json",

@@ -68,7 +68,9 @@ class ObstaclePlaybookEngine:
         return {"remediated": False, "strategy": "none", "action": "No playbook match; escalated to Master Architect"}
 
 class ProgressLedgerService:
-    def __init__(self, ledger_file: str = "/home/ubuntu/.taskmaster/tasks/progress_ledger.json"):
+    def __init__(self, ledger_file: str | None = None):
+        if ledger_file is None:
+            ledger_file = os.path.expanduser("~/.taskmaster/tasks/progress_ledger.json")
         self.ledger_file = ledger_file
         self.log_entries: list[ProgressLogEntry] = []
         self.success_markers: list[SuccessMarker] = []

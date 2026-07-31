@@ -14,7 +14,7 @@ TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 # ── defaults ──────────────────────────────────────────────────────────
 MODE="auto"
 WORKERS=1
-OPENCODE_BIN="/home/ubuntu/.opencode/bin/opencode"
+OPENCODE_BIN="$HOME/.opencode/bin/opencode"
 
 # ── helpers ───────────────────────────────────────────────────────────
 die() { echo "ERROR: $*" >&2; exit 1; }

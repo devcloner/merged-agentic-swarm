@@ -37,7 +37,9 @@ class APIKeyInfo:
                 f"total_requests={self.total_requests})")
 
 class KeyPoolManager:
-    def __init__(self, env_file_path: str = "/home/ubuntu/env.txt"):
+    def __init__(self, env_file_path: str | None = None):
+        if env_file_path is None:
+            env_file_path = os.path.expanduser("~/env.txt")
         self.env_file_path = env_file_path
         self.keys_by_provider: dict[str, list[APIKeyInfo]] = {}
         self.load_keys()
@@ -62,7 +64,10 @@ class KeyPoolManager:
             gemini_keys.append(env_vars["GEMINI_API_KEY"])
         
         # Load from gemini-keys/working-keys.txt if available (also check misspelled legacy path)
-        for candidate in ("/home/ubuntu/gemini-keys/working-keys.txt", "/home/ubuntu/gemlni-keys/working-keys.txt"):
+        for candidate in (
+            os.path.expanduser("~/gemini-keys/working-keys.txt"),
+            os.path.expanduser("~/gemlni-keys/working-keys.txt"),
+        ):
             if os.path.exists(candidate):
                 working_keys_file = candidate
                 break

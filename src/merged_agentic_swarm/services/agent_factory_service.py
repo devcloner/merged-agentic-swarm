@@ -17,7 +17,9 @@ from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
 logger = logging.getLogger("agent_factory")
 
 class ChainRegistry:
-    def __init__(self, registry_file: str = "/home/ubuntu/.taskmaster/tasks/spawn_chain_registry.json"):
+    def __init__(self, registry_file: str | None = None):
+        if registry_file is None:
+            registry_file = os.path.expanduser("~/.taskmaster/tasks/spawn_chain_registry.json")
         self.registry_file = registry_file
         self.entries: list[SpawnChainEntry] = []
         self.load_registry()

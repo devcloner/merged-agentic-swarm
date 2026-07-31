@@ -7,9 +7,9 @@ set -euo pipefail
 # Use --json for machine-readable output.
 # ─────────────────────────────────────────────────────────────────────────
 
-REPO_ROOT="/home/ubuntu"
-OPENCODE_BIN="/home/ubuntu/.opencode/bin/opencode"
-TASKMASTER_CONFIG="/home/ubuntu/.taskmaster/config.json"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+OPENCODE_BIN="$HOME/.opencode/bin/opencode"
+TASKMASTER_CONFIG="$HOME/.taskmaster/config.json"
 REGISTRY_DIR="$REPO_ROOT/docs/agentic/registry"
 
 # Temp file for JSON accumulation

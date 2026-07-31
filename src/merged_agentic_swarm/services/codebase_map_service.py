@@ -13,7 +13,9 @@ from merged_agentic_swarm.models.prd_models import SpecGap
 logger = logging.getLogger("codebase_map_service")
 
 class CodebaseMapService:
-    def __init__(self, repo_root: str = "/home/ubuntu"):
+    def __init__(self, repo_root: str | None = None):
+        if repo_root is None:
+            repo_root = os.getcwd()
         self.repo_root = repo_root
         self.symbol_cache: dict[str, Any] = {}
         self.spec_gaps: list[SpecGap] = []

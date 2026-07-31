@@ -11,7 +11,9 @@ from typing import Any
 logger = logging.getLogger("knowledge_cache")
 
 class KnowledgeCache:
-    def __init__(self, cache_file: str = "/home/ubuntu/.opencode/knowledge_cache.json", max_learnings: int = 200):
+    def __init__(self, cache_file: str | None = None, max_learnings: int = 200):
+        if cache_file is None:
+            cache_file = os.path.expanduser("~/.opencode/knowledge_cache.json")
         self.cache_file = cache_file
         self.max_learnings = max_learnings
         self.learnings: dict[str, dict[str, Any]] = {}

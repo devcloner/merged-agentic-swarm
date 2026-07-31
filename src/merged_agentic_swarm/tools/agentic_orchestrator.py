@@ -6,6 +6,11 @@ import logging
 import os
 import sys
 import time
+from pathlib import Path
+
+# Resolve repo root relative to this file (tools/ → merged_agentic_swarm/ → src/ → repo_root)
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+_REGISTRY_DIR = _REPO_ROOT / "docs" / "agentic" / "registry"
 
 
 from typing import Any
@@ -255,9 +260,9 @@ class MultiLayeredAgenticOrchestrator:
         graduate to durable agent specs.
         """
 
-        knowledge_registry = "/home/ubuntu/docs/agentic/registry/knowledge.jsonl"
-        agents_registry = "/home/ubuntu/docs/agentic/registry/agents.jsonl"
-        chain_registry = "/home/ubuntu/docs/agentic/registry/chain.jsonl"
+        knowledge_registry = str(_REGISTRY_DIR / "knowledge.jsonl")
+        agents_registry = str(_REGISTRY_DIR / "agents.jsonl")
+        chain_registry = str(_REGISTRY_DIR / "chain.jsonl")
         now = time.time()
 
         # Collect unpromoted learnings from hot cache
@@ -581,8 +586,8 @@ class MultiLayeredAgenticOrchestrator:
         # Auto-compact registries to prevent unbounded growth (FIX-14)
         compact_counts = self._compact_registries()
 
-        total_cold_knowledge = sum(1 for _ in open("/home/ubuntu/docs/agentic/registry/knowledge.jsonl") if _.strip())
-        total_cold_agents = sum(1 for _ in open("/home/ubuntu/docs/agentic/registry/agents.jsonl") if _.strip())
+        total_cold_knowledge = sum(1 for _ in open(str(_REGISTRY_DIR / "knowledge.jsonl")) if _.strip())
+        total_cold_agents = sum(1 for _ in open(str(_REGISTRY_DIR / "agents.jsonl")) if _.strip())
         logger.info("=== WORKFLOW COMPLETE: ALL WAVES PASSED ===")
         return {
             "status": "success",

@@ -7,11 +7,11 @@ set -euo pipefail
 # printed to stdout as pretty-printed JSON. Secret values are redacted.
 # ─────────────────────────────────────────────────────────────────────────
 
-REPO_ROOT="/home/ubuntu"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUTPUT_DIR="$REPO_ROOT/config/runtime"
 OUTPUT_FILE="$OUTPUT_DIR/environment.generated.json"
-OPENCODE_BIN="/home/ubuntu/.opencode/bin/opencode"
-TASKMASTER_CONFIG="/home/ubuntu/.taskmaster/config.json"
+OPENCODE_BIN="$HOME/.opencode/bin/opencode"
+TASKMASTER_CONFIG="$HOME/.taskmaster/config.json"
 REGISTRY_DIR="$REPO_ROOT/docs/agentic/registry"
 
 # ── help ─────────────────────────────────────────────────────────────────
@@ -50,10 +50,10 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 
-REPO_ROOT = "/home/ubuntu"
-OPENCODE_BIN = "/home/ubuntu/.opencode/bin/opencode"
-TASKMASTER_CONFIG = "/home/ubuntu/.taskmaster/config.json"
-REGISTRY_DIR = "/home/ubuntu/docs/agentic/registry"
+REPO_ROOT = os.getcwd()
+OPENCODE_BIN = os.path.expanduser("~/.opencode/bin/opencode")
+TASKMASTER_CONFIG = os.path.expanduser("~/.taskmaster/config.json")
+REGISTRY_DIR = os.path.join(REPO_ROOT, "docs", "agentic", "registry")
 
 def run(cmd, **kwargs):
     """Run a command and return stdout, or a fallback string on failure."""
