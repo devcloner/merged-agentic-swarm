@@ -12,6 +12,7 @@ termix/
 deployments/
 docs/archive/
 tools/token-savior/
+src/merged_agentic_swarm/tools/token-savior/
 .opencode/bin/
 
 # ── Python ──────────────────────────────────────────────────────

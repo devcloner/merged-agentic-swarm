@@ -78,8 +78,8 @@ import sys
 import time
 import uuid
 
-# Point to the repo root so imports work
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
+# Point to src/ so merged_agentic_swarm imports work
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../src"))
 
 from merged_agentic_swarm.models.agent_models import AgentSpec, WorkerRole
 from merged_agentic_swarm.services.worker_runtime_adapter import get_runtime_adapter
