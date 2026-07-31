@@ -4,8 +4,9 @@ Tests for tools/agentic_cli.py
 Coverage: cmd_config and basic CLI parsing.
 """
 import os
-import json
+
 import pytest
+
 from tools.agentic_cli import cmd_config
 
 
@@ -26,8 +27,9 @@ class TestCmdConfig:
 
     def test_main_entry_points(self):
         """Verify argparse setup works for each subcommand."""
-        from tools.agentic_cli import main
         import sys
+
+        from tools.agentic_cli import main
         # Test that unknown commands exit
         with pytest.raises(SystemExit):
             sys.argv = ["agentic_cli.py", "unknown"]

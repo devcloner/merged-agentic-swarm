@@ -5,11 +5,11 @@ Coverage: ClaudeProxyHandler (do_GET, do_POST), ProxyServerDaemon
 (start, stop), JSON response helpers.
 """
 import json
-import time
+
 import pytest
-from http.server import HTTPServer
+
 from proxy.claude_proxy_server import (
-    ClaudeProxyHandler, ProxyServerDaemon, ThreadedHTTPServer,
+    ProxyServerDaemon,
 )
 
 

@@ -4,11 +4,10 @@ Tests for services/task_master_service.py
 Coverage: TaskMasterService — load_state, save_state, _estimate_turns,
 optimize_and_parse_prd, update_task_status, get_tasks_for_wave.
 """
-import os
 import json
-import time
-import pytest
-from models.prd_models import TaskStatus, TaskPriority
+import os
+
+from models.prd_models import TaskStatus
 
 
 class TestTaskMasterService:

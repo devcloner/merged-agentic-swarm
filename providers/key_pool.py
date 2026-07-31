@@ -2,13 +2,12 @@
 API Key Pool Manager & Key Rotator
 Supports multi-provider key rotation, quota handling, cooldown tracking, and health checks.
 """
+import logging
 import os
 import time
-import random
-import logging
+from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
+from typing import Any
 
 logger = logging.getLogger("key_pool")
 
@@ -40,7 +39,7 @@ class APIKeyInfo:
 class KeyPoolManager:
     def __init__(self, env_file_path: str = "/home/ubuntu/env.txt"):
         self.env_file_path = env_file_path
-        self.keys_by_provider: Dict[str, List[APIKeyInfo]] = {}
+        self.keys_by_provider: dict[str, list[APIKeyInfo]] = {}
         self.load_keys()
 
     def load_keys(self):
@@ -125,6 +124,12 @@ class KeyPoolManager:
         if litellm_key:
             self.add_key("litellm", litellm_key, key_id="litellm-main")
 
+        # 11. FCC Proxy (localhost:8080) — uses ANTHROPIC_AUTH_TOKEN or falls back to "freecc"
+        fcc_proxy_key = (env_vars.get("ANTHROPIC_AUTH_TOKEN")
+                         or os.environ.get("ANTHROPIC_AUTH_TOKEN")
+                         or "freecc")
+        self.add_key("fcc-proxy", fcc_proxy_key, key_id="fcc-proxy-main")
+
         logger.info(f"Loaded key pools for providers: {list(self.keys_by_provider.keys())}")
 
     def add_key(self, provider: str, secret_value: str, key_id: str):
@@ -136,7 +141,7 @@ class KeyPoolManager:
         key_info = APIKeyInfo(key_id=key_id, provider=provider, secret_value=secret_value)
         self.keys_by_provider[provider].append(key_info)
 
-    def get_key(self, provider: str) -> Optional[APIKeyInfo]:
+    def get_key(self, provider: str) -> APIKeyInfo | None:
         """Gets an active API key using round-robin / least-used strategy."""
         now = time.time()
         keys = self.keys_by_provider.get(provider, [])
@@ -184,7 +189,7 @@ class KeyPoolManager:
         key_info.failure_count += 1
         logger.warning(f"Key {key_info.key_id} for provider {key_info.provider} rate-limited. Cooldown for {cooldown_seconds}s.")
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         summary = {}
         now = time.time()
         for provider, keys in self.keys_by_provider.items():

@@ -5,8 +5,7 @@ Coverage: CodebaseMapService — scan_repository, detect_spec_gaps,
 close_spec_gap, _parse_python_ast.
 """
 import os
-import time
-import pytest
+
 from models.prd_models import SpecGap
 
 

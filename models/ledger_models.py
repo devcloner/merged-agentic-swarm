@@ -2,20 +2,21 @@
 Progress Ledger, Success Markers, and Obstacle Playbooks Models
 """
 import time
-from typing import List, Dict, Any, Optional
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
+from typing import Any
+
 
 @dataclass
 class SuccessMarker:
     id: str
     task_id: str
     verifier_name: str
-    command_executed: Optional[str] = None
+    command_executed: str | None = None
     exit_code: int = 0
     output_summary: str = ""
     timestamp: float = field(default_factory=time.time)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 @dataclass
@@ -28,24 +29,24 @@ class ObstaclePlaybookEntry:
     trigger_count: int = 0
     created_at: float = field(default_factory=time.time)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 @dataclass
 class ProgressLogEntry:
     entry_id: str
     task_id: str
-    subtask_id: Optional[str]
+    subtask_id: str | None
     worker_id: str
     wave_id: int
     action: str
     status: str
     timestamp: float = field(default_factory=time.time)
     tokens_used: int = 0
-    learning_generated: Optional[str] = None
-    details: Dict[str, Any] = field(default_factory=dict)
+    learning_generated: str | None = None
+    details: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 @dataclass
@@ -58,5 +59,5 @@ class TaskMasterStateSnapshot:
     progress_percentage: float
     last_updated: float = field(default_factory=time.time)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)

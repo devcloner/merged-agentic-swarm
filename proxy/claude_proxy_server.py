@@ -1,22 +1,110 @@
 """
 Claude API Key Pool Proxy Server
-Exposes Anthropic-compatible and OpenAI-compatible API endpoints backed by multi-provider key pools.
+Exposes Anthropic-compatible, OpenAI-compatible API endpoints, and audio transcription
+backed by multi-provider key pools / NVIDIA NIM Whisper.
 """
-import os
-import sys
 import json
-import time
 import logging
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from socketserver import ThreadingMixIn
+import os
+import re
+import sys
 import threading
+import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from typing import Dict, Any, Optional
+from typing import Any
+
+import requests
+
 from providers.key_pool import default_key_pool
 from providers.multi_provider_fabric import default_fabric
 
 logger = logging.getLogger("claude_proxy")
+
+# ── Audio transcription helpers ──────────────────────────────────────────
+
+MIME_MAP = {
+    "wav": "audio/wav",
+    "mp3": "audio/mpeg",
+    "ogg": "audio/ogg",
+    "m4a": "audio/mp4",
+    "webm": "audio/webm",
+    "flac": "audio/flac",
+    "aac": "audio/aac",
+}
+
+def _parse_multipart(body: bytes, content_type: str) -> tuple[bytes | None, str | None, str | None]:
+    """Return (file_bytes, file_name, model_name) from a multipart body."""
+    m = re.search(r'boundary=(?:"([^"]+)"|([^;]+))', content_type)
+    if not m:
+        return None, None, None
+    boundary = (m.group(1) or m.group(2)).encode()
+
+    file_data = file_name = None
+    model_name = "openai/whisper-large-v3"
+
+    for part in body.split(b"--" + boundary):
+        if b"Content-Disposition" not in part:
+            continue
+        hdr_end = part.find(b"\r\n\r\n")
+        if hdr_end == -1:
+            continue
+        headers_raw = part[:hdr_end].decode("utf-8", errors="replace")
+        body_data = part[hdr_end + 4:]
+        # Strip trailing boundary markers and CRLF
+        if body_data.endswith(b"\r\n"):
+            body_data = body_data[:-2]
+        if body_data.endswith(b"--"):
+            body_data = body_data[:-2]
+
+        nm = re.search(r'name="([^"]*)"', headers_raw)
+        if not nm:
+            continue
+        field_name = nm.group(1)
+
+        if field_name == "file":
+            file_data = body_data
+            fn = re.search(r'filename="([^"]*)"', headers_raw)
+            file_name = fn.group(1) if fn else "audio.wav"
+        elif field_name == "model":
+            model_name = body_data.decode("utf-8", errors="replace").strip()
+
+    return file_data, file_name, model_name
+
+
+def _forward_transcription(
+    audio_data: bytes,
+    file_name: str | None,
+    model_name: str,
+) -> dict[str, Any] | tuple[int, dict[str, str]]:
+    """Forward a transcription request to the configured Whisper backend."""
+    backend_url = os.environ.get(
+        "WHISPER_BACKEND_URL",
+        "http://localhost:11434/v1/audio/transcriptions",
+    )
+    api_key = os.environ.get("WHISPER_API_KEY", "")
+
+    ext = file_name.rsplit(".", 1)[-1].lower() if file_name and "." in file_name else "wav"
+    mime_type = MIME_MAP.get(ext, "audio/wav")
+
+    try:
+        resp = requests.post(
+            backend_url,
+            files={"file": (file_name or "audio.wav", audio_data, mime_type)},
+            data={"model": model_name},
+            headers={"Authorization": f"Bearer {api_key}"} if api_key else {},
+            timeout=60,
+        )
+    except requests.exceptions.ConnectionError:
+        return 503, {"error": "Whisper backend unavailable (NVIDIA NIM not running)"}
+    except Exception as exc:
+        return 500, {"error": f"Transcription error: {exc}"}
+
+    if resp.status_code == 200:
+        return resp.json()
+    return resp.status_code, {"error": f"NIM transcription failed: {resp.text}"}
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Threaded HTTP server to handle concurrent requests."""
@@ -27,7 +115,7 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
         # Suppress default noisy access logs
         pass
 
-    def send_json_response(self, code: int, data: Dict[str, Any]):
+    def send_json_response(self, code: int, data: dict[str, Any]):
         body = json.dumps(data).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
@@ -58,6 +146,12 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
         content_len = int(self.headers.get("Content-Length", 0))
         post_body = self.rfile.read(content_len) if content_len > 0 else b"{}"
 
+        # ── Audio transcription (multipart) ────────────────────────────
+        if self.path in ("/v1/audio/transcriptions", "/v1/audio/transcriptions/"):
+            self._handle_audio_transcription(post_body)
+            return
+
+        # ── JSON-based endpoints ────────────────────────────────────────
         try:
             req_data = json.loads(post_body.decode("utf-8"))
         except Exception:
@@ -116,12 +210,29 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
         else:
             self.send_json_response(404, {"error": "Unsupported proxy endpoint"})
 
+    # ── Audio transcription handler ───────────────────────────────────
+    def _handle_audio_transcription(self, post_body: bytes) -> None:
+        content_type = self.headers.get("Content-Type", "")
+        audio_data, file_name, model_name = _parse_multipart(post_body, content_type)
+
+        if not audio_data:
+            self.send_json_response(400, {"error": "No audio file found in request"})
+            return
+
+        result = _forward_transcription(audio_data, file_name, model_name)
+
+        if isinstance(result, tuple):
+            code, body = result
+            self.send_json_response(code, body)
+        else:
+            self.send_json_response(200, result)
+
 class ProxyServerDaemon:
     def __init__(self, host: str = "0.0.0.0", port: int = 8085):
         self.host = host
         self.port = port
-        self.server: Optional[ThreadedHTTPServer] = None
-        self.thread: Optional[threading.Thread] = None
+        self.server: ThreadedHTTPServer | None = None
+        self.thread: threading.Thread | None = None
 
     def start(self):
         if self.server:
@@ -142,7 +253,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     srv = ProxyServerDaemon(port=8085)
     srv.start()
-    print(f"Proxy server running on port 8085... Press Ctrl+C to stop.")
+    print("Proxy server running on port 8085... Press Ctrl+C to stop.")
     try:
         while True:
             time.sleep(1)

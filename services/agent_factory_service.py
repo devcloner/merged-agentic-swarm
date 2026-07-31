@@ -2,16 +2,17 @@
 Durable Agent Factory & Knowledge-Box -> Spawn Chain Registry
 Turns validated learnings into HOT micro-specialists or COLD durable agents, maintaining a persistent chain registry.
 """
+import json
+import logging
 import os
 import sys
 import time
-import json
-import logging
 from datetime import datetime
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from typing import Dict, Any, List, Optional
-from models.agent_models import AgentSpec, AgentType, WorkerRole, SpawnChainEntry
+from typing import Any
+
+from models.agent_models import AgentSpec, AgentType, SpawnChainEntry, WorkerRole
 from tools.knowledge_cache import default_knowledge_cache
 
 logger = logging.getLogger("agent_factory")
@@ -19,7 +20,7 @@ logger = logging.getLogger("agent_factory")
 class ChainRegistry:
     def __init__(self, registry_file: str = "/home/ubuntu/.taskmaster/tasks/spawn_chain_registry.json"):
         self.registry_file = registry_file
-        self.entries: List[SpawnChainEntry] = []
+        self.entries: list[SpawnChainEntry] = []
         self.load_registry()
 
     def load_registry(self):
@@ -50,7 +51,7 @@ class ChainRegistry:
         except Exception as e:
             logger.error(f"Failed saving spawn chain registry: {e}")
 
-    def register_spawn(self, source_learning_id: str, spawned_agent_id: str, agent_type: AgentType, trigger_reason: str, parent_entry_id: Optional[str] = None) -> SpawnChainEntry:
+    def register_spawn(self, source_learning_id: str, spawned_agent_id: str, agent_type: AgentType, trigger_reason: str, parent_entry_id: str | None = None) -> SpawnChainEntry:
         entry = SpawnChainEntry(
             entry_id=f"CHAIN-{len(self.entries)+1:04d}",
             source_learning_id=source_learning_id,
@@ -65,10 +66,10 @@ class ChainRegistry:
         return entry
 
 class DurableAgentFactory:
-    def __init__(self, chain_registry: Optional[ChainRegistry] = None):
+    def __init__(self, chain_registry: ChainRegistry | None = None):
         self.chain_registry = chain_registry or ChainRegistry()
-        self.active_hot_specialists: Dict[str, AgentSpec] = {}
-        self.active_cold_agents: Dict[str, AgentSpec] = {}
+        self.active_hot_specialists: dict[str, AgentSpec] = {}
+        self.active_cold_agents: dict[str, AgentSpec] = {}
 
     def purge_expired(self) -> int:
         """Remove and return count of expired HOT micro-specialists (FIX-09)."""
@@ -83,7 +84,7 @@ class DurableAgentFactory:
                 logger.info(f"Purged expired HOT agent {aid} (lived {now - expired.created_at:.1f}s)")
         return len(expired_ids)
 
-    def _write_agent_spec_file(self, agent_spec: Dict[str, Any]) -> Optional[str]:
+    def _write_agent_spec_file(self, agent_spec: dict[str, Any]) -> str | None:
         """Write an agent spec .md file from a JSONL entry.
 
         Returns the file path, or None if the file already exists (skipped).
@@ -178,7 +179,7 @@ class DurableAgentFactory:
         logger.info(f"synced {count} new agent spec file(s)")
         return count
 
-    def spawn_from_learning(self, learning_id: str, trigger_reason: str, force_type: Optional[AgentType] = None) -> AgentSpec:
+    def spawn_from_learning(self, learning_id: str, trigger_reason: str, force_type: AgentType | None = None) -> AgentSpec:
         """Evaluates validated learning from Knowledge-Box and spawns HOT or COLD agent."""
         learning = default_knowledge_cache.get_learning(learning_id)
 

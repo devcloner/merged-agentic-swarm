@@ -5,9 +5,8 @@ Coverage: WaveGateController — evaluate_gate_criteria, advance_wave,
 get_wave_state, _check_ownership.
 """
 import os
-import json
-import pytest
-from models.prd_models import SubTask, EpicTask
+
+from models.prd_models import SubTask
 
 
 class TestWaveGateController:
@@ -82,7 +81,6 @@ class TestWaveGateController:
 
     def test_check_ownership_valid(self, owner_map_file, isolated_codebase_mapper):
         """Subtasks producing output within owned paths should have no violations."""
-        from services import wave_gate_service as wgs
         # Override base dir so it finds our owner map
         # Monkey-patch _check_ownership's base path resolution
         import services.wave_gate_service as wave_mod

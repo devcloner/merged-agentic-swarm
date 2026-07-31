@@ -1,11 +1,12 @@
 """
 pytest fixtures and shared test utilities for Merged Agentic Swarm.
 """
+import json
 import os
 import sys
-import time
-import json
 import tempfile
+import time
+
 import pytest
 
 # Ensure project root is on sys.path

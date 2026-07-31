@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-07-31T12:26:00Z",
+  "source": "live-discovery-via-verify_proxy.sh",
+  "proxy": {
+    "host": "http://localhost:8080",
+    "protocol": "Anthropic Messages API (/v1/messages)",
+    "auth_mode": "Bearer",
+    "auth_token": "freecc",
+    "health": "PASS (200 — healthy)",
+    "models_endpoint": "PASS (1015 models served)",
+    "bad_auth": "PASS (HTTP 401 — correctly rejected)",
+    "bad_model": "NOTE (proxy routes unknown models to deepseek fallback — intentional feature)",
+    "chat_status": "PARTIALLY_WORKING",
+    "exit_code": 0
+  },
+  "model_routing": {
+    "claude-3-opus": {
+      "backend": "deepseek-v4-pro",
+      "status": "PASS",
+      "latency_ms": 1820,
+      "note": "thinking-only response at max_tokens=50 — increase tokens for text"
+    },
+    "claude-3-5-haiku-20241022": {
+      "backend": "deepseek-v4-flash-free",
+      "status": "PASS",
+      "latency_ms": 1066,
+      "response": "OK"
+    },
+    "claude-sonnet-4-20250514": {
+      "backend": "OPENCODE",
+      "status": "BLOCKED",
+      "error": "Insufficient balance — OPENCODE API credits depleted",
+      "http_code": 401,
+      "fix": "Refill opencode credits at https://opencode.ai/workspace/wrk_01KYEWXQEAJJ3HV2QEY33BQGEN/billing"
+    },
+    "claude-3-7-sonnet": {
+      "backend": "OPENCODE",
+      "status": "BLOCKED",
+      "error": "Same upstream credits issue as claude-sonnet-4"
+    },
+    "gpt-4o": {
+      "backend": "deepseek-v4-flash",
+      "status": "PASS"
+    }
+  },
+  "fabric_routing_fix": {
+    "action": "Update MODEL_FABRIC_ROUTES to route through FCC proxy (port 8080) with Anthropic format",
+    "action2": "Remove dead litellm:4000 routes (port not listening)",
+    "action3": "Use proxy as primary route for claude-3-opus, claude-3-5-haiku (working deepseek backends)",
+    "note": "FCC proxy provides provider fallback internally. Routes to OPENCODE are blocked on credits. Routes to deepseek backends work."
+  }
+}

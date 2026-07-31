@@ -5,9 +5,15 @@ Coverage: TaskStatus, TaskPriority, SubTask, EpicTask, SpecGap,
 PRDDocument, PRDAnalysisResult.
 """
 import time
+
 from models.prd_models import (
-    TaskStatus, TaskPriority, SubTask, EpicTask, SpecGap,
-    PRDDocument, PRDAnalysisResult,
+    EpicTask,
+    PRDAnalysisResult,
+    PRDDocument,
+    SpecGap,
+    SubTask,
+    TaskPriority,
+    TaskStatus,
 )
 
 

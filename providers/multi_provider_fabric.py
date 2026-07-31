@@ -2,36 +2,37 @@
 Multi-Backend Model Fabric
 Routes requests across providers with priority fallbacks, format normalization, and key pool rotation.
 """
+import json
+import logging
 import os
 import sys
-import json
-import time
-import logging
-import urllib.request
-import urllib.error
 import threading
+import time
+import urllib.error
+import urllib.request
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 from providers.key_pool import default_key_pool
 
 logger = logging.getLogger("model_fabric")
 
 # ── Module-level circuit breaker state (shared across all fabric instances) ──
-_circuit_breaker: Dict[str, int] = {}
-_circuit_open_until: Dict[str, float] = {}
-_permanently_dead: Dict[str, float] = {}  # provider -> ban-expiry timestamp
-_last_successful_provider: Optional[str] = None
+_circuit_breaker: dict[str, int] = {}
+_circuit_open_until: dict[str, float] = {}
+_permanently_dead: dict[str, float] = {}  # provider -> ban-expiry timestamp
+_last_successful_provider: str | None = None
 CIRCUIT_BREAKER_THRESHOLD = 3
 CIRCUIT_BREAKER_COOLDOWN = 120.0
 PERMA_BAN_DURATION = 86400.0  # 24h — don't re-try auth-failed providers for a day
 _fabric_lock = threading.Lock()
 
 
-def _record_failure(provider: str, http_code: Optional[int] = None):
-    """Record a provider failure — perma-ban on auth errors, circuit-break on others."""
+def _record_failure(provider: str, http_code: int | None = None):
+    """Record a provider failure — perma-ban on 401 auth errors, circuit-break on others."""
     with _fabric_lock:
-        if http_code in (401, 403):
+        if http_code == 401:
             _permanently_dead[provider] = time.time() + PERMA_BAN_DURATION
             logger.warning(f"Provider {provider} permanently blacklisted (HTTP {http_code}).")
             return
@@ -53,8 +54,9 @@ def _record_success(provider: str):
         _last_successful_provider = provider
 
 # Fallback Routing Table
-MODEL_FABRIC_ROUTES: Dict[str, List[Dict[str, str]]] = {
+MODEL_FABRIC_ROUTES: dict[str, list[dict[str, str]]] = {
     "claude-3-7-sonnet": [
+        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
         {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions"},
         {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://api.opencode.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
@@ -64,6 +66,7 @@ MODEL_FABRIC_ROUTES: Dict[str, List[Dict[str, str]]] = {
         {"provider": "amazonaws", "model": "anthropic.claude-3-5-sonnet-20241022-v2:0", "url": "https://bedrock-runtime.us-east-1.amazonaws.com/model/invoke"},
     ],
     "claude-3-5-sonnet": [
+        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
         {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://api.opencode.ai/v1/chat/completions"},
@@ -72,12 +75,14 @@ MODEL_FABRIC_ROUTES: Dict[str, List[Dict[str, str]]] = {
         {"provider": "openrouter", "model": "anthropic/claude-3.5-sonnet", "url": "https://openrouter.ai/api/v1/chat/completions"}
     ],
     "claude-3-5-haiku": [
+        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
         {"provider": "litellm", "model": "gemini-2.5-flash-lite", "url": "http://localhost:4000/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "groq", "model": "llama-3.3-70b-versatile", "url": "https://api.groq.com/openai/v1/chat/completions"},
         {"provider": "alibabacloud", "model": "qwen3.6-flash", "url": "https://ws-os3nbzniaeck95yo.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions"}
     ],
     "claude-3-opus": [
+        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
         {"provider": "litellm", "model": "gemini-2.5-pro", "url": "http://localhost:4000/v1/chat/completions"},
         {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://api.opencode.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-pro", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
@@ -89,7 +94,7 @@ class MultiProviderFabric:
     def __init__(self, key_pool=None):
         self.key_pool = key_pool or default_key_pool
 
-    def format_anthropic_to_openai(self, messages: List[Dict[str, Any]], system_prompt: Optional[str] = None) -> List[Dict[str, Any]]:
+    def format_anthropic_to_openai(self, messages: list[dict[str, Any]], system_prompt: str | None = None) -> list[dict[str, Any]]:
         openai_messages = []
         if system_prompt:
             openai_messages.append({"role": "system", "content": system_prompt})
@@ -108,7 +113,7 @@ class MultiProviderFabric:
             openai_messages.append({"role": role, "content": content})
         return openai_messages
 
-    def format_openai_to_anthropic_response(self, openai_resp: Dict[str, Any], model_alias: str) -> Dict[str, Any]:
+    def format_openai_to_anthropic_response(self, openai_resp: dict[str, Any], model_alias: str) -> dict[str, Any]:
         """Converts OpenAI response payload to Anthropic messages payload format."""
         choices = openai_resp.get("choices", [])
         content_text = ""
@@ -119,9 +124,9 @@ class MultiProviderFabric:
                 # Reasoning-only response (e.g. Gemini thinking models): extract from finish_reason context
                 finish_reason = choices[0].get("finish_reason", "")
                 if finish_reason == "length":
-                    content_text = f"[Reasoning completed — response truncated at token limit. Try a simpler prompt or increase max_tokens.]"
+                    content_text = "[Reasoning completed — response truncated at token limit. Try a simpler prompt or increase max_tokens.]"
                 elif finish_reason in ("stop", "end_turn"):
-                    content_text = f"[Model produced reasoning-only response with no visible text output.]"
+                    content_text = "[Model produced reasoning-only response with no visible text output.]"
 
         usage = openai_resp.get("usage", {})
         return {
@@ -143,7 +148,7 @@ class MultiProviderFabric:
             }
         }
 
-    def _build_route_list(self, model_alias: str) -> List[Dict[str, str]]:
+    def _build_route_list(self, model_alias: str) -> list[dict[str, str]]:
         """Build route list, promoting the last successful provider to the front."""
         routes = list(MODEL_FABRIC_ROUTES.get(model_alias, MODEL_FABRIC_ROUTES["claude-3-7-sonnet"]))
         if _last_successful_provider:
@@ -152,7 +157,7 @@ class MultiProviderFabric:
                 routes.insert(0, routes.pop(idx))
         return routes
 
-    def dispatch_request(self, model_alias: str, messages: List[Dict[str, Any]], system_prompt: Optional[str] = None, max_tokens: int = 4096, temperature: float = 0.7) -> Dict[str, Any]:
+    def dispatch_request(self, model_alias: str, messages: list[dict[str, Any]], system_prompt: str | None = None, max_tokens: int = 4096, temperature: float = 0.7) -> dict[str, Any]:
         """Dispatches request across multi-backend provider fallback cascade."""
         routes = self._build_route_list(model_alias)
 
@@ -211,6 +216,12 @@ class MultiProviderFabric:
 
                     self.key_pool.mark_success(key_info, latency_ms=latency, tokens=tokens)
                     _record_success(provider)
+
+                    # If the response is already in Anthropic Messages format (e.g. fcc-proxy), return it directly.
+                    if resp_json.get("type") == "message":
+                        resp_json["model"] = model_alias  # override model name in response
+                        return resp_json
+
                     return self.format_openai_to_anthropic_response(resp_json, model_alias)
 
             except urllib.error.HTTPError as e:

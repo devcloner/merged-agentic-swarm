@@ -5,9 +5,14 @@ Coverage: AgentSpec, WorkerPoolConfig, SpawnChainEntry, WorkerPoolState,
 WorkerRole, AgentType enums.
 """
 import time
+
 from models.agent_models import (
-    AgentSpec, AgentType, WorkerRole, WorkerPoolConfig,
-    SpawnChainEntry, WorkerPoolState,
+    AgentSpec,
+    AgentType,
+    SpawnChainEntry,
+    WorkerPoolConfig,
+    WorkerPoolState,
+    WorkerRole,
 )
 
 

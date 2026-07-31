@@ -6,9 +6,8 @@ Coverage: ChainRegistry (load, save, register_spawn), DurableAgentFactory
 """
 import os
 import time
-import json
-import pytest
-from models.agent_models import AgentType, AgentSpec, WorkerRole
+
+from models.agent_models import AgentSpec, AgentType, WorkerRole
 
 
 class TestChainRegistry:
@@ -96,8 +95,8 @@ class TestDurableAgentFactory:
         assert "cold-permanent" in factory.active_cold_agents
 
     def test_spawn_from_learning_cold(self, temp_dir, isolated_knowledge_cache, isolated_chain_registry):
-        from services.agent_factory_service import DurableAgentFactory
         import services.agent_factory_service as afs_mod
+        from services.agent_factory_service import DurableAgentFactory
         orig_cache = afs_mod.default_knowledge_cache
         afs_mod.default_knowledge_cache = isolated_knowledge_cache
         try:
@@ -112,8 +111,8 @@ class TestDurableAgentFactory:
             afs_mod.default_knowledge_cache = orig_cache
 
     def test_spawn_from_learning_hot(self, temp_dir, isolated_knowledge_cache, isolated_chain_registry):
-        from services.agent_factory_service import DurableAgentFactory
         import services.agent_factory_service as afs_mod
+        from services.agent_factory_service import DurableAgentFactory
         orig_cache = afs_mod.default_knowledge_cache
         afs_mod.default_knowledge_cache = isolated_knowledge_cache
         try:
@@ -127,8 +126,8 @@ class TestDurableAgentFactory:
             afs_mod.default_knowledge_cache = orig_cache
 
     def test_spawn_from_learning_with_force_type(self, temp_dir, isolated_knowledge_cache, isolated_chain_registry):
-        from services.agent_factory_service import DurableAgentFactory
         import services.agent_factory_service as afs_mod
+        from services.agent_factory_service import DurableAgentFactory
         orig_cache = afs_mod.default_knowledge_cache
         afs_mod.default_knowledge_cache = isolated_knowledge_cache
         try:
@@ -141,8 +140,8 @@ class TestDurableAgentFactory:
             afs_mod.default_knowledge_cache = orig_cache
 
     def test_spawn_from_learning_registers_in_chain(self, temp_dir, isolated_knowledge_cache, isolated_chain_registry):
-        from services.agent_factory_service import DurableAgentFactory
         import services.agent_factory_service as afs_mod
+        from services.agent_factory_service import DurableAgentFactory
         orig_cache = afs_mod.default_knowledge_cache
         afs_mod.default_knowledge_cache = isolated_knowledge_cache
         try:

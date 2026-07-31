@@ -2,17 +2,14 @@
 Task Master AI Spine Service
 PRD optimization, task parsing, dependency resolution, and single source of truth sync.
 """
+import json
+import logging
 import os
 import sys
-import json
 import time
-import logging
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from typing import Dict, Any, List, Optional
-from models.prd_models import (
-    PRDDocument, PRDAnalysisResult, EpicTask, SubTask, TaskStatus, TaskPriority, SpecGap
-)
+from models.prd_models import EpicTask, PRDAnalysisResult, SpecGap, SubTask, TaskPriority, TaskStatus
 from providers.multi_provider_fabric import default_fabric
 
 logger = logging.getLogger("task_master_service")
@@ -30,7 +27,7 @@ class TaskMasterService:
     """
     def __init__(self, state_file_path: str = "/home/ubuntu/.taskmaster/tasks/tasks.json"):
         self.state_file_path = state_file_path
-        self.current_analysis: Optional[PRDAnalysisResult] = None
+        self.current_analysis: PRDAnalysisResult | None = None
         self.load_state()
 
     def load_state(self):
@@ -242,7 +239,7 @@ Identify any missing requirements or spec gaps.
         self.save_state()
         return analysis
 
-    def update_task_status(self, task_id: str, new_status: TaskStatus, error_message: Optional[str] = None):
+    def update_task_status(self, task_id: str, new_status: TaskStatus, error_message: str | None = None):
         """Updates task status in state and syncs to file."""
         if not self.current_analysis:
             return
@@ -261,7 +258,7 @@ Identify any missing requirements or spec gaps.
                     break
         self.save_state()
 
-    def get_tasks_for_wave(self, wave_id: int) -> List[EpicTask]:
+    def get_tasks_for_wave(self, wave_id: int) -> list[EpicTask]:
         if not self.current_analysis:
             return []
         return [epic for epic in self.current_analysis.epics if epic.wave_id == wave_id]

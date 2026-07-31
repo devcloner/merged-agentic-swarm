@@ -2,31 +2,32 @@
 Agentic Multi-Layered Workflow Master Orchestrator
 Integrates Task Master AI, Codebase Mapper, Wave Gates, OpenCode 40-Worker Swarm, Key Pool Proxy, Durable Agent Factory, and Progress Ledger.
 """
+import logging
 import os
 import sys
 import time
-import logging
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from typing import Dict, Any, List, Optional
-from models.prd_models import PRDAnalysisResult, TaskStatus
-from models.agent_models import WorkerRole, AgentType
-from services.task_master_service import default_task_master
+from typing import Any
+
+from models.agent_models import AgentType, WorkerRole
+from models.prd_models import TaskStatus
+from proxy.claude_proxy_server import ProxyServerDaemon
+from services.agent_factory_service import default_agent_factory
 from services.codebase_map_service import default_codebase_mapper
 from services.opencode_swarm_service import default_swarm_manager
-from services.agent_factory_service import default_agent_factory
-from services.wave_gate_service import default_wave_controller
 from services.progress_ledger_service import default_progress_ledger
+from services.task_master_service import default_task_master
+from services.wave_gate_service import default_wave_controller
 from tools.knowledge_cache import default_knowledge_cache
-from proxy.claude_proxy_server import ProxyServerDaemon
 
 logger = logging.getLogger("agentic_orchestrator")
 
 class MultiLayeredAgenticOrchestrator:
     def __init__(self, prd_title: str = "Multi-Layered Agentic Workflow System"):
         self.prd_title = prd_title
-        self.proxy_daemon: Optional[ProxyServerDaemon] = None
+        self.proxy_daemon: ProxyServerDaemon | None = None
         self.promoted_learning_ids: set = set()
         self.promoted_ids_file: str = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -60,7 +61,7 @@ class MultiLayeredAgenticOrchestrator:
 
     # ── Worker output → file application (FIX-01) ──
 
-    def _run_syntax_verification(self) -> Dict[str, Any]:
+    def _run_syntax_verification(self) -> dict[str, Any]:
         """Run actual syntax + import verification instead of hardcoded unittest (FIX-10).
 
         Tries scripts/ci.sh first, falls back to inline syntax check on core files.
@@ -120,7 +121,7 @@ class MultiLayeredAgenticOrchestrator:
 
     # ── Registry compaction (FIX-14: auto-compact at end of run) ──
 
-    def _compact_registries(self) -> Dict[str, int]:
+    def _compact_registries(self) -> dict[str, int]:
         """Deduplicate cold-path registries by content hash (knowledge) and ID (agents/chain).
 
         knowledge.jsonl: group by title+category+solution content hash, keep last in group.
@@ -128,7 +129,8 @@ class MultiLayeredAgenticOrchestrator:
         chain.jsonl:     group by source_learning_id, keep last per source.
         Returns dict of {registry: removed_count}.
         """
-        import hashlib, json
+        import hashlib
+        import json
 
         registry_dir = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -187,7 +189,7 @@ class MultiLayeredAgenticOrchestrator:
         logger.info(f"Registry compaction: {total} entries removed ({counts})")
         return counts
 
-    def _apply_worker_outputs(self, results: List[Dict[str, Any]], wave_label: str = "") -> int:
+    def _apply_worker_outputs(self, results: list[dict[str, Any]], wave_label: str = "") -> int:
         """Parse worker response content for file writes and apply them to disk.
 
         Scans each completed worker result for markdown code blocks preceded by a
@@ -253,7 +255,6 @@ class MultiLayeredAgenticOrchestrator:
         durable cold-path registries. Repeated patterns (≥3 same-category entries)
         graduate to durable agent specs.
         """
-        import json
 
         knowledge_registry = "/home/ubuntu/docs/agentic/registry/knowledge.jsonl"
         agents_registry = "/home/ubuntu/docs/agentic/registry/agents.jsonl"
@@ -271,7 +272,7 @@ class MultiLayeredAgenticOrchestrator:
             return {"promoted_knowledge": 0, "promoted_agents": 0}
 
         # Build category frequency map for validation (includes previously promoted)
-        category_counts: Dict[str, int] = {}
+        category_counts: dict[str, int] = {}
         for lid, learning in default_knowledge_cache.learnings.items():
             cat = learning.get("category", "general")
             category_counts[cat] = category_counts.get(cat, 0) + 1
@@ -347,7 +348,7 @@ class MultiLayeredAgenticOrchestrator:
         )
         return {"promoted_knowledge": promoted_knowledge, "promoted_agents": promoted_agents}
 
-    def initialize_system(self, start_proxy_port: int = 8085) -> Dict[str, Any]:
+    def initialize_system(self, start_proxy_port: int = 8085) -> dict[str, Any]:
         """Initializes Key Pool Proxy server and verifies service readiness."""
         logger.info("Initializing Agentic System proxy server and model fabric...")
         try:
@@ -365,7 +366,7 @@ class MultiLayeredAgenticOrchestrator:
             "timestamp": time.time()
         }
 
-    def run_full_agentic_workflow(self, prd_content: str) -> Dict[str, Any]:
+    def run_full_agentic_workflow(self, prd_content: str) -> dict[str, Any]:
         """Runs the complete self-healing 6-step agent-to-agent workflow."""
         logger.info("=== STARTING MULTI-LAYERED AGENTIC WORKFLOW ===")
         

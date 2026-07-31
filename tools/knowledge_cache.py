@@ -2,11 +2,11 @@
 Knowledge Cache Service
 Persistent cache for validated learnings, obstacle resolution patterns, and AST symbol manifests.
 """
-import os
 import json
-import time
 import logging
-from typing import Dict, Any, List, Optional
+import os
+import time
+from typing import Any
 
 logger = logging.getLogger("knowledge_cache")
 
@@ -14,8 +14,8 @@ class KnowledgeCache:
     def __init__(self, cache_file: str = "/home/ubuntu/.opencode/knowledge_cache.json", max_learnings: int = 200):
         self.cache_file = cache_file
         self.max_learnings = max_learnings
-        self.learnings: Dict[str, Dict[str, Any]] = {}
-        self.symbol_cache: Dict[str, Any] = {}
+        self.learnings: dict[str, dict[str, Any]] = {}
+        self.symbol_cache: dict[str, Any] = {}
         self.load_cache()
 
     def load_cache(self):
@@ -28,8 +28,8 @@ class KnowledgeCache:
 
                 # Compact pre-existing duplicates by content hash (title+category+solution).
                 # Prevents LEARN-0001..0005 dupes from persisting across restarts.
-                seen: Dict[str, str] = {}  # content hash -> surviving learning ID
-                deduped: Dict[str, Dict[str, Any]] = {}
+                seen: dict[str, str] = {}  # content hash -> surviving learning ID
+                deduped: dict[str, dict[str, Any]] = {}
                 dupes_removed = 0
                 for lid, entry in raw_learnings.items():
                     key = f"{entry.get('title','')}|{entry.get('category','')}|{entry.get('solution','')}"
@@ -55,7 +55,7 @@ class KnowledgeCache:
         with open(self.cache_file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
 
-    def add_learning(self, title: str, category: str, pattern_solution: str, tags: Optional[List[str]] = None, ttl_sec: Optional[float] = None) -> str:
+    def add_learning(self, title: str, category: str, pattern_solution: str, tags: list[str] | None = None, ttl_sec: float | None = None) -> str:
         # Dedup via content hash: title + category + solution (prevents semantic duplicates
         # like LEARN-0001 through LEARN-0005 that share identical content under different IDs)
         for existing in self.learnings.values():
@@ -91,10 +91,10 @@ class KnowledgeCache:
         logger.info(f"Added validated learning {learning_id}: {title}")
         return learning_id
 
-    def get_learning(self, learning_id: str) -> Optional[Dict[str, Any]]:
+    def get_learning(self, learning_id: str) -> dict[str, Any] | None:
         return self.learnings.get(learning_id)
 
-    def search_learnings(self, query: str) -> List[Dict[str, Any]]:
+    def search_learnings(self, query: str) -> list[dict[str, Any]]:
         results = []
         q = query.lower()
         for l in self.learnings.values():

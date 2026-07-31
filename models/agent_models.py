@@ -2,9 +2,10 @@
 Agent, Worker Pool, and Spawn Chain Data Models
 """
 import time
+from dataclasses import asdict, dataclass, field
 from enum import Enum
-from typing import List, Dict, Any, Optional
-from dataclasses import dataclass, field, asdict
+from typing import Any
+
 
 class WorkerRole(str, Enum):
     MASTER_ARCHITECT = "master_architect"
@@ -31,10 +32,10 @@ class AgentSpec:
     system_prompt: str
     model_alias: str = "claude-3-7-sonnet"
     max_concurrency: int = 1
-    ttl_sec: Optional[float] = None  # None = durable (no expiry); HOT specialists get 300s
-    validated_learnings_applied: List[str] = field(default_factory=list)
-    memory_context: Dict[str, Any] = field(default_factory=dict)
-    parent_agent_id: Optional[str] = None
+    ttl_sec: float | None = None  # None = durable (no expiry); HOT specialists get 300s
+    validated_learnings_applied: list[str] = field(default_factory=list)
+    memory_context: dict[str, Any] = field(default_factory=dict)
+    parent_agent_id: str | None = None
     created_at: float = field(default_factory=time.time)
 
     @property
@@ -44,7 +45,7 @@ class AgentSpec:
             return False  # durable — never expires
         return (time.time() - self.created_at) > self.ttl_sec
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d['role'] = self.role.value if isinstance(self.role, Enum) else self.role
         d['agent_type'] = self.agent_type.value if isinstance(self.agent_type, Enum) else self.agent_type
@@ -54,7 +55,7 @@ class AgentSpec:
 class WorkerPoolConfig:
     pool_name: str = "opencode-swarm-40"
     max_total_workers: int = 40
-    role_allocations: Dict[str, int] = field(default_factory=lambda: {
+    role_allocations: dict[str, int] = field(default_factory=lambda: {
         WorkerRole.MASTER_ARCHITECT.value: 1,
         WorkerRole.CODEBASE_MAPPER.value: 4,
         WorkerRole.SPEC_GAP_CLOSER.value: 4,
@@ -71,10 +72,10 @@ class SpawnChainEntry:
     spawned_agent_id: str
     agent_type: AgentType
     trigger_reason: str
-    parent_entry_id: Optional[str] = None
+    parent_entry_id: str | None = None
     timestamp: float = field(default_factory=time.time)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d['agent_type'] = self.agent_type.value if isinstance(self.agent_type, Enum) else self.agent_type
         return d
@@ -85,8 +86,8 @@ class WorkerPoolState:
     total_assigned: int = 0
     completed_tasks: int = 0
     failed_tasks: int = 0
-    workers_by_role: Dict[str, List[str]] = field(default_factory=dict)
-    pool_health: Dict[str, Dict] = field(default_factory=dict)
+    workers_by_role: dict[str, list[str]] = field(default_factory=dict)
+    pool_health: dict[str, dict] = field(default_factory=dict)
 
     def record_pool_success(self, pool_id: str) -> None:
         """Increment the completed counter for the given pool."""
@@ -103,9 +104,9 @@ class WorkerPoolState:
         else:
             self.pool_health[pool_id]["failed"] += 1
 
-    def get_pool_summary(self) -> Dict[str, Dict]:
+    def get_pool_summary(self) -> dict[str, dict]:
         """Return a copy of the pool_health dict."""
         return dict(self.pool_health)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)

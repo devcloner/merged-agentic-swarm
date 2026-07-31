@@ -2,14 +2,15 @@
 Codebase Mapper & Spec Gap Closer Service
 Maps repository structure, AST symbols, and closes spec gaps before mass edits.
 """
-import os
-import sys
 import ast
 import json
 import logging
+import os
+import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 from models.prd_models import SpecGap
 
 logger = logging.getLogger("codebase_map_service")
@@ -17,12 +18,12 @@ logger = logging.getLogger("codebase_map_service")
 class CodebaseMapService:
     def __init__(self, repo_root: str = "/home/ubuntu"):
         self.repo_root = repo_root
-        self.symbol_cache: Dict[str, Any] = {}
-        self.spec_gaps: List[SpecGap] = []
+        self.symbol_cache: dict[str, Any] = {}
+        self.spec_gaps: list[SpecGap] = []
         self._state_file: str = os.path.join(repo_root, ".opencode", "codebase_cache.json")
         self._load_state()
 
-    def scan_repository(self) -> Dict[str, Any]:
+    def scan_repository(self) -> dict[str, Any]:
         """Scans workspace repository files and parses AST definitions."""
         file_tree = []
         symbol_index = {}
@@ -60,7 +61,7 @@ class CodebaseMapService:
         logger.info(f"Codebase map completed: {len(file_tree)} total files, {len(symbol_index)} python modules parsed.")
         return self.symbol_cache
 
-    def _parse_python_ast(self, file_path: str) -> Dict[str, Any]:
+    def _parse_python_ast(self, file_path: str) -> dict[str, Any]:
         """Parses Python file to extract top-level functions, classes, and imports."""
         try:
             with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -85,7 +86,7 @@ class CodebaseMapService:
         except Exception as e:
             return {"error": str(e)}
 
-    def detect_spec_gaps(self, required_components: List[str]) -> List[SpecGap]:
+    def detect_spec_gaps(self, required_components: list[str]) -> list[SpecGap]:
         """Cross-references required components against mapped codebase to find spec gaps.
 
         Checks whether each required component exists as a directory or file in the

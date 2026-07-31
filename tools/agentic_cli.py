@@ -2,12 +2,11 @@
 Merged Agentic Swarm — CLI Entry Point
 Provides run, status, promote, and config subcommands.
 """
+import argparse
+import json
+import logging
 import os
 import sys
-import json
-import time
-import argparse
-import logging
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -92,8 +91,8 @@ def cmd_status(args):
 
 def cmd_promote(args):
     """Force cold-path promotion without running full orchestrator."""
-    from tools.knowledge_cache import default_knowledge_cache
     from tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+    from tools.knowledge_cache import default_knowledge_cache
 
     orch = MultiLayeredAgenticOrchestrator()
     result = orch._promote_cold_path(phase_label="manual_cli")

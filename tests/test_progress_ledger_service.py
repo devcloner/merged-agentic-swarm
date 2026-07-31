@@ -6,9 +6,6 @@ ProgressLedgerService (load, save, log_progress, record_success_marker,
 handle_task_failure).
 """
 import os
-import time
-import json
-import pytest
 
 
 class TestObstaclePlaybookEngine:

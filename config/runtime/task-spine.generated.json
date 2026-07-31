@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-07-31T11:10:00Z",
+  "task_spine": {
+    "mode": "local_fallback",
+    "adapter": "services/task_spine_adapter.py",
+    "state_path": ".taskmaster/tasks/task_spine.json",
+    "cli": "uv run python services/task_spine_adapter.py",
+    "commands": {
+      "init": "--init",
+      "create": "--create --title \"...\" --description \"...\" [--priority P1|P2|P3]",
+      "claim": "--claim --task-id <id> --worker-id <worker>",
+      "complete": "--complete --task-id <id> [--evidence '{\"key\":\"value\"}']",
+      "fail": "--fail --task-id <id> --error-message \"...\"",
+      "block": "--block --task-id <id> [--blocked-by id1,id2]",
+      "list": "--list [--status pending|in_progress|completed|failed|blocked]",
+      "inspect": "--inspect --task-id <id>",
+      "attach_evidence": "--attach-evidence --task-id <id> --evidence '{\"path\":\"...\",\"summary\":\"...\"}'"
+    },
+    "task_master_status": "CONFIGURED_ONLY",
+    "task_master_blocker": "No valid Anthropic API key (ANTHROPIC_API_KEY=freecc only works with FCC proxy, not real Anthropic API)"
+  },
+  "acceptance_tests": {
+    "create_task": "PASS",
+    "claim_task": "PASS",
+    "complete_task": "PASS",
+    "block_task": "PASS",
+    "list_tasks": "PASS",
+    "inspect_task": "PASS",
+    "persist_across_reads": "PASS",
+    "attach_evidence": "PASS"
+  }
+}

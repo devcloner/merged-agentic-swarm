@@ -2,23 +2,24 @@
 Progress Ledger, Success Markers, and Self-Healing Obstacle Playbook Engine
 Maintains continuous progress report, verifies success markers, and executes auto-remediation playbooks.
 """
-import os
-import sys
-import re
 import json
-import time
 import logging
+import os
+import re
+import sys
+import time
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from typing import Dict, Any, List, Optional
-from models.ledger_models import ProgressLogEntry, SuccessMarker, ObstaclePlaybookEntry, TaskMasterStateSnapshot
+from typing import Any
+
+from models.ledger_models import ObstaclePlaybookEntry, ProgressLogEntry, SuccessMarker
 from services.task_master_service import default_task_master
 
 logger = logging.getLogger("progress_ledger")
 
 class ObstaclePlaybookEngine:
     def __init__(self):
-        self.playbooks: List[ObstaclePlaybookEntry] = [
+        self.playbooks: list[ObstaclePlaybookEntry] = [
             ObstaclePlaybookEntry(
                 id="PLAYBOOK-01",
                 error_pattern=r"429|quota|rate limit|too many requests",
@@ -49,7 +50,7 @@ class ObstaclePlaybookEngine:
             )
         ]
 
-    def match_and_remediate(self, error_message: str, task_id: str) -> Dict[str, Any]:
+    def match_and_remediate(self, error_message: str, task_id: str) -> dict[str, Any]:
         """Matches error against playbooks and applies self-healing strategy."""
         for entry in self.playbooks:
             if re.search(entry.error_pattern, error_message, re.IGNORECASE):
@@ -70,8 +71,8 @@ class ObstaclePlaybookEngine:
 class ProgressLedgerService:
     def __init__(self, ledger_file: str = "/home/ubuntu/.taskmaster/tasks/progress_ledger.json"):
         self.ledger_file = ledger_file
-        self.log_entries: List[ProgressLogEntry] = []
-        self.success_markers: List[SuccessMarker] = []
+        self.log_entries: list[ProgressLogEntry] = []
+        self.success_markers: list[SuccessMarker] = []
         self.playbook_engine = ObstaclePlaybookEngine()
         self.load_ledger()
 
@@ -98,7 +99,7 @@ class ProgressLedgerService:
         except Exception as e:
             logger.error(f"Failed saving progress ledger: {e}")
 
-    def log_progress(self, task_id: str, subtask_id: Optional[str], worker_id: str, wave_id: int, action: str, status: str, tokens_used: int = 0, learning_generated: Optional[str] = None, details: Optional[Dict[str, Any]] = None) -> ProgressLogEntry:
+    def log_progress(self, task_id: str, subtask_id: str | None, worker_id: str, wave_id: int, action: str, status: str, tokens_used: int = 0, learning_generated: str | None = None, details: dict[str, Any] | None = None) -> ProgressLogEntry:
         entry = ProgressLogEntry(
             entry_id=f"LOG-{len(self.log_entries)+1:05d}",
             timestamp=time.time(),
@@ -117,7 +118,7 @@ class ProgressLedgerService:
         logger.info(f"Progress Ledger logged: [{task_id}] {action} -> {status}")
         return entry
 
-    def record_success_marker(self, task_id: str, verifier_name: str, command: Optional[str] = None, exit_code: int = 0, output_summary: str = "", command_executed: Optional[str] = None) -> SuccessMarker:
+    def record_success_marker(self, task_id: str, verifier_name: str, command: str | None = None, exit_code: int = 0, output_summary: str = "", command_executed: str | None = None) -> SuccessMarker:
         cmd = command or command_executed
         marker = SuccessMarker(
             id=f"MARKER-{len(self.success_markers)+1:04d}",
@@ -133,7 +134,7 @@ class ProgressLedgerService:
         logger.info(f"Recorded Success Marker {marker.id} for task {task_id}")
         return marker
 
-    def handle_task_failure(self, task_id: str, error_message: str) -> Dict[str, Any]:
+    def handle_task_failure(self, task_id: str, error_message: str) -> dict[str, Any]:
         """Processes a task failure through self-healing playbooks."""
         res = self.playbook_engine.match_and_remediate(error_message, task_id)
         self.log_progress(

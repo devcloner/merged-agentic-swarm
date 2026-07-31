@@ -18,26 +18,42 @@
       "status": "completed",
       "completion_pct": 100,
       "color": "GREEN",
-      "notes": "Codebase scanned (1293 files, 510 Python modules). Spec gap detection improved to directory-based checking — 0 false positives."
+      "notes": "Codebase scanned (1293 files, 510 Python modules). Spec gap detection improved to directory-based checking \u2014 0 false positives."
     },
     "phase_3": {
       "status": "completed",
       "completion_pct": 100,
       "color": "GREEN",
-      "notes": "All 4 waves pass via orchestrator with gate validation (12 success markers). Worker pools: 40 workers, 7 roles, 4 pools. Concurrency ramp [4→8→16→24→40] configured."
+      "notes": "All 4 waves pass via orchestrator with gate validation (12 success markers). Worker pools: 40 workers, 7 roles, 4 pools. Concurrency ramp [4\u21928\u219216\u219224\u219240] configured."
     },
     "phase_4": {
       "status": "completed",
       "completion_pct": 100,
       "color": "GREEN",
-      "notes": "Cold-path promotion pipeline verified: hot cache (8 learnings) → knowledge.jsonl (17 entries) → agents.jsonl (3 agents) → chain.jsonl (3 entries). Spawn chain: 15 entries. Learning dedup and diversity improvements added."
+      "notes": "Cold-path promotion pipeline verified: hot cache (8 learnings) \u2192 knowledge.jsonl (17 entries) \u2192 agents.jsonl (3 agents) \u2192 chain.jsonl (3 entries). Spawn chain: 15 entries. Learning dedup and diversity improvements added."
     }
   },
   "pool_status": {
-    "domain_module": { "assigned": 0, "done": 0, "blocked": 0 },
-    "type_hardening": { "assigned": 0, "done": 0, "blocked": 0 },
-    "test_engineering": { "assigned": 0, "done": 0, "blocked": 0 },
-    "security_a11y": { "assigned": 0, "done": 0, "blocked": 0 }
+    "domain_module": {
+      "assigned": 0,
+      "done": 0,
+      "blocked": 0
+    },
+    "type_hardening": {
+      "assigned": 0,
+      "done": 0,
+      "blocked": 0
+    },
+    "test_engineering": {
+      "assigned": 0,
+      "done": 0,
+      "blocked": 0
+    },
+    "security_a11y": {
+      "assigned": 0,
+      "done": 0,
+      "blocked": 0
+    }
   },
   "live_ai_verification": {
     "provider": "litellm-proxy (localhost:4000)",
@@ -54,15 +70,15 @@
     "current_url": "opencode.ai/v1/chat/completions",
     "result": "403 (website returned HTML, not API)",
     "fixed_url": "api.opencode.ai/v1/chat/completions",
-    "fixed_result": "200 OK but 'Not Found' body — model name or auth mismatch",
+    "fixed_result": "200 OK but 'Not Found' body \u2014 model name or auth mismatch",
     "verdict": "opencode_go/deepseek-v4-flash not a valid model at api.opencode.ai. ACP protocol, not OpenAI REST."
   },
   "blockers": [
-    "opencode 403: api.opencode.ai returns 'Not Found' for all OpenAI endpoints — account, key, or model name mismatch",
+    "opencode 403: api.opencode.ai returns 'Not Found' for all OpenAI endpoints \u2014 account, key, or model name mismatch",
     "gemini timeout: direct API at generativelanguage.googleapis.com times out (network or quota)",
-    "groq 403: error code 1010 — account or API key issue",
+    "groq 403: error code 1010 \u2014 account or API key issue",
     "alibabacloud timeout: network connectivity issue",
-    "digitalocean 403: 'Forbidden' — not authorized",
+    "digitalocean 403: 'Forbidden' \u2014 not authorized",
     "MCP config .claude/mcp.json requires session restart to validate runtime",
     "Worker pools configured but no real code-modification subtasks dispatched yet"
   ],
@@ -71,10 +87,39 @@
     "launched_at": "2026-07-30T14:35:00Z",
     "agents_registered": 12,
     "phases": [
-      {"name": "Registry Compaction", "items": ["compact-knowledge", "compact-agents", "compact-chain"]},
-      {"name": "Core Improvements", "items": ["ramp-controller", "agent-spec-writer", "pool-health", "ownership-gate"]},
-      {"name": "Infrastructure", "items": ["anomaly-wiring", "base-commands", "reusable-skills"]},
-      {"name": "Integration", "items": ["syntax-verify", "ci-check", "progress-update"]}
+      {
+        "name": "Registry Compaction",
+        "items": [
+          "compact-knowledge",
+          "compact-agents",
+          "compact-chain"
+        ]
+      },
+      {
+        "name": "Core Improvements",
+        "items": [
+          "ramp-controller",
+          "agent-spec-writer",
+          "pool-health",
+          "ownership-gate"
+        ]
+      },
+      {
+        "name": "Infrastructure",
+        "items": [
+          "anomaly-wiring",
+          "base-commands",
+          "reusable-skills"
+        ]
+      },
+      {
+        "name": "Integration",
+        "items": [
+          "syntax-verify",
+          "ci-check",
+          "progress-update"
+        ]
+      }
     ],
     "docs_created": [
       "docs/agentic/COMPREHENSIVE_AUDIT.md",
@@ -97,32 +142,32 @@
       "notes": "Registry compaction, ramp controller, agent spec writer, anomaly wiring, ownership gate, pool health, commands, skills."
     },
     {
-      "milestone": "EPIC-05 — Synthesis & Reporting",
+      "milestone": "EPIC-05 \u2014 Synthesis & Reporting",
       "completed_at": "2026-07-30T14:45:00Z",
       "status": "completed",
-      "notes": "Completion report, PRD v2 updated with all FR items verified, knowledge.jsonl semantic dedup (8→4), content-hash dedup in knowledge_cache.py, progress.json final milestone, CI pass verified, orchestrator end-to-end smoke test passed (4 waves, 21 markers). All P0/P1 gaps closed."
+      "notes": "Completion report, PRD v2 updated with all FR items verified, knowledge.jsonl semantic dedup (8\u21924), content-hash dedup in knowledge_cache.py, progress.json final milestone, CI pass verified, orchestrator end-to-end smoke test passed (4 waves, 21 markers). All P0/P1 gaps closed."
     },
     {
-      "milestone": "Phase 0 — Control Plane Foundation",
+      "milestone": "Phase 0 \u2014 Control Plane Foundation",
       "completed_at": "2026-07-30T01:13:00Z",
       "status": "completed",
       "files_created": 15,
       "notes": "All registries, configs, PRD, MCP config, setup script, architect prompt created."
     },
     {
-      "milestone": "Phase 1 — PRD Parsing",
+      "milestone": "Phase 1 \u2014 PRD Parsing",
       "completed_at": "2026-07-30T01:40:00Z",
       "status": "completed",
       "notes": "6 epics, 20 subtasks, 24 estimated turns. State path reconciled."
     },
     {
-      "milestone": "Phase 2 — Codebase Map & Gap Analysis",
+      "milestone": "Phase 2 \u2014 Codebase Map & Gap Analysis",
       "completed_at": "2026-07-30T01:47:00Z",
       "status": "completed",
       "notes": "1293 files scanned, 510 Python modules parsed. Spec gap detection improved."
     },
     {
-      "milestone": "Phases 3-4 — Full Orchestrator Run + Live AI",
+      "milestone": "Phases 3-4 \u2014 Full Orchestrator Run + Live AI",
       "completed_at": "2026-07-30T13:52:00Z",
       "status": "completed",
       "notes": "End-to-end orchestrator runs passing all waves. Live AI inference via liteLLM proxy confirmed. Cold-path promotion working. Learning dedup + diversity added.",
@@ -139,6 +184,12 @@
         "live_ai": "gemini-2.5-flash via liteLLM proxy",
         "files_committed": 25
       }
+    },
+    {
+      "milestone": "Learning Loop E2E Test",
+      "completed_at": "learning-loop-test-1785501094",
+      "status": "completed",
+      "notes": "Learning loop e2e test passed. Agent agent-learning_loop_test-cold-1785495164 promoted. 5 artifacts written. | Re-run: learning-loop-test-1785495230 (agent: agent-learning_loop_test-cold-1785495230) | Re-run: learning-loop-test-1785495243 (agent: agent-learning_loop_test-cold-1785495243) | Re-run: learning-loop-test-1785500940 (agent: agent-learning_loop_test-cold-1785500940) | Re-run: learning-loop-test-1785501094 (agent: agent-learning_loop_test-cold-1785501094)"
     }
   ],
   "deep_assessment": {
@@ -148,31 +199,31 @@
         "id": "CG-01",
         "title": "Worker output never applied to codebase",
         "description": "execute_subtask_batch_parallel dispatches AI requests to the fabric, stores responses in result dicts, but NEVER applies output to files. The system orchestrates perfectly but produces no tangible changes.",
-        "impact": "HIGH — Orchestrator is a metadata manager, not a code modifier"
+        "impact": "HIGH \u2014 Orchestrator is a metadata manager, not a code modifier"
       },
       {
         "id": "CG-02",
         "title": "Timeout cascade on every fabric call",
-        "description": "litellm (15s) → opencode (instant 403) → gemini (0.8s timeout) → groq (instant 403) → alibabacloud (0.8s timeout) → digitalocean (instant 403) → simulation. Each fabric call takes ~17s before falling through.",
-        "impact": "HIGH — Every worker subtask costs ~17s even with simulation. 8 fabric calls × 17s = ~136s wasted in timeouts alone."
+        "description": "litellm (15s) \u2192 opencode (instant 403) \u2192 gemini (0.8s timeout) \u2192 groq (instant 403) \u2192 alibabacloud (0.8s timeout) \u2192 digitalocean (instant 403) \u2192 simulation. Each fabric call takes ~17s before falling through.",
+        "impact": "HIGH \u2014 Every worker subtask costs ~17s even with simulation. 8 fabric calls \u00d7 17s = ~136s wasted in timeouts alone."
       },
       {
         "id": "CG-03",
         "title": "No circuit breaker for consistently failing providers",
         "description": "If litellm consistently times out (e.g., Gemini overloaded), the fabric tries it first on every call and waits 15s each time before moving on. No mechanism to temporarily disable a failing provider.",
-        "impact": "MEDIUM — Amplifies CG-02"
+        "impact": "MEDIUM \u2014 Amplifies CG-02"
       },
       {
         "id": "CG-04",
         "title": "Learning dedup only works forward",
         "description": "Existing duplicates (LEARN-0001 through 0005 all same title/category) persist permanently. No cleanup mechanism for pre-existing duplicates.",
-        "impact": "LOW — cosmetic, doesn't affect functionality"
+        "impact": "LOW \u2014 cosmetic, doesn't affect functionality"
       },
       {
         "id": "CG-05",
         "title": "Cold-path registries grow unboundedly",
         "description": "knowledge.jsonl, agents.jsonl, chain.jsonl are append-only with no compaction, TTL, or pruning. After 3 runs: 17 KB knowledge entries.",
-        "impact": "LOW — will accumulate over time but not performance-critical"
+        "impact": "LOW \u2014 will accumulate over time but not performance-critical"
       }
     ],
     "medium_improvements": [
@@ -197,7 +248,7 @@
       "All external provider API keys need renewal or reconfiguration",
       "MCP config requires Claude Code session restart (cannot be done in this session)",
       "fcc-server dual-mode (Anthropic Messages API support) for TM CLI",
-      "no git remote configured — local commits only"
+      "no git remote configured \u2014 local commits only"
     ]
   },
   "next_recommended_actions": [
@@ -208,5 +259,16 @@
     "5. Close GAP-01 (SSE streaming proxy support) and GAP-02 (TM CLI format reconciliation)",
     "6. Add auto-compaction hook to orchestrator end-of-run sequence",
     "7. Implement topological dependency resolution for epics in task_master_service.py"
-  ]
+  ],
+  "_last_learning_loop_run": "learning-loop-test-1785501094",
+  "_last_learning_loop_agent": "agent-learning_loop_test-cold-1785501094",
+  "learning_loop_verification": {
+    "last_run": 1785495956.5081766,
+    "knowledge_promoted": "LEARN-VFY-1785495956",
+    "agent_created": "agent-validation-regex-vfy-1785495956",
+    "agent_file": ".claude/agents/agent-validation-regex-vfy-1785495956.md",
+    "chain_entry": "CHAIN-VFY-1785495956",
+    "test_passed": true,
+    "status": "VERIFIED_PROMOTED"
+  }
 }

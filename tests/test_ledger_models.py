@@ -5,7 +5,9 @@ Coverage: SuccessMarker, ObstaclePlaybookEntry, ProgressLogEntry,
 TaskMasterStateSnapshot.
 """
 from models.ledger_models import (
-    SuccessMarker, ObstaclePlaybookEntry, ProgressLogEntry,
+    ObstaclePlaybookEntry,
+    ProgressLogEntry,
+    SuccessMarker,
     TaskMasterStateSnapshot,
 )
 

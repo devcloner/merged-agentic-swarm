@@ -5,15 +5,17 @@ Coverage: format_anthropic_to_openai, format_openai_to_anthropic_response,
 _build_route_list, dispatch_request (simulation fallback), circuit breaker,
 perma-ban.
 """
-import time
 import json
-from unittest.mock import patch, MagicMock
-import pytest
+import time
+from unittest.mock import MagicMock, patch
+
 from providers.multi_provider_fabric import (
-    MultiProviderFabric, MODEL_FABRIC_ROUTES,
-    _circuit_breaker, _circuit_open_until, _permanently_dead,
-    _last_successful_provider,
-    _record_failure, _record_success,
+    MultiProviderFabric,
+    _circuit_breaker,
+    _circuit_open_until,
+    _permanently_dead,
+    _record_failure,
+    _record_success,
 )
 
 
@@ -64,7 +66,7 @@ class TestRouteBuilding:
     def test_build_route_list_default(self):
         routes = self.fabric._build_route_list("claude-3-7-sonnet")
         assert len(routes) > 0
-        assert routes[0]["provider"] == "litellm"  # default first
+        assert routes[0]["provider"] == "fcc-proxy"  # default first
 
     def test_build_route_list_promotes_last_successful(self):
         import providers.multi_provider_fabric as mpf
@@ -87,9 +89,11 @@ class TestCircuitBreaker:
         _record_failure("test_provider", http_code=401)
         assert "test_provider" in _permanently_dead
 
-    def test_record_failure_perma_ban_403(self):
-        _record_failure("test_provider", http_code=403)
-        assert "test_provider" in _permanently_dead
+    def test_record_failure_403_trips_circuit_breaker(self):
+        for _ in range(3):
+            _record_failure("test_provider", http_code=403)
+        assert "test_provider" not in _permanently_dead
+        assert "test_provider" in _circuit_open_until
 
     def test_record_failure_circuit_breaker(self):
         for _ in range(3):

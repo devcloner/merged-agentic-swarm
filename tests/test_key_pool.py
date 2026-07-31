@@ -4,11 +4,11 @@ Tests for providers/key_pool.py
 Coverage: APIKeyInfo, KeyPoolManager (load_keys, get_key, add_key,
 mark_success, mark_rate_limited, get_summary).
 """
-import os
 import time
-import json
+
 import pytest
-from providers.key_pool import KeyPoolManager, APIKeyInfo, KeyStatus
+
+from providers.key_pool import APIKeyInfo, KeyPoolManager, KeyStatus
 
 
 class TestAPIKeyInfo:

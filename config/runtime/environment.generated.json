@@ -1,0 +1,450 @@
+{
+  "generated_at": "2026-07-31T12:31:14Z",
+  "hostname": "hirtef",
+  "script_version": "1.0.0",
+  "os": {
+    "name": "Ubuntu 24.04.4 LTS",
+    "arch": "aarch64",
+    "kernel": "6.17.0-1019-oracle"
+  },
+  "runtimes": {
+    "python": "3.12.3",
+    "node": "22.23.1",
+    "uv": "0.12.0",
+    "git": "2.43.0",
+    "docker": "29.6.2"
+  },
+  "listening_ports": [
+    {
+      "port": "11451",
+      "address": "0.0.0.0:11451",
+      "process": ""
+    },
+    {
+      "port": "22653",
+      "address": "127.0.0.1:22653",
+      "process": "node"
+    },
+    {
+      "port": "6389",
+      "address": "127.0.0.1:6389",
+      "process": "agy"
+    },
+    {
+      "port": "24099",
+      "address": "127.0.0.1:24099",
+      "process": "node"
+    },
+    {
+      "port": "1485",
+      "address": "127.0.0.1:1485",
+      "process": "node"
+    },
+    {
+      "port": "19237",
+      "address": "127.0.0.1:19237",
+      "process": "node"
+    },
+    {
+      "port": "3000",
+      "address": "127.0.0.1:3000",
+      "process": ""
+    },
+    {
+      "port": "2065",
+      "address": "127.0.0.1:2065",
+      "process": "node"
+    },
+    {
+      "port": "29261",
+      "address": "127.0.0.1:29261",
+      "process": "node"
+    },
+    {
+      "port": "53",
+      "address": "127.0.0.54:53",
+      "process": ""
+    },
+    {
+      "port": "29861",
+      "address": "127.0.0.1:29861",
+      "process": "node"
+    },
+    {
+      "port": "53",
+      "address": "127.0.0.53%lo:53",
+      "process": ""
+    },
+    {
+      "port": "51121",
+      "address": "0.0.0.0:51121",
+      "process": ""
+    },
+    {
+      "port": "1455",
+      "address": "0.0.0.0:1455",
+      "process": ""
+    },
+    {
+      "port": "631",
+      "address": "0.0.0.0:631",
+      "process": ""
+    },
+    {
+      "port": "111",
+      "address": "0.0.0.0:111",
+      "process": ""
+    },
+    {
+      "port": "80",
+      "address": "0.0.0.0:80",
+      "process": ""
+    },
+    {
+      "port": "22",
+      "address": "0.0.0.0:22",
+      "process": ""
+    },
+    {
+      "port": "443",
+      "address": "0.0.0.0:443",
+      "process": ""
+    },
+    {
+      "port": "9200",
+      "address": "127.0.0.1:9200",
+      "process": "opencode"
+    },
+    {
+      "port": "8000",
+      "address": "0.0.0.0:8000",
+      "process": "sub-agent-mcp"
+    },
+    {
+      "port": "8085",
+      "address": "0.0.0.0:8085",
+      "process": "node"
+    },
+    {
+      "port": "8082",
+      "address": "0.0.0.0:8082",
+      "process": ""
+    },
+    {
+      "port": "8080",
+      "address": "0.0.0.0:8080",
+      "process": "fcc-server"
+    },
+    {
+      "port": "8317",
+      "address": "127.0.0.1:8317",
+      "process": ""
+    },
+    {
+      "port": "9847",
+      "address": "127.0.0.1:9847",
+      "process": "node"
+    },
+    {
+      "port": "27623",
+      "address": "127.0.0.1:27623",
+      "process": "agy"
+    },
+    {
+      "port": "27347",
+      "address": "127.0.0.1:27347",
+      "process": "node"
+    },
+    {
+      "port": "54545",
+      "address": "0.0.0.0:54545",
+      "process": ""
+    },
+    {
+      "port": "11451",
+      "address": "[::]:11451",
+      "process": ""
+    },
+    {
+      "port": "9000",
+      "address": "*:9000",
+      "process": ""
+    },
+    {
+      "port": "51121",
+      "address": "[::]:51121",
+      "process": ""
+    },
+    {
+      "port": "1455",
+      "address": "[::]:1455",
+      "process": ""
+    },
+    {
+      "port": "631",
+      "address": "[::]:631",
+      "process": ""
+    },
+    {
+      "port": "111",
+      "address": "[::]:111",
+      "process": ""
+    },
+    {
+      "port": "80",
+      "address": "[::]:80",
+      "process": ""
+    },
+    {
+      "port": "22",
+      "address": "[::]:22",
+      "process": ""
+    },
+    {
+      "port": "443",
+      "address": "[::]:443",
+      "process": ""
+    },
+    {
+      "port": "8082",
+      "address": "[::]:8082",
+      "process": ""
+    },
+    {
+      "port": "54545",
+      "address": "[::]:54545",
+      "process": ""
+    }
+  ],
+  "matched_processes": [
+    {
+      "pid": "66",
+      "user": "root",
+      "command": "[rcu_tasks_rude_kthread]"
+    },
+    {
+      "pid": "67",
+      "user": "root",
+      "command": "[rcu_tasks_trace_kthread]"
+    },
+    {
+      "pid": "69",
+      "user": "root",
+      "command": "[khungtaskd]"
+    },
+    {
+      "pid": "1268",
+      "user": "earlyoom",
+      "command": "/usr/bin/earlyoom -m 5 -s 5 -r 3600 --prefer (python|node|chroma|litellm)"
+    },
+    {
+      "pid": "2049",
+      "user": "root",
+      "command": "./CLIProxyAPI"
+    },
+    {
+      "pid": "2200",
+      "user": "root",
+      "command": "haproxy -W -db -f /tmp/haproxy.cfg"
+    },
+    {
+      "pid": "2515",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 1455 -container-ip 172.20.0.3 -container-port 1455 -use-listen-fd"
+    },
+    {
+      "pid": "2521",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 1455 -container-ip 172.20.0.3 -container-port 1455 -use-listen-fd"
+    },
+    {
+      "pid": "2542",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip 127.0.0.1 -host-port 8317 -container-ip 172.20.0.3 -container-port 8317 -use-listen-fd"
+    },
+    {
+      "pid": "2558",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 11451 -container-ip 172.20.0.3 -container-port 11451 -use-listen-fd"
+    },
+    {
+      "pid": "2565",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 11451 -container-ip 172.20.0.3 -container-port 11451 -use-listen-fd"
+    },
+    {
+      "pid": "2582",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 51121 -container-ip 172.20.0.3 -container-port 51121 -use-listen-fd"
+    },
+    {
+      "pid": "2591",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 51121 -container-ip 172.20.0.3 -container-port 51121 -use-listen-fd"
+    },
+    {
+      "pid": "2616",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 54545 -container-ip 172.20.0.3 -container-port 54545 -use-listen-fd"
+    },
+    {
+      "pid": "2623",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 54545 -container-ip 172.20.0.3 -container-port 54545 -use-listen-fd"
+    },
+    {
+      "pid": "2715",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip 127.0.0.1 -host-port 3000 -container-ip 172.20.0.6 -container-port 3000 -use-listen-fd"
+    },
+    {
+      "pid": "2744",
+      "user": "root",
+      "command": "haproxy -W -db -f /tmp/haproxy.cfg"
+    },
+    {
+      "pid": "342617",
+      "user": "ubuntu",
+      "command": "/home/ubuntu/.local/share/uv/tools/free-claude-code/bin/python /home/ubuntu/.local/bin/fcc-server"
+    },
+    {
+      "pid": "450203",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 80 -container-ip 172.20.0.2 -container-port 80 -use-listen-fd"
+    },
+    {
+      "pid": "450209",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 80 -container-ip 172.20.0.2 -container-port 80 -use-listen-fd"
+    },
+    {
+      "pid": "450223",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 443 -container-ip 172.20.0.2 -container-port 443 -use-listen-fd"
+    },
+    {
+      "pid": "450231",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 443 -container-ip 172.20.0.2 -container-port 443 -use-listen-fd"
+    },
+    {
+      "pid": "450247",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto udp -host-ip 0.0.0.0 -host-port 443 -container-ip 172.20.0.2 -container-port 443 -use-listen-fd"
+    },
+    {
+      "pid": "450252",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto udp -host-ip :: -host-port 443 -container-ip 172.20.0.2 -container-port 443 -use-listen-fd"
+    },
+    {
+      "pid": "450271",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8082 -container-ip 172.20.0.2 -container-port 8082 -use-listen-fd"
+    },
+    {
+      "pid": "450279",
+      "user": "root",
+      "command": "/usr/bin/docker-proxy -proto tcp -host-ip :: -host-port 8082 -container-ip 172.20.0.2 -container-port 8082 -use-listen-fd"
+    },
+    {
+      "pid": "518420",
+      "user": "ubuntu",
+      "command": "/home/ubuntu/.local/share/uv/tools/free-claude-code/bin/python /home/ubuntu/.local/bin/fcc-claude --output-format stream-json --verbose --input-format stream-json --model fable --permission-prompt-tool stdio --allowedTools Grep,MultiEdit,Bash(git log:*),Bash(git diff:*),Task,Bash(git status:*),TodoRead,Write,TodoWrite,WebSearch,WebFetch,Edit,Read,Glob,exit_plan_mode --tools default --mcp-config {\"mcpServers\":{\"cloudcli-browser\":{\"type\":\"stdio\",\"command\":\"/usr/local/bin/node\",\"args\":[\"/home/ubuntu/claudecodeui/dist-server/server/browser-use-mcp.js\"],\"env\":{\"CLOUDCLI_BROWSER_USE_MCP_TOKEN\":\"95f52784637237398950b85795fc81eb17400de41feb574be186e94d101e4023\",\"CLOUDCLI_BROWSER_USE_API_URL\":\"http://127.0.0.1:8085/api/browser-use-mcp\"}}}} --setting-sources=project,user,local --permission-mode plan"
+    },
+    {
+      "pid": "518421",
+      "user": "ubuntu",
+      "command": "/home/ubuntu/.local/share/uv/tools/free-claude-code/bin/python /home/ubuntu/.local/bin/fcc-claude --output-format stream-json --verbose --input-format stream-json --model fable --permission-prompt-tool stdio --allowedTools Grep,MultiEdit,Bash(git log:*),Bash(git diff:*),Task,Bash(git status:*),TodoRead,Write,TodoWrite,WebSearch,WebFetch,Edit,Read,Glob,exit_plan_mode --tools default --mcp-config {\"mcpServers\":{\"cloudcli-browser\":{\"type\":\"stdio\",\"command\":\"/usr/local/bin/node\",\"args\":[\"/home/ubuntu/claudecodeui/dist-server/server/browser-use-mcp.js\"],\"env\":{\"CLOUDCLI_BROWSER_USE_MCP_TOKEN\":\"95f52784637237398950b85795fc81eb17400de41feb574be186e94d101e4023\",\"CLOUDCLI_BROWSER_USE_API_URL\":\"http://127.0.0.1:8085/api/browser-use-mcp\"}}}} --setting-sources=project,user,local --permission-mode plan"
+    },
+    {
+      "pid": "518422",
+      "user": "ubuntu",
+      "command": "/home/ubuntu/.local/bin/claude --output-format stream-json --verbose --input-format stream-json --model fable --permission-prompt-tool stdio --allowedTools Grep,MultiEdit,Bash(git log:*),Bash(git diff:*),Task,Bash(git status:*),TodoRead,Write,TodoWrite,WebSearch,WebFetch,Edit,Read,Glob,exit_plan_mode --tools default --mcp-config {\"mcpServers\":{\"cloudcli-browser\":{\"type\":\"stdio\",\"command\":\"/usr/local/bin/node\",\"args\":[\"/home/ubuntu/claudecodeui/dist-server/server/browser-use-mcp.js\"],\"env\":{\"CLOUDCLI_BROWSER_USE_MCP_TOKEN\":\"95f52784637237398950b85795fc81eb17400de41feb574be186e94d101e4023\",\"CLOUDCLI_BROWSER_USE_API_URL\":\"http://127.0.0.1:8085/api/browser-use-mcp\"}}}} --setting-sources=project,user,local --permission-mode plan"
+    },
+    {
+      "pid": "518424",
+      "user": "ubuntu",
+      "command": "/home/ubuntu/.local/bin/claude --output-format stream-json --verbose --input-format stream-json --model fable --permission-prompt-tool stdio --allowedTools Grep,MultiEdit,Bash(git log:*),Bash(git diff:*),Task,Bash(git status:*),TodoRead,Write,TodoWrite,WebSearch,WebFetch,Edit,Read,Glob,exit_plan_mode --tools default --mcp-config {\"mcpServers\":{\"cloudcli-browser\":{\"type\":\"stdio\",\"command\":\"/usr/local/bin/node\",\"args\":[\"/home/ubuntu/claudecodeui/dist-server/server/browser-use-mcp.js\"],\"env\":{\"CLOUDCLI_BROWSER_USE_MCP_TOKEN\":\"95f52784637237398950b85795fc81eb17400de41feb574be186e94d101e4023\",\"CLOUDCLI_BROWSER_USE_API_URL\":\"http://127.0.0.1:8085/api/browser-use-mcp\"}}}} --setting-sources=project,user,local --permission-mode plan"
+    },
+    {
+      "pid": "518557",
+      "user": "ubuntu",
+      "command": "/home/ubuntu/.local/share/uv/tools/free-claude-code/bin/python /home/ubuntu/.local/bin/fcc-claude --output-format stream-json --verbose --input-format stream-json --model fable --permission-prompt-tool stdio --resume=0f7bfc79-603b-4b45-9f76-3239531206d7 --allowedTools Grep,MultiEdit,Bash(git log:*),Bash(git diff:*),Task,Bash(git status:*),TodoRead,Write,TodoWrite,WebSearch,WebFetch,Edit,Read,Glob,exit_plan_mode --tools default --mcp-config {\"mcpServers\":{\"cloudcli-browser\":{\"type\":\"stdio\",\"command\":\"/usr/local/bin/node\",\"args\":[\"/home/ubuntu/claudecodeui/dist-server/server/browser-use-mcp.js\"],\"env\":{\"CLOUDCLI_BROWSER_USE_MCP_TOKEN\":\"95f52784637237398950b85795fc81eb17400de41feb574be186e94d101e4023\",\"CLOUDCLI_BROWSER_USE_API_URL\":\"http://127.0.0.1:8085/api/browser-use-mcp\"}}}} --setting-sources=project,user,local --permission-mode plan"
+    },
+    {
+      "pid": "518558",
+      "user": "ubuntu",
+      "command": "/home/ubuntu/.local/bin/claude --output-format stream-json --verbose --input-format stream-json --model fable --permission-prompt-tool stdio --resume=0f7bfc79-603b-4b45-9f76-3239531206d7 --allowedTools Grep,MultiEdit,Bash(git log:*),Bash(git diff:*),Task,Bash(git status:*),TodoRead,Write,TodoWrite,WebSearch,WebFetch,Edit,Read,Glob,exit_plan_mode --tools default --mcp-config {\"mcpServers\":{\"cloudcli-browser\":{\"type\":\"stdio\",\"command\":\"/usr/local/bin/node\",\"args\":[\"/home/ubuntu/claudecodeui/dist-server/server/browser-use-mcp.js\"],\"env\":{\"CLOUDCLI_BROWSER_USE_MCP_TOKEN\":\"95f52784637237398950b85795fc81eb17400de41feb574be186e94d101e4023\",\"CLOUDCLI_BROWSER_USE_API_URL\":\"http://127.0.0.1:8085/api/browser-use-mcp\"}}}} --setting-sources=project,user,local --permission-mode plan"
+    },
+    {
+      "pid": "519403",
+      "user": "ubuntu",
+      "command": "node /home/ubuntu/.claude-code-ui/plugins/cloudcli-plugin-task-queue/dist/server.js"
+    },
+    {
+      "pid": "973157",
+      "user": "ubuntu",
+      "command": "/home/ubuntu/.opencode/bin/opencode serve --port 9200 --hostname 127.0.0.1 --print-logs"
+    },
+    {
+      "pid": "985565",
+      "user": "ubuntu",
+      "command": "/home/ubuntu/.local/share/uv/tools/free-claude-code/bin/python /home/ubuntu/.local/bin/fcc-claude"
+    },
+    {
+      "pid": "1052844",
+      "user": "ubuntu",
+      "command": "/home/ubuntu/.local/share/uv/tools/free-claude-code/bin/python /home/ubuntu/.local/bin/fcc-claude"
+    },
+    {
+      "pid": "1070852",
+      "user": "70",
+      "command": "postgres: cliproxyapi cliproxyapi 172.18.0.2(36736) idle"
+    },
+    {
+      "pid": "1070922",
+      "user": "ubuntu",
+      "command": "/bin/bash -c source /home/ubuntu/fcc-gh-clone/.claude-isolated/shell-snapshots/snapshot-bash-1785500360942-x5bgfl.sh 2>/dev/null || true && shopt -u extglob 2>/dev/null || true && { \\builtin unalias -- 'unsetenv'; \\builtin unset -f -- 'unsetenv'; } >/dev/null 2>&1 || true && eval 'bash /home/ubuntu/scripts/agentic/run_smoke_workflow.sh 2>&1' < /dev/null && pwd -P >| /home/ubuntu/.fcc-tmp/claude-717d-cwd"
+    }
+  ],
+  "opencode": {
+    "binary": "/home/ubuntu/.opencode/bin/opencode",
+    "exists": true,
+    "executable": true,
+    "version": "1.18.10"
+  },
+  "proxy_8080": {
+    "host": "localhost",
+    "port": 8080,
+    "reachable": true,
+    "http_status": 200,
+    "model_count": 1015
+  },
+  "port_4000": {
+    "host": "localhost",
+    "port": 4000,
+    "expected": "dead",
+    "status": "dead",
+    "http_status": 0
+  },
+  "taskmaster": {
+    "config_path": "/home/ubuntu/.taskmaster/config.json",
+    "exists": true,
+    "main_provider": "anthropic",
+    "main_model": "claude-sonnet-4-20250514"
+  },
+  "registries": {
+    "directory": "/home/ubuntu/docs/agentic/registry",
+    "knowledge_jsonl_lines": 44,
+    "agents_jsonl_lines": 13,
+    "chain_jsonl_lines": 11,
+    "progress_json_lines": 274
+  },
+  "sub_agent_mcp": {
+    "host": "localhost",
+    "port": 8000,
+    "reachable": false,
+    "http_status": 0
+  }
+}

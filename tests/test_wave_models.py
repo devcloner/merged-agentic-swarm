@@ -3,7 +3,7 @@ Tests for models/wave_models.py
 
 Coverage: WavePhase, WaveStatus, WaveGateCriteria, WaveExecutionState.
 """
-from models.wave_models import WavePhase, WaveStatus, WaveGateCriteria, WaveExecutionState
+from models.wave_models import WaveExecutionState, WaveGateCriteria, WavePhase, WaveStatus
 
 
 class TestWavePhase:

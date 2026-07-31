@@ -6,11 +6,6 @@ _compact_registries, _run_syntax_verification, _append_jsonl,
 _promote_cold_path, initialize_system.
 """
 import os
-import json
-import time
-import tempfile
-import pytest
-from models.prd_models import SubTask
 
 
 class TestApplyWorkerOutputs:
@@ -52,7 +47,6 @@ class TestCompactRegistries:
     def test_no_registries_no_crash(self):
         """_compact_registries handles missing registry dir gracefully."""
         # Temporarily point to nonexistent dir
-        import tools.agentic_orchestrator as mod
         counts = self.orch._compact_registries()
         assert isinstance(counts, dict)
 

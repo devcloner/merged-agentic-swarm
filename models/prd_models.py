@@ -2,9 +2,10 @@
 PRD and Task Master Data Models
 """
 import time
+from dataclasses import asdict, dataclass, field
 from enum import Enum
-from typing import List, Dict, Any, Optional
-from dataclasses import dataclass, field, asdict
+from typing import Any
+
 
 class TaskStatus(str, Enum):
     PENDING = "pending"
@@ -27,15 +28,15 @@ class SubTask:
     title: str
     description: str
     status: TaskStatus = TaskStatus.PENDING
-    assigned_worker_id: Optional[str] = None
-    input_artifacts: List[str] = field(default_factory=list)
-    output_artifacts: List[str] = field(default_factory=list)
-    error_message: Optional[str] = None
+    assigned_worker_id: str | None = None
+    input_artifacts: list[str] = field(default_factory=list)
+    output_artifacts: list[str] = field(default_factory=list)
+    error_message: str | None = None
     estimated_turns: int = 1  # complexity estimate for Phase 1 analysis
     created_at: float = field(default_factory=time.time)
-    completed_at: Optional[float] = None
+    completed_at: float | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d['status'] = self.status.value if isinstance(self.status, Enum) else self.status
         return d
@@ -48,14 +49,14 @@ class EpicTask:
     wave_id: int
     priority: TaskPriority = TaskPriority.P1_HIGH
     status: TaskStatus = TaskStatus.PENDING
-    subtasks: List[SubTask] = field(default_factory=list)
-    dependencies: List[str] = field(default_factory=list) # IDs of prerequisite tasks
-    acceptance_criteria: List[str] = field(default_factory=list)
-    spec_gaps: List[str] = field(default_factory=list)
+    subtasks: list[SubTask] = field(default_factory=list)
+    dependencies: list[str] = field(default_factory=list) # IDs of prerequisite tasks
+    acceptance_criteria: list[str] = field(default_factory=list)
+    spec_gaps: list[str] = field(default_factory=list)
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d['status'] = self.status.value if isinstance(self.status, Enum) else self.status
         d['priority'] = self.priority.value if isinstance(self.priority, Enum) else self.priority
@@ -67,12 +68,12 @@ class SpecGap:
     id: str
     epic_id: str
     missing_requirement: str
-    affected_files: List[str]
+    affected_files: list[str]
     suggested_fix: str
     resolved: bool = False
-    resolution_note: Optional[str] = None
+    resolution_note: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 @dataclass
@@ -86,13 +87,13 @@ class PRDDocument:
 class PRDAnalysisResult:
     title: str
     summary: str
-    epics: List[EpicTask] = field(default_factory=list)
-    spec_gaps: List[SpecGap] = field(default_factory=list)
+    epics: list[EpicTask] = field(default_factory=list)
+    spec_gaps: list[SpecGap] = field(default_factory=list)
     total_estimated_turns: int = 0
     parsed_at: float = field(default_factory=time.time)
-    fabric_response_preview: Optional[str] = None  # raw AI response (truncated)
+    fabric_response_preview: str | None = None  # raw AI response (truncated)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         d = {
             "title": self.title,
             "summary": self.summary,

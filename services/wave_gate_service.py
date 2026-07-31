@@ -2,25 +2,24 @@
 Wave Gates Controller Service
 Enforces gated phase boundaries (Wave 0 to Wave 3) with pre-condition and post-condition verification.
 """
+import fnmatch
+import json
+import logging
 import os
 import sys
-import json
 import time
-import fnmatch
-import logging
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from typing import Dict, Any, List, Optional, Tuple
-from models.wave_models import WaveStatus, WaveGateCriteria, WaveExecutionState
 from models.prd_models import SubTask
-from services.task_master_service import default_task_master
+from models.wave_models import WaveExecutionState, WaveGateCriteria, WaveStatus
 from services.codebase_map_service import default_codebase_mapper
+from services.task_master_service import default_task_master
 
 logger = logging.getLogger("wave_gate")
 
 class WaveGateController:
     def __init__(self):
-        self.waves: Dict[int, WaveExecutionState] = {
+        self.waves: dict[int, WaveExecutionState] = {
             0: WaveExecutionState(
                 wave_id=0,
                 name="Wave 0: Codebase Mapping & Spec Gap Gate",
@@ -49,7 +48,7 @@ class WaveGateController:
     def get_wave_state(self, wave_id: int) -> WaveExecutionState:
         return self.waves.get(wave_id, self.waves[0])
 
-    def _check_ownership(self, subtasks: List[SubTask], pool_id: str) -> List[str]:
+    def _check_ownership(self, subtasks: list[SubTask], pool_id: str) -> list[str]:
         """Verify each subtask's output paths against the ownership map for pool_id.
 
         Checks that every output_artifact falls within the pool's owned_paths
@@ -88,7 +87,7 @@ class WaveGateController:
         owned_paths = pool_config.get("owned_paths", [])
         forbidden_paths = pool_config.get("forbidden_paths", [])
 
-        violations: List[str] = []
+        violations: list[str] = []
         for subtask in subtasks:
             for output_path in subtask.output_artifacts:
                 # Check forbidden paths first
@@ -110,7 +109,7 @@ class WaveGateController:
 
         return violations
 
-    def evaluate_gate_criteria(self, wave_id: int) -> Tuple[bool, List[str]]:
+    def evaluate_gate_criteria(self, wave_id: int) -> tuple[bool, list[str]]:
         """Evaluates whether all criteria for a wave gate are met."""
         state = self.waves.get(wave_id)
         if not state:
@@ -149,7 +148,7 @@ class WaveGateController:
         passed = len(reasons) == 0
         return passed, reasons
 
-    def advance_wave(self) -> Tuple[bool, str]:
+    def advance_wave(self) -> tuple[bool, str]:
         """Attempts to pass the current wave gate and advance to the next wave."""
         passed, reasons = self.evaluate_gate_criteria(self.current_wave)
         curr_state = self.waves[self.current_wave]

@@ -4,10 +4,10 @@ Tests for tools/knowledge_cache.py
 Coverage: KnowledgeCache — load_cache, save_cache, add_learning (with dedup,
 expiry, max enforce), get_learning, search_learnings.
 """
+import json
 import os
 import time
-import json
-import pytest
+
 from tools.knowledge_cache import KnowledgeCache
 
 

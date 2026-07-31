@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-07-31T10:30:00Z",
+  "generator": "live-discovery",
+  "environment": {
+    "os": "Ubuntu 24.04.4 LTS",
+    "kernel": "6.17.0-1019-oracle",
+    "arch": "aarch64",
+    "user": "ubuntu",
+    "home": "/home/ubuntu",
+    "repo_root": "/home/ubuntu",
+    "git_branch": "main",
+    "git_remote": null,
+    "git_dirty": true
+  },
+  "runtimes": {
+    "python": {"version": "3.12.3", "path": "/usr/bin/python3"},
+    "uv": {"version": "0.12.0"},
+    "node": {"version": "22.23.1"},
+    "npm": {"version": "10.9.8"},
+    "git": {"version": "2.43.0"},
+    "docker": {"version": "29.6.2"},
+    "pm2": {"installed": false}
+  },
+  "ports": {
+    "8080": {"process": "fcc-server", "pid": 342617, "protocol": "HTTP", "auth": "Bearer freecc", "status": "VERIFIED_USED"},
+    "8085": {"process": "node", "pid": 354200, "protocol": "HTTP", "status": "RUNNING_UNTESTED"},
+    "8000": {"process": "sub-agent-mcp", "pid": 1482, "protocol": "MCP", "status": "RUNNING"},
+    "4000": {"process": null, "status": "DEAD"},
+    "9000": {"process": "unknown", "status": "LISTENING"},
+    "3000": {"process": "docker-proxy", "status": "CONTAINER_PROXY"}
+  },
+  "opencode": {
+    "binary_path": "/home/ubuntu/.opencode/bin/opencode",
+    "version": "1.18.10",
+    "installed": true,
+    "swarm_agents_configured": 0,
+    "worker_processes_running": 0,
+    "swarm_config": "empty",
+    "status": "INSTALLED_NOT_USED"
+  },
+  "task_master": {
+    "config_path": "/home/ubuntu/.taskmaster/config.json",
+    "state_dir": "/home/ubuntu/.taskmaster/tasks/",
+    "installed": true,
+    "invoked": false,
+    "provider": "anthropic",
+    "api_key_valid": false,
+    "status": "CONFIGURED_ONLY"
+  },
+  "proxy": {
+    "fcc_server": {
+      "port": 8080,
+      "auth_mode": "bearer",
+      "auth_token": "freecc",
+      "models_served": 200,
+      "protocol": "OpenAI-compatible",
+      "status": "VERIFIED_USED"
+    },
+    "litellm": {
+      "port": 4000,
+      "status": "DEAD"
+    },
+    "node_proxy": {
+      "port": 8085,
+      "status": "RUNNING_UNTESTED"
+    }
+  },
+  "providers": {
+    "opencode": {"key_present": true, "live_tested": true, "result": "WORKING"},
+    "openrouter": {"key_present": true, "live_tested": false, "result": "UNKNOWN"},
+    "mistral": {"key_present": true, "live_tested": false, "result": "UNKNOWN"},
+    "nvidia_nim": {"key_present": true, "live_tested": false, "result": "UNKNOWN"},
+    "gemini": {"key_present": true, "live_tested": false, "result": "TIMEOUT_DIRECT"},
+    "groq": {"key_present": false, "live_tested": false, "result": "NO_KEY"},
+    "deepseek": {"key_present": false, "live_tested": false, "result": "NO_KEY"}
+  },
+  "registries": {
+    "knowledge_jsonl": {"path": "docs/agentic/registry/knowledge.jsonl", "entries": 39, "status": "STALE"},
+    "agents_jsonl": {"path": "docs/agentic/registry/agents.jsonl", "entries": 8, "status": "STALE"},
+    "chain_jsonl": {"path": "docs/agentic/registry/chain.jsonl", "entries": 6, "status": "STALE"},
+    "progress_json": {"path": "docs/agentic/registry/progress.json", "claimed_completion_pct": 100, "actual_pool_work": 0, "status": "MISLEADING"}
+  },
+  "critical_blockers": [
+    "no_git_remote",
+    "task_master_api_keys_placeholder",
+    "no_process_supervisor_pm2",
+    "fabric_routes_target_dead_port_4000"
+  ]
+}
