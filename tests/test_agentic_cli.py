@@ -23,7 +23,7 @@ class TestCmdConfig:
         """Verify model routes appear in config output."""
         cmd_config(None)
         captured = capsys.readouterr()
-        assert "litellm" in captured.out
+        assert "mistral" in captured.out
 
     def test_main_entry_points(self):
         """Verify argparse setup works for each subcommand."""

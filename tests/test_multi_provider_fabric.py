@@ -66,13 +66,13 @@ class TestRouteBuilding:
     def test_build_route_list_default(self):
         routes = self.fabric._build_route_list("claude-3-7-sonnet")
         assert len(routes) > 0
-        assert routes[0]["provider"] == "fcc-proxy"  # default first
+        assert routes[0]["provider"] == "gemini"  # gemini is first (verified, 42-key pool)
 
     def test_build_route_list_promotes_last_successful(self):
         import merged_agentic_swarm.providers.multi_provider_fabric as mpf
-        mpf._last_successful_provider = {"claude-3-5-sonnet": "groq"}
+        mpf._last_successful_provider = {"claude-3-5-sonnet": "fcc-proxy"}
         routes = self.fabric._build_route_list("claude-3-5-sonnet")
-        assert routes[0]["provider"] == "groq"
+        assert routes[0]["provider"] == "fcc-proxy"
 
     def test_build_route_list_fallback_to_default(self):
         routes = self.fabric._build_route_list("unknown-model")

@@ -70,6 +70,7 @@ class DurableAgentFactory:
         self.chain_registry = chain_registry or ChainRegistry()
         self.active_hot_specialists: dict[str, AgentSpec] = {}
         self.active_cold_agents: dict[str, AgentSpec] = {}
+        self._load_cold_agents_from_registry()
 
     def purge_expired(self) -> int:
         """Remove and return count of expired HOT micro-specialists (FIX-09)."""
@@ -83,6 +84,51 @@ class DurableAgentFactory:
             if expired:
                 logger.info(f"Purged expired HOT agent {aid} (lived {now - expired.created_at:.1f}s)")
         return len(expired_ids)
+
+    def _load_cold_agents_from_registry(self):
+        """Load durable agents from the cold-path agents.jsonl registry.
+
+        Called once at init so a fresh process discovers agents promoted by
+        previous runs — this is the key restart-survival path.
+        """
+        import json
+
+        agents_registry = os.path.expanduser("~/.config/merged-agentic-swarm/agents.jsonl")
+        if not os.path.exists(agents_registry):
+            # Fallback to repo-relative path (file is at src/merged_agentic_swarm/services/)
+            repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+            agents_registry = os.path.join(repo_root, "docs", "agentic", "registry", "agents.jsonl")
+        if not os.path.exists(agents_registry):
+            logger.debug("No agents.jsonl found; no durable agents to load.")
+            return
+
+        try:
+            with open(agents_registry) as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    spec_dict = json.loads(line)
+                    agent_id = spec_dict.get("id", "")
+                    if agent_id and spec_dict.get("ttl_sec") is None:  # durable — no TTL
+                        role_str = spec_dict.get("role", "core_engineer")
+                        try:
+                            role = WorkerRole(role_str)
+                        except ValueError:
+                            role = WorkerRole.CORE_ENGINEER
+                        spec = AgentSpec(
+                            id=agent_id,
+                            name=spec_dict.get("name", agent_id),
+                            role=role,
+                            agent_type=AgentType.COLD_DURABLE,
+                            system_prompt=spec_dict.get("system_prompt", ""),
+                            created_at=spec_dict.get("promoted_at", 0.0),
+                            ttl_sec=None,  # durable
+                        )
+                        self.active_cold_agents[agent_id] = spec
+            logger.info(f"Loaded {len(self.active_cold_agents)} durable agents from {agents_registry}")
+        except Exception as e:
+            logger.warning(f"Failed to load durable agents from {agents_registry}: {e}")
 
     def _write_agent_spec_file(self, agent_spec: dict[str, Any]) -> str | None:
         """Write an agent spec .md file from a JSONL entry.

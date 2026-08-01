@@ -1,8 +1,8 @@
 # Merged Agentic Swarm OS — Progress Report
 
-**Generated:** 2026-07-31 21:05:47 UTC (2026-07-31T21:05:47Z)
+**Generated:** 2026-07-31 23:32:21 UTC (2026-07-31T23:32:21Z)
 **Report version:** 1.0.0
-**Repository:** /home/ubuntu
+**Repository:** /home/ubuntu/merged-agentic-swarm
 **Branch:** main
 
 ---
@@ -27,10 +27,10 @@ Phase 2 — Verification & Integration | 25% complete (smoke test run)
 
 ## 3. Subsystem Status
 
-- **OpenCode status:** INSTALLED_NOT_USED (0 workers running)
-- **Task Master status:** CONFIGURED_ONLY
-- **Proxy status:** USED — fcc-server port 8080 (RUNNING_UNTESTED node proxy on 8085)
-- **Selected endpoint:** VERIFIED_USED (fcc-server:8080)
+- **OpenCode status:** USED_AS_IDE_ONLY (0 workers running)
+- **Task Master status:** NOT_USED
+- **Proxy status:** NOT USED
+- **Selected endpoint:** RUNNING (fcc-server:8080)
 
 ---
 
@@ -38,9 +38,9 @@ Phase 2 — Verification & Integration | 25% complete (smoke test run)
 
 | Result | Count |
 |--------|-------|
-| Completed | 8 |
+| Completed | 5 |
 | Failed | 0 |
-| Blocked/Skipped | 0 |
+| Blocked/Skipped | 2 |
 | Critical failures | 0 |
 
 **Failed steps:** 
@@ -49,19 +49,8 @@ Phase 2 — Verification & Integration | 25% complete (smoke test run)
 
 ## 5. Durable Agents
 
-13 durable agent spec(s) in `.claude/agents/`:
-- agent-learning_loop_test-cold-1785495164.md
-- agent-learning_loop_test-cold-1785495230.md
-- agent-learning_loop_test-cold-1785495243.md
-- agent-learning_loop_test-cold-1785500940.md
-- agent-learning_loop_test-cold-1785501094.md
-- agent-learning_loop_test-cold-1785531946.md
-- agent-single_agent_cat-cold-1785425141837.md
-- agent-swarm_concurrency-cold-1785423023323.md
-- agent-threshold_test-cold-1785425141832.md
-- agent-validation-regex-vfy-1785495956.md
-- agent-verification-cold-1785423023833.md
-- master-architect-prompt.md
+0 durable agent spec(s) in `.claude/agents/`:
+- (none)
 
 ---
 
@@ -69,16 +58,16 @@ Phase 2 — Verification & Integration | 25% complete (smoke test run)
 
 | Registry | Entries |
 |----------|---------|
-| knowledge.jsonl | 46 |
-| agents.jsonl | 11 |
-| chain.jsonl | 13 |
-| Promoted learnings | 2 |
+| knowledge.jsonl | 52 |
+| agents.jsonl | 13 |
+| chain.jsonl | 14 |
+| Promoted learnings | 0 |
 
 ---
 
 ## 7. Provider Fabric Status
 
-1 working / 2 unavailable
+0 working / 0 unavailable
 
 ---
 
@@ -86,17 +75,17 @@ Phase 2 — Verification & Integration | 25% complete (smoke test run)
 
 | Subsystem | Status | Detail |
 |-----------|--------|--------|
-| Environment Discovery | OK | USED — fcc-server port 8080 (RUNNING_UNTESTED node proxy on 8085) |
-| Proxy (fcc + node) | OK | USED — fcc-server port 8080 (RUNNING_UNTESTED node proxy on 8085) |
-| Task Spine | OK | CONFIGURED_ONLY |
-| Worker Runtime (1 worker) | OK | INSTALLED_NOT_USED (0 workers running) |
-| Worker Runtime (2 workers) | OK | INSTALLED_NOT_USED (0 workers running) |
-| Learning Loop | OK | 46 records in registry |
-| Durable Agents | OK | 13 agent specs |
-| Progress Report | OK | Generated 2026-07-31 21:05:47 UTC |
-| Multi-Provider Fabric | -- | 1 working / 2 unavailable |
-| Registries (knowledge/agents/chain) | -- | 46 / 11 / 13 entries |
-| Promoted Learnings | -- | 2 promoted |
+| Environment Discovery | OK | NOT USED |
+| Proxy (fcc + node) | SKIP | NOT USED |
+| Task Spine | OK | NOT_USED |
+| Worker Runtime (1 worker) | OK | USED_AS_IDE_ONLY (0 workers running) |
+| Worker Runtime (2 workers) | -- | USED_AS_IDE_ONLY (0 workers running) |
+| Learning Loop | SKIP | 52 records in registry |
+| Durable Agents | -- | 0 agent specs |
+| Progress Report | OK | Generated 2026-07-31 23:32:21 UTC |
+| Multi-Provider Fabric | -- | 0 working / 0 unavailable |
+| Registries (knowledge/agents/chain) | -- | 52 / 13 / 14 entries |
+| Promoted Learnings | -- | 0 promoted |
 
 ---
 
@@ -122,99 +111,87 @@ python3 tools/agentic_cli.py run
 
 ## 11. Audit Trail
 
-Audit files in `/home/ubuntu/docs/agentic/audit`:
+Audit files in `/home/ubuntu/merged-agentic-swarm/docs/agentic/audit`:
 
 - `BASELINE_AUDIT.md` (10283 bytes, 240 lines)
 - `DURABLE_AGENT_ROUTING_VERIFICATION.md` (2888 bytes, 88 lines)
-- `LEARNING_LOOP_VERIFICATION.md` (4903 bytes, 114 lines)
-- `PROXY_VERIFICATION.md` (4358 bytes, 100 lines)
-- `TASK_SPINE_VERIFICATION.md` (4849 bytes, 123 lines)
-- `WORKER_RUNTIME_VERIFICATION.md` (4276 bytes, 126 lines)
-- `environment-facts.json` (3297 bytes, 89 lines)
+- `LEARNING_LOOP_VERIFICATION.md` (7267 bytes, 103 lines)
+- `PROXY_VERIFICATION.md` (5376 bytes, 117 lines)
+- `TASK_SPINE_VERIFICATION.md` (6701 bytes, 118 lines)
+- `WORKER_RUNTIME_VERIFICATION.md` (7759 bytes, 190 lines)
+- `environment-facts.json` (1221 bytes, 23 lines)
 
 ### Smoke Test Results (raw)
 
 ```json
 {
   "workflow": "smoke-test",
-  "version": "1.0.0",
-  "started_at": "2026-07-31T12:31:13Z",
-  "completed_at": "2026-07-31T12:31:35Z",
+  "version": "2.0.0",
+  "started_at": "2026-07-31T23:32:19Z",
+  "completed_at": "2026-07-31T23:32:21Z",
   "verdict": "pass",
   "counts": {
-    "total": 8,
-    "passed": 8,
+    "total": 7,
+    "passed": 5,
     "failed": 0,
-    "skipped": 0,
+    "skipped": 2,
     "critical_failed": 0
   },
   "passed": [
     "discover",
-    "proxy",
+    "config",
     "spine",
     "worker1",
-    "worker2",
-    "learning",
-    "durable",
     "report"
   ],
-  "failed": [
-    ""
-  ],
+  "failed": [],
   "skipped": [
-    ""
+    "proxy",
+    "learning"
   ],
   "steps": [
     {
       "step": "discover",
       "status": "passed",
       "critical": true,
-      "duration_sec": 1
+      "duration_sec": 0
+    },
+    {
+      "step": "config",
+      "status": "passed",
+      "critical": true,
+      "duration_sec": 0
     },
     {
       "step": "proxy",
-      "status": "passed",
-      "critical": true,
-      "duration_sec": 6
+      "status": "skipped",
+      "critical": true
     },
     {
       "step": "spine",
       "status": "passed",
       "critical": true,
-      "duration_sec": 6
+      "duration_sec": 2
     },
     {
       "step": "worker1",
       "status": "passed",
       "critical": true,
-      "duration_sec": 4
-    },
-    {
-      "step": "worker2",
-      "status": "passed",
-      "critical": false,
-      "duration_sec": 4
-    },
-    {
-      "step": "learning",
-      "status": "passed",
-      "critical": false,
       "duration_sec": 0
     },
     {
-      "step": "durable",
-      "status": "passed",
-      "critical": false,
-      "duration_sec": 1
+      "step": "learning",
+      "status": "skipped",
+      "critical": true
     },
     {
       "step": "report",
       "status": "passed",
-      "critical": false,
+      "critical": true,
       "duration_sec": 0
     }
   ],
-  "results_file": "/home/ubuntu/config/runtime/smoke-test-results.json"
+  "results_file": "/home/ubuntu/merged-agentic-swarm/config/runtime/smoke-test-results.json"
 }
 ```
 

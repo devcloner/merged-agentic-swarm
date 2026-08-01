@@ -235,11 +235,18 @@ Identify any missing requirements or spec gaps.
             )
         ]
 
+        # Build summary, including AI fabric preview if available
+        preview_snippet = ""
+        if fabric_response_text:
+            if isinstance(fabric_response_text, str):
+                preview_snippet = f" Fabric AI response preview: {fabric_response_text[:300]}"
+            else:
+                preview_snippet = f" Fabric AI response received (type={type(fabric_response_text).__name__})."
+
         analysis = PRDAnalysisResult(
             title=title,
             summary=f"PRD parsed into {len(epics)} epics with {sum(len(e.subtasks) for e in epics)} subtasks, "
-                    f"{total_turns} estimated turns."
-                    f"{' Fabric AI response preview: ' + fabric_response_text[:300] if fabric_response_text else ' (fabric unavailable — using structured baseline).'}",
+                    f"{total_turns} estimated turns.{preview_snippet}",
             epics=epics,
             spec_gaps=spec_gaps,
             total_estimated_turns=total_turns,

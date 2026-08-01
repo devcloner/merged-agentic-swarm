@@ -1,32 +1,28 @@
 {
   "workflow": "smoke-test",
-  "version": "1.0.0",
-  "started_at": "2026-07-31T21:05:23Z",
-  "completed_at": "2026-07-31T21:05:47Z",
+  "version": "2.0.0",
+  "started_at": "2026-07-31T23:32:19Z",
+  "completed_at": "2026-07-31T23:32:21Z",
   "verdict": "pass",
   "counts": {
-    "total": 8,
-    "passed": 8,
+    "total": 7,
+    "passed": 5,
     "failed": 0,
-    "skipped": 0,
+    "skipped": 2,
     "critical_failed": 0
   },
   "passed": [
   "discover",
-  "proxy",
+  "config",
   "spine",
   "worker1",
-  "worker2",
-  "learning",
-  "durable",
   "report"
 ],
-  "failed": [
-  ""
-],
+  "failed": [],
   "skipped": [
-  ""
+  "proxy",
+  "learning"
 ],
-  "steps": [{"step":"discover","status":"passed","critical":true,"duration_sec":2},{"step":"proxy","status":"passed","critical":true,"duration_sec":5},{"step":"spine","status":"passed","critical":true,"duration_sec":6},{"step":"worker1","status":"passed","critical":true,"duration_sec":5},{"step":"worker2","status":"passed","critical":false,"duration_sec":5},{"step":"learning","status":"passed","critical":false,"duration_sec":0},{"step":"durable","status":"passed","critical":false,"duration_sec":1},{"step":"report","status":"passed","critical":false,"duration_sec":0}],
-  "results_file": "/home/ubuntu/config/runtime/smoke-test-results.json"
+  "steps": [{"step":"discover","status":"passed","critical":true,"duration_sec":0},{"step":"config","status":"passed","critical":true,"duration_sec":0},{"step":"proxy","status":"skipped","critical":true},{"step":"spine","status":"passed","critical":true,"duration_sec":2},{"step":"worker1","status":"passed","critical":true,"duration_sec":0},{"step":"learning","status":"skipped","critical":true},{"step":"report","status":"passed","critical":true,"duration_sec":0}],
+  "results_file": "/home/ubuntu/merged-agentic-swarm/config/runtime/smoke-test-results.json"
 }

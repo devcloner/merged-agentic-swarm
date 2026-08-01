@@ -51,40 +51,65 @@ def _record_success(provider: str, model_alias: str | None = None):
 
 # Fallback Routing Table
 #
-# NOTE: As of 2026-07-31, only Mistral has a verified working API key in this environment.
-# OpenCode (no credits), OpenRouter (invalid key), NVIDIA NIM (timeout).
-# Routes are ordered by verified status first, then by cost/depth.
+# Free-model providers verified working in this environment (2026-08-01):
+#   - Gemini  — 42 keys in ~/gemlni-keys/working-keys.txt; free tier serves
+#               gemini-2.5-flash and gemini-2.5-flash-lite (HTTP 200 verified).
+#   - Mistral — single working key; small/ministral/tiny/codestral/large all 200.
+#   - fcc-proxy (localhost:8080) fronts Mistral successfully; its OpenRouter /
+#     OpenCode / NIM upstreams are dead (401 / no credits / timeout) and get
+#     perma-banned on first failure, so they are kept only as cascade fallbacks.
+# Routes are ordered verified-first, then by cost/depth. Dead providers fail
+# fast (perma-ban / circuit breaker) and fall through to the next working route.
 # See docs/agentic/audit/PROXY_VERIFICATION.md for the full audit.
 MODEL_FABRIC_ROUTES: dict[str, list[dict[str, str]]] = {
-    # ── deep tier (claude-3-opus) ──────────────────────────────────────────
+    # ── deep tier (claude-3-opus) — strongest available models ─────────────
     "claude-3-opus": [
         {"provider": "mistral", "model": "codestral-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-large-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
+        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
     ],
     # ── main tier (claude-3-7-sonnet) ──────────────────────────────────────
     "claude-3-7-sonnet": [
+        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
+        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
     ],
     # ── main tier (claude-3-5-sonnet) ──────────────────────────────────────
     "claude-3-5-sonnet": [
+        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
+        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
     ],
-    # ── fast tier (claude-3-5-haiku) ───────────────────────────────────────
+    # ── fast tier (claude-3-5-haiku) — cheapest/latency-first ──────────────
     "claude-3-5-haiku": [
+        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "mistral", "model": "mistral-tiny", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
+        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
     ],
     # ── general-purpose alias (fabCFA) — mirrors main tier ─────────────────
     "fabCFA": [
+        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
         {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
+        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
     ],
 }
 
@@ -158,6 +183,22 @@ class MultiProviderFabric:
 
     def dispatch_request(self, model_alias: str, messages: list[dict[str, Any]], system_prompt: str | None = None, max_tokens: int = 4096, temperature: float = 0.7) -> dict[str, Any]:
         """Dispatches request across multi-backend provider fallback cascade."""
+        # Empty conversation is a malformed request — don't burn provider calls
+        # (or cascade timeouts) on it; respond immediately like a 400 would.
+        if not messages and not system_prompt:
+            logger.warning("dispatch_request called with empty messages; returning error response.")
+            return {
+                "id": f"msg_err_{int(time.time()*1000)}",
+                "type": "message",
+                "role": "assistant",
+                "model": model_alias,
+                "content": [{"type": "text", "text": "[ERROR] Empty conversation: provide at least one message."}],
+                "stop_reason": "end_turn",
+                "stop_sequence": None,
+                "usage": {"input_tokens": 0, "output_tokens": 0},
+                "error": "empty_conversation",
+            }
+
         routes = self._build_route_list(model_alias)
 
         last_error = None

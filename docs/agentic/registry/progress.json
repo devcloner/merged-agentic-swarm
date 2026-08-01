@@ -187,9 +187,9 @@
     },
     {
       "milestone": "Learning Loop E2E Test",
-      "completed_at": "learning-loop-test-1785531946",
+      "completed_at": "learning-loop-test-1785540722",
       "status": "completed",
-      "notes": "Learning loop e2e test passed. Agent agent-learning_loop_test-cold-1785495164 promoted. 5 artifacts written. | Re-run: learning-loop-test-1785495230 (agent: agent-learning_loop_test-cold-1785495230) | Re-run: learning-loop-test-1785495243 (agent: agent-learning_loop_test-cold-1785495243) | Re-run: learning-loop-test-1785500940 (agent: agent-learning_loop_test-cold-1785500940) | Re-run: learning-loop-test-1785501094 (agent: agent-learning_loop_test-cold-1785501094) | Re-run: learning-loop-test-1785531946 (agent: agent-learning_loop_test-cold-1785531946)"
+      "notes": "Learning loop e2e test passed. Agent agent-learning_loop_test-cold-1785495164 promoted. 5 artifacts written. | Re-run: learning-loop-test-1785495230 (agent: agent-learning_loop_test-cold-1785495230) | Re-run: learning-loop-test-1785495243 (agent: agent-learning_loop_test-cold-1785495243) | Re-run: learning-loop-test-1785500940 (agent: agent-learning_loop_test-cold-1785500940) | Re-run: learning-loop-test-1785501094 (agent: agent-learning_loop_test-cold-1785501094) | Re-run: learning-loop-test-1785531946 (agent: agent-learning_loop_test-cold-1785531946) | Re-run: learning-loop-test-1785540614 (agent: agent-learning_loop_test-cold-1785540614) | Re-run: learning-loop-test-1785540722 (agent: agent-learning_loop_test-cold-1785540722)"
     }
   ],
   "deep_assessment": {
@@ -260,8 +260,8 @@
     "6. Add auto-compaction hook to orchestrator end-of-run sequence",
     "7. Implement topological dependency resolution for epics in task_master_service.py"
   ],
-  "_last_learning_loop_run": "learning-loop-test-1785531946",
-  "_last_learning_loop_agent": "agent-learning_loop_test-cold-1785531946",
+  "_last_learning_loop_run": "learning-loop-test-1785540722",
+  "_last_learning_loop_agent": "agent-learning_loop_test-cold-1785540722",
   "learning_loop_verification": {
     "last_run": 1785495956.5081766,
     "knowledge_promoted": "LEARN-VFY-1785495956",

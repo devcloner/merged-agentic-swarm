@@ -300,7 +300,7 @@ class MultiLayeredAgenticOrchestrator:
                 "id": lid,
                 "title": learning.get("title", ""),
                 "category": learning.get("category", "general"),
-                "solution": learning.get("solution", ""),
+                "solution": learning.get("pattern_solution", learning.get("solution", "")),
                 "tags": learning.get("tags", []),
                 "promoted_at": now,
                 "source": "orchestrator_cold_path",
@@ -341,6 +341,13 @@ class MultiLayeredAgenticOrchestrator:
                 }
                 self._append_jsonl(chain_registry, chain_entry)
                 promoted_agents += 1
+
+                # 4. Write the actual agent .md spec file to .claude/agents/
+                written_path = default_agent_factory._write_agent_spec_file(agent_spec)
+                if written_path:
+                    logger.info(f"Wrote durable agent spec: {written_path}")
+                else:
+                    logger.debug(f"Agent spec file already exists for {agent_spec['id']} (skipped)")
 
                 # Also register in the hot-path spawn chain for cross-referencing
                 default_agent_factory.chain_registry.register_spawn(

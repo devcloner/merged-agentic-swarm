@@ -29,21 +29,53 @@ logger = logging.getLogger("worker_runtime_adapter")
 
 OPENCODE_BIN = os.path.expanduser("~/.opencode/bin/opencode")
 
+# Resolve the actual opencode binary from PATH or common locations
+_OPENCODE_BIN_RESOLVED: str | None = None
+
+
+def _resolve_opencode_bin() -> str | None:
+    """Resolve the opencode binary from PATH or known locations."""
+    global _OPENCODE_BIN_RESOLVED
+    if _OPENCODE_BIN_RESOLVED is not None:
+        return _OPENCODE_BIN_RESOLVED if _OPENCODE_BIN_RESOLVED else None
+
+    candidates = [
+        OPENCODE_BIN,
+        os.path.expanduser("~/.local/bin/opencode"),
+        "/usr/local/bin/opencode",
+        "/usr/bin/opencode",
+    ]
+    # Also check PATH
+    import shutil
+    path_bin = shutil.which("opencode")
+    if path_bin:
+        candidates.insert(0, path_bin)
+
+    for candidate in candidates:
+        if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+            _OPENCODE_BIN_RESOLVED = candidate
+            return candidate
+    _OPENCODE_BIN_RESOLVED = ""  # sentinel for "not found"
+    return None
+
 # ── Mode auto-detection ────────────────────────────────────────────────
 
 
 def _opencode_available() -> bool:
     """Return True if the OpenCode binary exists and responds to --help."""
-    if not os.path.isfile(OPENCODE_BIN) or not os.access(OPENCODE_BIN, os.X_OK):
+    bin_path = _resolve_opencode_bin()
+    if not bin_path:
         return False
     try:
         result = subprocess.run(
-            [OPENCODE_BIN, "--help"],
+            [bin_path, "--help"],
             capture_output=True,
             text=True,
             timeout=5,
         )
-        return result.returncode == 0 and "opencode" in result.stdout.lower()
+        # OpenCode sends help output to stderr
+        output = (result.stdout + result.stderr).lower()
+        return result.returncode == 0 and "opencode" in output
     except Exception:
         return False
 
@@ -71,8 +103,13 @@ class WorkerRuntimeAdapter:
       direct_fabric   — bare fabric dispatch, no worker subprocess at all
     """
 
-    OPENCODE_BIN: str = OPENCODE_BIN
+    OPENCODE_BIN: str = OPENCODE_BIN  # default (may be overridden)
     DEFAULT_PORT_BASE: int = 9200
+
+    @classmethod
+    def _get_opencode_bin(cls) -> str | None:
+        """Return the resolved opencode binary, or None if unavailable."""
+        return _resolve_opencode_bin()
 
     def __init__(self, mode: str = "auto") -> None:
         if mode == "auto":
@@ -212,11 +249,14 @@ class WorkerRuntimeAdapter:
         sends the task via stdin / HTTP, and captures the result.
         If the serve subprocess fails, falls back to native.
         """
+        opencode_bin = self._get_opencode_bin()
+        if not opencode_bin:
+            return self._launch_via_native(worker_spec, task)
+
         port = self._next_port()
         cmd = [
-            self.OPENCODE_BIN, "serve",
+            opencode_bin, "serve",
             "--port", str(port),
-            "--hostname", "127.0.0.1",
             "--print-logs",
         ]
         try:

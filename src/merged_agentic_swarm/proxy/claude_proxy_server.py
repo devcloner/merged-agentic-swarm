@@ -248,9 +248,9 @@ class ProxyServerDaemon:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    srv = ProxyServerDaemon(port=8085)
+    srv = ProxyServerDaemon(port=8089)
     srv.start()
-    print("Proxy server running on port 8085... Press Ctrl+C to stop.")
+    print("Proxy server running on port 8089... Press Ctrl+C to stop.")
     try:
         while True:
             time.sleep(1)
