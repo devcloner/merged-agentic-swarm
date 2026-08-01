@@ -51,65 +51,87 @@ def _record_success(provider: str, model_alias: str | None = None):
 
 # Fallback Routing Table
 #
-# Free-model providers verified working in this environment (2026-08-01):
-#   - Gemini  — 42 keys in ~/gemlni-keys/working-keys.txt; free tier serves
-#               gemini-2.5-flash and gemini-2.5-flash-lite (HTTP 200 verified).
-#   - Mistral — single working key; small/ministral/tiny/codestral/large all 200.
-#   - fcc-proxy (localhost:8080) fronts Mistral successfully; its OpenRouter /
-#     OpenCode / NIM upstreams are dead (401 / no credits / timeout) and get
-#     perma-banned on first failure, so they are kept only as cascade fallbacks.
-# Routes are ordered verified-first, then by cost/depth. Dead providers fail
-# fast (perma-ban / circuit breaker) and fall through to the next working route.
-# See docs/agentic/audit/PROXY_VERIFICATION.md for the full audit.
-MODEL_FABRIC_ROUTES: dict[str, list[dict[str, str]]] = {
+# Every route below was live-verified (HTTP 200) in this environment on 2026-08-01:
+#   - Gemini  — 42 keys in ~/gemlni-keys/working-keys.txt rotate via KeyPoolManager
+#               (least-used selection). gemini-2.5-flash: 36/42 keys 200;
+#               gemini-2.5-flash-lite: 39/42 keys 200 (3 keys 404 — not enabled for
+#               flash-lite); gemini-flash-latest alias also 200. The 2.5-pro / 2.0-flash
+#               family 429s on all 42 keys (outside these keys' free quota) — excluded.
+#   - NVIDIA NIM — integrate.api.nvidia.com, free tier. llama-3.1-8b / -70b / gpt-oss-20b /
+#               glm-5.2 / mistral-nemotron / nemotron-super-49b / nemotron-3-super-120b
+#               all 200 in <3s. llama-3.3-70b-instruct is 200 but ~44s — kept as a
+#               deep fallback with a per-route timeout override (was misdiagnosed as
+#               dead before the timeout fix; the fixed 10s timeout killed it).
+#   - fcc-proxy (localhost:8080) — fronts 943 models; nvidia_nim/* and mistral/*
+#               through the proxy are 200 (0.2-0.4s). Its opencode_go and open_router
+#               upstreams 401 (dead upstream keys inside the proxy) — excluded.
+#   - Mistral — api.mistral.ai, single working key; small/ministral/tiny/codestral/large 200.
+#   - OpenRouter — ONLY :free models are referenced (user does not use paid models).
+#               The env key is 401 "User not found" as of this audit, so these routes
+#               perma-ban on first hit and are skipped cheaply; kept so a valid key
+#               activates them automatically. 14 :free models exist on the platform.
+# Routes are ordered verified-first (reliability × speed), then as fallbacks. Dead
+# providers fail fast (perma-ban on 401 / circuit breaker) and fall through.
+MODEL_FABRIC_ROUTES: dict[str, list[dict[str, Any]]] = {
     # ── deep tier (claude-3-opus) — strongest available models ─────────────
     "claude-3-opus": [
-        {"provider": "mistral", "model": "codestral-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "mistral", "model": "mistral-large-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
-        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {"provider": "mistral", "model": "mistral-large-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {"provider": "fcc-proxy", "model": "nvidia_nim/meta/llama-3.1-70b-instruct", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "mistral", "model": "codestral-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions", "timeout": 60},
         {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
-        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
     ],
     # ── main tier (claude-3-7-sonnet) ──────────────────────────────────────
     "claude-3-7-sonnet": [
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
-        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
-        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
     ],
     # ── main tier (claude-3-5-sonnet) ──────────────────────────────────────
     "claude-3-5-sonnet": [
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
-        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
-        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
     ],
     # ── fast tier (claude-3-5-haiku) — cheapest/latency-first ──────────────
     "claude-3-5-haiku": [
         {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "nvidia_nim", "model": "meta/llama-3.1-8b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-tiny", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
-        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "nvidia_nim", "model": "mistralai/mistral-nemotron", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {"provider": "fcc-proxy", "model": "nvidia_nim/meta/llama-3.1-8b-instruct", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
-        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
     ],
     # ── general-purpose alias (fabCFA) — mirrors main tier ─────────────────
     "fabCFA": [
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
-        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
+        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
-        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
     ],
 }
 
@@ -222,59 +244,80 @@ class MultiProviderFabric:
                     _circuit_open_until.pop(provider, None)
                     _circuit_breaker[provider] = 0
 
-            key_info = self.key_pool.get_key(provider)
-            if not key_info:
-                logger.debug(f"No key available for provider {provider}, trying next in fabric chain.")
-                continue
+            # Try this route with up to KEY_RETRY_LIMIT distinct keys from the pool.
+            # A 429/503 is a per-key throttle — with N keys rotating, the next key is
+            # usually fine, so rotate within the route before cascading providers.
+            # Only non-throttle failures (401, 5xx, timeout) trip the provider-level
+            # circuit breaker, so one slow key can't take the whole provider down.
+            key_retry_limit = 3
+            for _ in range(key_retry_limit):
+                key_info = self.key_pool.get_key(provider)
+                if not key_info:
+                    logger.debug(f"No key available for provider {provider}, trying next in fabric chain.")
+                    break
 
-            openai_msgs = self.format_anthropic_to_openai(messages, system_prompt)
-            payload = {
-                "model": target_model,
-                "messages": openai_msgs,
-                "max_tokens": max_tokens,
-                "temperature": temperature
-            }
-
-            start_time = time.time()
-            try:
-                headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {key_info.secret_value}",
-                    "User-Agent": "MergedAgenticSwarm/1.0",
+                openai_msgs = self.format_anthropic_to_openai(messages, system_prompt)
+                payload = {
+                    "model": target_model,
+                    "messages": openai_msgs,
+                    "max_tokens": max_tokens,
+                    "temperature": temperature
                 }
 
-                req_data = json.dumps(payload).encode("utf-8")
-                req = urllib.request.Request(target_url, data=req_data, headers=headers, method="POST")
+                start_time = time.time()
+                try:
+                    headers = {
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {key_info.secret_value}",
+                        "User-Agent": "MergedAgenticSwarm/1.0",
+                    }
 
-                is_local = any(host in target_url for host in ["localhost", "127.0.0.1"])
-                timeout = 5.0 if is_local else 10.0
-                with urllib.request.urlopen(req, timeout=timeout) as response:
-                    res_body = response.read().decode("utf-8")
-                    resp_json = json.loads(res_body)
-                    latency = (time.time() - start_time) * 1000
-                    tokens = resp_json.get("usage", {}).get("total_tokens", 0)
+                    req_data = json.dumps(payload).encode("utf-8")
+                    req = urllib.request.Request(target_url, data=req_data, headers=headers, method="POST")
 
-                    self.key_pool.mark_success(key_info, latency_ms=latency, tokens=tokens)
-                    _record_success(provider, model_alias=model_alias)
+                    is_local = any(host in target_url for host in ["localhost", "127.0.0.1"])
+                    # Per-route timeout override: some free backends (e.g. NVIDIA NIM's
+                    # llama-3.3-70b) are slow-but-alive and need more than the default
+                    # 10s before they'd be falsely declared dead.
+                    timeout = route.get("timeout", 5.0 if is_local else 10.0)
+                    with urllib.request.urlopen(req, timeout=timeout) as response:
+                        res_body = response.read().decode("utf-8")
+                        resp_json = json.loads(res_body)
+                        latency = (time.time() - start_time) * 1000
+                        tokens = resp_json.get("usage", {}).get("total_tokens", 0)
 
-                    # If the response is already in Anthropic Messages format (e.g. fcc-proxy), return it directly.
-                    if resp_json.get("type") == "message":
-                        resp_json["model"] = model_alias  # override model name in response
-                        return resp_json
+                        self.key_pool.mark_success(key_info, latency_ms=latency, tokens=tokens)
+                        _record_success(provider, model_alias=model_alias)
 
-                    return self.format_openai_to_anthropic_response(resp_json, model_alias)
+                        # If the response is already in Anthropic Messages format (e.g. fcc-proxy), return it directly.
+                        if resp_json.get("type") == "message":
+                            resp_json["model"] = model_alias  # override model name in response
+                            return resp_json
 
-            except urllib.error.HTTPError as e:
-                err_text = e.read().decode("utf-8", errors="ignore") if hasattr(e, "read") else str(e)
-                logger.warning(f"HTTPError {e.code} on provider {provider} (model {target_model}): {err_text[:200]}")
-                if e.code in (429, 503):
-                    self.key_pool.mark_rate_limited(key_info, cooldown_seconds=60.0)
-                last_error = f"HTTP {e.code}: {err_text[:200]}"
-                _record_failure(provider, http_code=e.code)
-            except Exception as e:
-                logger.warning(f"Error calling provider {provider}: {e}")
-                last_error = str(e)
-                _record_failure(provider)
+                        return self.format_openai_to_anthropic_response(resp_json, model_alias)
+
+                except urllib.error.HTTPError as e:
+                    err_text = e.read().decode("utf-8", errors="ignore") if hasattr(e, "read") else str(e)
+                    logger.warning(f"HTTPError {e.code} on provider {provider} (model {target_model}): {err_text[:200]}")
+                    if e.code == 401:
+                        # Auth failure — provider-level, perma-ban and move on.
+                        last_error = f"HTTP {e.code}: {err_text[:200]}"
+                        _record_failure(provider, http_code=e.code)
+                        break
+                    if e.code in (429, 503):
+                        # Key-level throttle — cool this key down, rotate to another.
+                        self.key_pool.mark_rate_limited(key_info, cooldown_seconds=60.0)
+                        last_error = f"HTTP {e.code}: {err_text[:200]}"
+                        continue
+                    # Other HTTP errors — provider-level failure, trip breaker.
+                    last_error = f"HTTP {e.code}: {err_text[:200]}"
+                    _record_failure(provider, http_code=e.code)
+                    break
+                except Exception as e:
+                    logger.warning(f"Error calling provider {provider}: {e}")
+                    last_error = str(e)
+                    _record_failure(provider)
+                    break
 
         # Fallback offline simulation
         logger.warning(f"All live API providers unreachable or unconfigured for {model_alias}. Using simulation fallback (last error: {last_error}).")

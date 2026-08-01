@@ -1,0 +1,1314 @@
+{
+  "symbol_cache": {
+    "total_files": 107,
+    "python_files": 48,
+    "file_list": [
+      "SESSIONS_REPORT.md",
+      "ONBOARDING.md",
+      "PROMPTS.md",
+      "Makefile",
+      "pyproject.toml",
+      "opencode.json",
+      "setup-and-run.sh",
+      "uv.lock",
+      "CLAUDE.md",
+      "Merged Agentic Swarm Blueprin.md",
+      "claude-code-proxy.json",
+      "opencode-swarm.json",
+      ".gitignore",
+      "complex_multi_agenetic_work/llm-agent-execution-brief.md",
+      "complex_multi_agenetic_work/Merged Agentic Swarm Blueprin.md",
+      "complex_multi_agenetic_work/merged-agentic-swarm-blueprint.md",
+      "scripts/ci.sh",
+      "scripts/agentic/verify_component.sh",
+      "scripts/agentic/stop_agentic_services.sh",
+      "scripts/agentic/task_spine_cli.py",
+      "scripts/agentic/run_smoke_workflow.sh",
+      "scripts/agentic/run_learning_loop_test.sh",
+      "scripts/agentic/start_task_spine.sh",
+      "scripts/agentic/load_durable_agents.sh",
+      "scripts/agentic/start_worker_runtime.sh",
+      "scripts/agentic/discover_environment.sh",
+      "scripts/agentic/verify_learning_loop.py",
+      "scripts/agentic/verify_proxy.sh",
+      "scripts/agentic/verify_task_spine.sh",
+      "scripts/agentic/generate_progress_report.sh",
+      "scripts/agentic/verify_worker_runtime.sh",
+      "scripts/agentic/start_proxy.sh",
+      "scripts/agentic/run_spotify_ai_workflow.py",
+      "docs/agentic/WAVE_PLAN_40_AGENTS.md",
+      "docs/agentic/COMPREHENSIVE_AUDIT.md",
+      "docs/agentic/OPERATOR_RUNBOOK.md",
+      "docs/agentic/RUNBOOK.md",
+      "docs/agentic/IMPROVEMENT_RECOMMENDATIONS.md",
+      "docs/agentic/PROGRESS_REPORT.md",
+      "docs/agentic/KNOWLEDGE_BOX_SCHEMA.md",
+      "docs/agentic/COMPLETION_REPORT.md",
+      "docs/agentic/AGENT_SPEC_CONTRACT.md",
+      "docs/agentic/PRD_V2_EXECUTION_READY.md",
+      "docs/agentic/audit/BASELINE_AUDIT.md",
+      "docs/agentic/audit/TASK_SPINE_VERIFICATION.md",
+      "docs/agentic/audit/environment-facts.json",
+      "docs/agentic/audit/DURABLE_AGENT_ROUTING_VERIFICATION.md",
+      "docs/agentic/audit/PROXY_VERIFICATION.md",
+      "docs/agentic/audit/WORKER_RUNTIME_VERIFICATION.md",
+      "docs/agentic/audit/LEARNING_LOOP_VERIFICATION.md",
+      "docs/agentic/registry/STATE_PATH_NOTES.md",
+      "docs/agentic/registry/chain.jsonl",
+      "docs/agentic/registry/progress.json",
+      "docs/agentic/registry/knowledge.jsonl",
+      "docs/agentic/registry/agents.jsonl",
+      "docs/agentic/providers/PROVIDER_REGISTRY.json",
+      "tests/test_multi_provider_fabric.py",
+      "tests/test_prd_models.py",
+      "tests/test_agentic_orchestrator.py",
+      "tests/test_ledger_models.py",
+      "tests/test_wave_gate_service.py",
+      "tests/test_wave_models.py",
+      "tests/conftest.py",
+      "tests/test_task_master_service.py",
+      "tests/test_codebase_map_service.py",
+      "tests/test_claude_proxy_server.py",
+      "tests/test_key_pool.py",
+      "tests/test_progress_ledger_service.py",
+      "tests/test_agent_factory_service.py",
+      "tests/test_learning_loop.py",
+      "tests/test_agent_models.py",
+      "tests/test_token_savior.py",
+      "tests/test_opencode_swarm_service.py",
+      "tests/test_knowledge_cache.py",
+      "tests/test_agentic_cli.py",
+      "tests/__init__.py",
+      "src/merged_agentic_swarm/__init__.py",
+      "src/merged_agentic_swarm/models/prd_models.py",
+      "src/merged_agentic_swarm/models/wave_models.py",
+      "src/merged_agentic_swarm/models/ledger_models.py",
+      "src/merged_agentic_swarm/models/agent_models.py",
+      "src/merged_agentic_swarm/models/__init__.py",
+      "src/merged_agentic_swarm/proxy/claude_proxy_server.py",
+      "src/merged_agentic_swarm/proxy/__init__.py",
+      "src/merged_agentic_swarm/providers/key_pool.py",
+      "src/merged_agentic_swarm/providers/multi_provider_fabric.py",
+      "src/merged_agentic_swarm/providers/__init__.py",
+      "src/merged_agentic_swarm/tools/agentic_cli.py",
+      "src/merged_agentic_swarm/tools/token_savior.py",
+      "src/merged_agentic_swarm/tools/agentic_orchestrator.py",
+      "src/merged_agentic_swarm/tools/knowledge_cache.py",
+      "src/merged_agentic_swarm/tools/__init__.py",
+      "src/merged_agentic_swarm/services/task_spine_adapter.py",
+      "src/merged_agentic_swarm/services/wave_gate_service.py",
+      "src/merged_agentic_swarm/services/worker_runtime_adapter.py",
+      "src/merged_agentic_swarm/services/codebase_map_service.py",
+      "src/merged_agentic_swarm/services/opencode_swarm_service.py",
+      "src/merged_agentic_swarm/services/agent_factory_service.py",
+      "src/merged_agentic_swarm/services/task_master_service.py",
+      "src/merged_agentic_swarm/services/__init__.py",
+      "src/merged_agentic_swarm/services/progress_ledger_service.py",
+      "config/runtime/environment.generated.json",
+      "config/runtime/smoke-test-results.json",
+      "config/runtime/worker-runtime.generated.json",
+      "config/runtime/capabilities.generated.json",
+      "config/runtime/routing.generated.json",
+      "config/runtime/task-spine.generated.json"
+    ],
+    "symbols": {
+      "scripts/agentic/task_spine_cli.py": {
+        "classes": [],
+        "functions": [
+          "_load_state",
+          "_save_state",
+          "_find_task",
+          "cmd_create",
+          "cmd_list",
+          "cmd_claim",
+          "cmd_update",
+          "cmd_block",
+          "cmd_attach_evidence",
+          "cmd_inspect",
+          "cmd_restart_verify",
+          "main"
+        ],
+        "imports": [
+          "sys",
+          "json",
+          "pathlib",
+          "time",
+          "__future__",
+          "os",
+          "argparse"
+        ]
+      },
+      "scripts/agentic/verify_learning_loop.py": {
+        "classes": [],
+        "functions": [],
+        "imports": [
+          "sys",
+          "merged_agentic_swarm.tools.agentic_orchestrator",
+          "json",
+          "merged_agentic_swarm.services.agent_factory_service",
+          "pathlib",
+          "time",
+          "os",
+          "merged_agentic_swarm.tools.knowledge_cache"
+        ]
+      },
+      "scripts/agentic/run_spotify_ai_workflow.py": {
+        "classes": [],
+        "functions": [
+          "run_git"
+        ],
+        "imports": [
+          "sys",
+          "tomllib",
+          "datetime",
+          "merged_agentic_swarm.tools.agentic_orchestrator",
+          "json",
+          "subprocess",
+          "merged_agentic_swarm.services.agent_factory_service",
+          "pathlib",
+          "time",
+          "os",
+          "merged_agentic_swarm.tools.knowledge_cache"
+        ]
+      },
+      "tests/test_multi_provider_fabric.py": {
+        "classes": [
+          "TestFormatConversion",
+          "TestRouteBuilding",
+          "TestCircuitBreaker",
+          "TestDispatchRequest"
+        ],
+        "functions": [
+          "setup_method",
+          "test_format_anthropic_to_openai_with_system",
+          "test_format_anthropic_to_openai_no_system",
+          "test_format_with_content_blocks",
+          "test_format_openai_to_anthropic",
+          "test_format_openai_empty_choices",
+          "setup_method",
+          "test_build_route_list_default",
+          "test_build_route_list_promotes_last_successful",
+          "test_build_route_list_fallback_to_default",
+          "setup_method",
+          "test_record_failure_perma_ban_401",
+          "test_record_failure_403_trips_circuit_breaker",
+          "test_record_failure_circuit_breaker",
+          "test_record_success_resets",
+          "test_perma_ban_expiry_clears",
+          "setup_method",
+          "_block_all_providers",
+          "test_simulation_fallback",
+          "test_dispatch_with_context_objects",
+          "test_dispatch_successful_call",
+          "test_skip_perma_banned_provider"
+        ],
+        "imports": [
+          "time",
+          "unittest.mock",
+          "merged_agentic_swarm.providers.multi_provider_fabric",
+          "json"
+        ]
+      },
+      "tests/test_prd_models.py": {
+        "classes": [
+          "TestTaskStatus",
+          "TestTaskPriority",
+          "TestSubTask",
+          "TestEpicTask",
+          "TestSpecGap",
+          "TestPRDDocument",
+          "TestPRDAnalysisResult"
+        ],
+        "functions": [
+          "test_values",
+          "test_values",
+          "test_default_creation",
+          "test_to_dict_serializes_enum",
+          "test_marked_completed_sets_timestamp",
+          "test_with_error",
+          "test_default_creation",
+          "test_with_subtasks",
+          "test_to_dict_serializes_nested",
+          "test_default_creation",
+          "test_resolve",
+          "test_to_dict",
+          "test_default_creation",
+          "test_custom_title",
+          "test_default_creation",
+          "test_to_dict_without_preview",
+          "test_to_dict_with_preview"
+        ],
+        "imports": [
+          "merged_agentic_swarm.models.prd_models",
+          "time"
+        ]
+      },
+      "tests/test_agentic_orchestrator.py": {
+        "classes": [
+          "TestApplyWorkerOutputs",
+          "TestCompactRegistries",
+          "TestAppendJSONL",
+          "TestRunSyntaxVerification",
+          "TestPromoteColdPath",
+          "TestInitializeSystem"
+        ],
+        "functions": [
+          "setup_method",
+          "test_empty_results",
+          "test_no_completed_results",
+          "test_no_content_in_response",
+          "test_non_dict_response",
+          "test_skipped_when_missing_worker_id",
+          "setup_method",
+          "test_no_registries_no_crash",
+          "setup_method",
+          "test_append_to_new_file",
+          "test_append_to_existing_file",
+          "setup_method",
+          "test_syntax_verification_runs",
+          "setup_method",
+          "test_no_unpromoted_learnings",
+          "test_promotes_single_learning",
+          "test_promotes_agent_when_category_threshold_reached",
+          "test_does_not_duplicate_agent_per_category",
+          "test_persists_promoted_ids",
+          "test_initialize_system"
+        ],
+        "imports": [
+          "merged_agentic_swarm.tools.agentic_orchestrator",
+          "os",
+          "merged_agentic_swarm.tools.knowledge_cache"
+        ]
+      },
+      "tests/test_ledger_models.py": {
+        "classes": [
+          "TestSuccessMarker",
+          "TestObstaclePlaybookEntry",
+          "TestProgressLogEntry",
+          "TestTaskMasterStateSnapshot"
+        ],
+        "functions": [
+          "test_default_creation",
+          "test_to_dict",
+          "test_default_creation",
+          "test_to_dict",
+          "test_default_creation",
+          "test_to_dict",
+          "test_default_creation",
+          "test_to_dict"
+        ],
+        "imports": [
+          "merged_agentic_swarm.models.ledger_models"
+        ]
+      },
+      "tests/test_wave_gate_service.py": {
+        "classes": [
+          "TestWaveGateController"
+        ],
+        "functions": [
+          "setup_method",
+          "test_initial_state",
+          "test_get_wave_state_valid",
+          "test_get_wave_state_invalid_defaults_to_0",
+          "test_evaluate_gate_wave_0_passes",
+          "test_evaluate_gate_invalid_wave",
+          "test_advance_wave_passes",
+          "test_advance_wave_beyond_all",
+          "test_check_ownership_valid",
+          "test_fail_advance_if_wave_not_pass",
+          "test_wave_2_gate_checks_execution",
+          "test_wave_3_gate_checks_verification",
+          "test_advance_wave_sets_timestamps"
+        ],
+        "imports": [
+          "merged_agentic_swarm.models.prd_models",
+          "merged_agentic_swarm.services.wave_gate_service",
+          "os",
+          "merged_agentic_swarm.services"
+        ]
+      },
+      "tests/test_wave_models.py": {
+        "classes": [
+          "TestWavePhase",
+          "TestWaveStatus",
+          "TestWaveGateCriteria",
+          "TestWaveExecutionState"
+        ],
+        "functions": [
+          "test_values",
+          "test_ordering",
+          "test_values",
+          "test_default_creation",
+          "test_to_dict",
+          "test_custom_checks",
+          "test_default_creation",
+          "test_advance_to_in_progress",
+          "test_to_dict",
+          "test_failure"
+        ],
+        "imports": [
+          "merged_agentic_swarm.models.wave_models",
+          "time"
+        ]
+      },
+      "tests/conftest.py": {
+        "classes": [],
+        "functions": [
+          "temp_dir",
+          "temp_env_file",
+          "isolated_key_pool",
+          "isolated_fabric",
+          "isolated_knowledge_cache",
+          "isolated_chain_registry",
+          "isolated_agent_factory",
+          "isolated_progress_ledger",
+          "isolated_task_master",
+          "isolated_wave_controller",
+          "isolated_swarm_manager",
+          "isolated_codebase_mapper",
+          "owner_map_file",
+          "make_subtask",
+          "make_epic",
+          "_make",
+          "_make"
+        ],
+        "imports": [
+          "merged_agentic_swarm.services.opencode_swarm_service",
+          "merged_agentic_swarm.services.task_master_service",
+          "merged_agentic_swarm.models.prd_models",
+          "merged_agentic_swarm.providers.multi_provider_fabric",
+          "json",
+          "merged_agentic_swarm.services.wave_gate_service",
+          "merged_agentic_swarm.services.progress_ledger_service",
+          "merged_agentic_swarm.services.codebase_map_service",
+          "pytest",
+          "merged_agentic_swarm.services.agent_factory_service",
+          "tempfile",
+          "time",
+          "os",
+          "merged_agentic_swarm.providers.key_pool",
+          "merged_agentic_swarm.tools.knowledge_cache"
+        ]
+      },
+      "tests/test_task_master_service.py": {
+        "classes": [
+          "TestTaskMasterService"
+        ],
+        "functions": [
+          "test_empty_state",
+          "test_load_existing_state",
+          "test_load_corrupted_state",
+          "test_estimate_turns_simple",
+          "test_estimate_turns_complex",
+          "test_estimate_turns_capped",
+          "test_optimize_and_parse_prd",
+          "test_optimize_and_parse_prd_persists",
+          "test_update_task_status_epic",
+          "test_update_task_status_subtask",
+          "test_update_task_status_with_error",
+          "test_update_task_status_no_analysis",
+          "test_get_tasks_for_wave",
+          "test_get_tasks_for_wave_no_analysis",
+          "test_prd_analysis_includes_fabric_preview"
+        ],
+        "imports": [
+          "merged_agentic_swarm.models.prd_models",
+          "os",
+          "json",
+          "merged_agentic_swarm.services.task_master_service"
+        ]
+      },
+      "tests/test_codebase_map_service.py": {
+        "classes": [
+          "TestCodebaseMapService"
+        ],
+        "functions": [
+          "test_scan_empty_repo",
+          "test_scan_repo_with_python_file",
+          "test_scan_preserves_state_file",
+          "test_load_from_cache",
+          "test_detect_spec_gaps_no_gaps",
+          "test_detect_spec_gaps_with_gaps",
+          "test_close_spec_gap",
+          "test_close_spec_gap_not_found",
+          "test_parse_python_ast_extracts_symbols",
+          "test_parse_invalid_file",
+          "test_detect_hidden_directory"
+        ],
+        "imports": [
+          "merged_agentic_swarm.models.prd_models",
+          "os",
+          "merged_agentic_swarm.services.codebase_map_service"
+        ]
+      },
+      "tests/test_claude_proxy_server.py": {
+        "classes": [
+          "TestProxyServerDaemon",
+          "TestClaudeProxyHandler"
+        ],
+        "functions": [
+          "test_start_stop",
+          "test_double_start",
+          "setup_server",
+          "test_health_endpoint",
+          "test_status_endpoint",
+          "test_get_unknown_endpoint_returns_404",
+          "test_post_chat_completions_with_invalid_json",
+          "test_post_v1_messages",
+          "test_options_request",
+          "test_post_unsupported_endpoint",
+          "test_empty_content_length"
+        ],
+        "imports": [
+          "merged_agentic_swarm.proxy.claude_proxy_server",
+          "urllib.request",
+          "json",
+          "urllib.error",
+          "pytest"
+        ]
+      },
+      "tests/test_key_pool.py": {
+        "classes": [
+          "TestAPIKeyInfo",
+          "TestKeyPoolManager"
+        ],
+        "functions": [
+          "test_default_creation",
+          "test_repr_does_not_leak_secret",
+          "test_mark_cooldown",
+          "test_load_keys_from_env_file",
+          "test_add_key_skips_placeholder",
+          "test_add_key_creates_new_provider",
+          "test_add_key_appends_to_existing",
+          "test_get_key_no_provider",
+          "test_get_key_returns_least_used",
+          "test_get_key_round_robin",
+          "test_get_key_recovers_cooldown",
+          "test_get_key_returns_forced_recovered",
+          "test_mark_success",
+          "test_mark_success_smoothed_latency",
+          "test_mark_rate_limited",
+          "test_get_summary",
+          "test_get_key_missing"
+        ],
+        "imports": [
+          "time",
+          "pytest",
+          "merged_agentic_swarm.providers.key_pool"
+        ]
+      },
+      "tests/test_progress_ledger_service.py": {
+        "classes": [
+          "TestObstaclePlaybookEngine",
+          "TestProgressLedgerService"
+        ],
+        "functions": [
+          "setup_method",
+          "test_match_rate_limit",
+          "test_match_rate_limit_case_insensitive",
+          "test_match_import_error",
+          "test_match_syntax_error",
+          "test_match_type_error",
+          "test_no_match",
+          "test_trigger_count_increments",
+          "test_empty_ledger",
+          "test_log_progress",
+          "test_log_progress_persists",
+          "test_record_success_marker",
+          "test_record_success_with_command_executed",
+          "test_handle_task_failure",
+          "test_load_corrupted_ledger",
+          "test_save_and_load_success_markers"
+        ],
+        "imports": [
+          "os",
+          "merged_agentic_swarm.services.progress_ledger_service"
+        ]
+      },
+      "tests/test_agent_factory_service.py": {
+        "classes": [
+          "TestChainRegistry",
+          "TestDurableAgentFactory"
+        ],
+        "functions": [
+          "test_default_registry",
+          "test_register_spawn",
+          "test_persists_across_loads",
+          "test_register_spawn_with_parent",
+          "test_load_corrupted_file",
+          "test_purge_expired_removes_hot_agents",
+          "test_purge_expired_durable_untouched",
+          "test_spawn_from_learning_cold",
+          "test_spawn_from_learning_hot",
+          "test_spawn_from_learning_with_force_type",
+          "test_spawn_from_learning_registers_in_chain",
+          "test_write_agent_spec_file_creates_md",
+          "test_write_agent_spec_file_skips_existing",
+          "test_sync_agent_specs_missing_registry",
+          "mock_exists"
+        ],
+        "imports": [
+          "merged_agentic_swarm.models.agent_models",
+          "time",
+          "os",
+          "merged_agentic_swarm.services.agent_factory_service"
+        ]
+      },
+      "tests/test_learning_loop.py": {
+        "classes": [
+          "TestCaptureStep",
+          "TestRecordStep",
+          "TestEvaluateStep",
+          "TestPromoteStep",
+          "TestLoadAfterRestart",
+          "TestRouteAndReuse",
+          "TestDedup",
+          "TestFullLifecycle"
+        ],
+        "functions": [
+          "_make_learning_entry",
+          "_make_knowledge_jsonl_entry",
+          "_make_agent_jsonl_entry",
+          "_make_chain_jsonl_entry",
+          "_append_jsonl",
+          "_read_jsonl",
+          "_evaluate_promotion_criteria",
+          "_promote_learning",
+          "_verify_promotion",
+          "_load_agents_from_registry",
+          "_simulate_reuse",
+          "test_capture_produces_valid_entry",
+          "test_capture_requires_specific_claim",
+          "test_record_to_knowledge_cache",
+          "test_record_dedup_identical_content",
+          "test_evaluate_passes_strong_entry",
+          "test_evaluate_fails_weak_entry",
+          "test_evaluate_detects_duplicate",
+          "test_promote_writes_all_five_artifacts",
+          "test_promote_knowledge_jsonl_has_correct_fields",
+          "test_promote_agents_jsonl_has_correct_fields",
+          "test_promote_chain_jsonl_has_correct_fields",
+          "test_promote_agent_md_has_required_frontmatter",
+          "test_promote_progress_json_updated",
+          "test_fresh_load_finds_promoted_agent",
+          "test_agent_md_file_survives_restart",
+          "test_route_task_to_promoted_agent",
+          "test_reuse_uses_correct_system_prompt",
+          "test_duplicate_learning_not_promoted",
+          "test_dedup_via_content_hash",
+          "test_different_content_not_deduped",
+          "test_full_lifecycle",
+          "test_multiple_promotions_in_sequence"
+        ],
+        "imports": [
+          "time",
+          "os",
+          "json",
+          "merged_agentic_swarm.tools.knowledge_cache"
+        ]
+      },
+      "tests/test_agent_models.py": {
+        "classes": [
+          "TestWorkerRole",
+          "TestAgentType",
+          "TestAgentSpec",
+          "TestWorkerPoolConfig",
+          "TestSpawnChainEntry",
+          "TestWorkerPoolState"
+        ],
+        "functions": [
+          "test_values",
+          "test_values",
+          "test_default_creation",
+          "test_durable_never_expires",
+          "test_hot_expires_after_ttl",
+          "test_hot_not_expired_within_ttl",
+          "test_to_dict_serializes_enums",
+          "test_custom_fields",
+          "test_default_allocations",
+          "test_custom_config",
+          "test_default_creation",
+          "test_to_dict",
+          "test_default_state",
+          "test_record_pool_success",
+          "test_record_pool_failure",
+          "test_record_rate_limit",
+          "test_get_pool_summary_returns_copy",
+          "test_to_dict"
+        ],
+        "imports": [
+          "merged_agentic_swarm.models.agent_models",
+          "time"
+        ]
+      },
+      "tests/test_token_savior.py": {
+        "classes": [
+          "TestTokenSavior"
+        ],
+        "functions": [
+          "setup_method",
+          "test_compact_code_removes_blank_and_comment_lines",
+          "test_compact_code_truncates_long",
+          "test_compact_code_does_not_truncate_short",
+          "test_compact_bash_output_short",
+          "test_compact_bash_output_filters_errors",
+          "test_compress_prose_removes_fillers",
+          "test_compress_prose_keeps_essential",
+          "test_compress_prose_does_not_mutate_clean_text",
+          "test_empty_input"
+        ],
+        "imports": [
+          "merged_agentic_swarm.tools.token_savior"
+        ]
+      },
+      "tests/test_opencode_swarm_service.py": {
+        "classes": [
+          "TestConcurrencyRampController",
+          "TestOpenCodeSwarmManager"
+        ],
+        "functions": [
+          "setup_method",
+          "test_ramp_sequence_length",
+          "test_get_current_max_workers_gate_0",
+          "test_get_current_max_workers_gate_1",
+          "test_get_current_max_workers_gate_2",
+          "test_get_current_max_workers_gate_3",
+          "test_get_current_max_workers_beyond_gates",
+          "test_get_current_max_workers_negative",
+          "test_get_ramp_sequence",
+          "setup_method",
+          "test_initializes_40_workers",
+          "test_workers_by_role",
+          "test_get_available_worker_returns_correct_role",
+          "test_get_available_worker_round_robin",
+          "test_get_available_worker_tester_round_robin",
+          "test_get_available_worker_fallback_to_core_engineer",
+          "test_get_pool_id_mapped",
+          "test_get_pool_id_fallback",
+          "test_execute_subtask_with_worker_fabric_simulation",
+          "test_execute_subtask_batch_parallel"
+        ],
+        "imports": [
+          "merged_agentic_swarm.models.agent_models",
+          "merged_agentic_swarm.services.opencode_swarm_service"
+        ]
+      },
+      "tests/test_knowledge_cache.py": {
+        "classes": [
+          "TestKnowledgeCache"
+        ],
+        "functions": [
+          "test_empty_cache",
+          "test_add_and_get_learning",
+          "test_add_learning_duplicate_content",
+          "test_add_learning_different_content_same_title",
+          "test_persists_across_instances",
+          "test_max_learnings_evicts_oldest",
+          "test_search_learnings",
+          "test_search_learnings_matches_tags",
+          "test_search_learnings_empty_cache",
+          "test_compacts_duplicates_on_load",
+          "test_ttl_expiry",
+          "test_cache_saves_symbols",
+          "test_add_learning_with_tags"
+        ],
+        "imports": [
+          "time",
+          "os",
+          "json",
+          "merged_agentic_swarm.tools.knowledge_cache"
+        ]
+      },
+      "tests/test_agentic_cli.py": {
+        "classes": [
+          "TestCmdConfig",
+          "TestCLIStringFunctions",
+          "Args"
+        ],
+        "functions": [
+          "test_cmd_config_output",
+          "test_cmd_config_routes_printed",
+          "test_main_entry_points",
+          "test_cmd_promote_without_orchestrator_state",
+          "test_cmd_status_no_progress_file"
+        ],
+        "imports": [
+          "merged_agentic_swarm.tools.agentic_cli",
+          "pytest",
+          "os",
+          "sys"
+        ]
+      },
+      "tests/__init__.py": {
+        "classes": [],
+        "functions": [],
+        "imports": []
+      },
+      "src/merged_agentic_swarm/__init__.py": {
+        "classes": [],
+        "functions": [],
+        "imports": []
+      },
+      "src/merged_agentic_swarm/models/prd_models.py": {
+        "classes": [
+          "TaskStatus",
+          "TaskPriority",
+          "SubTask",
+          "EpicTask",
+          "SpecGap",
+          "PRDDocument",
+          "PRDAnalysisResult"
+        ],
+        "functions": [
+          "to_dict",
+          "to_dict",
+          "to_dict",
+          "to_dict"
+        ],
+        "imports": [
+          "time",
+          "typing",
+          "enum",
+          "dataclasses"
+        ]
+      },
+      "src/merged_agentic_swarm/models/wave_models.py": {
+        "classes": [
+          "WavePhase",
+          "WaveStatus",
+          "WaveGateCriteria",
+          "WaveExecutionState"
+        ],
+        "functions": [
+          "to_dict",
+          "to_dict"
+        ],
+        "imports": [
+          "typing",
+          "enum",
+          "dataclasses"
+        ]
+      },
+      "src/merged_agentic_swarm/models/ledger_models.py": {
+        "classes": [
+          "SuccessMarker",
+          "ObstaclePlaybookEntry",
+          "ProgressLogEntry",
+          "TaskMasterStateSnapshot"
+        ],
+        "functions": [
+          "to_dict",
+          "to_dict",
+          "to_dict",
+          "to_dict"
+        ],
+        "imports": [
+          "time",
+          "typing",
+          "dataclasses"
+        ]
+      },
+      "src/merged_agentic_swarm/models/agent_models.py": {
+        "classes": [
+          "WorkerRole",
+          "AgentType",
+          "AgentSpec",
+          "WorkerPoolConfig",
+          "SpawnChainEntry",
+          "WorkerPoolState"
+        ],
+        "functions": [
+          "is_expired",
+          "to_dict",
+          "to_dict",
+          "record_pool_success",
+          "record_pool_failure",
+          "get_pool_summary",
+          "to_dict"
+        ],
+        "imports": [
+          "time",
+          "typing",
+          "enum",
+          "dataclasses"
+        ]
+      },
+      "src/merged_agentic_swarm/models/__init__.py": {
+        "classes": [],
+        "functions": [],
+        "imports": [
+          "merged_agentic_swarm.models.agent_models",
+          "merged_agentic_swarm.models.prd_models",
+          "merged_agentic_swarm.models.wave_models",
+          "merged_agentic_swarm.models.ledger_models"
+        ]
+      },
+      "src/merged_agentic_swarm/proxy/claude_proxy_server.py": {
+        "classes": [
+          "ThreadedHTTPServer",
+          "ClaudeProxyHandler",
+          "ProxyServerDaemon"
+        ],
+        "functions": [
+          "_parse_multipart",
+          "_forward_transcription",
+          "log_message",
+          "send_json_response",
+          "do_OPTIONS",
+          "do_GET",
+          "do_POST",
+          "_handle_audio_transcription",
+          "__init__",
+          "start",
+          "stop"
+        ],
+        "imports": [
+          "socketserver",
+          "threading",
+          "merged_agentic_swarm.providers.multi_provider_fabric",
+          "json",
+          "re",
+          "http.server",
+          "requests",
+          "merged_agentic_swarm.providers.key_pool",
+          "time",
+          "typing",
+          "os",
+          "logging"
+        ]
+      },
+      "src/merged_agentic_swarm/proxy/__init__.py": {
+        "classes": [],
+        "functions": [],
+        "imports": [
+          "merged_agentic_swarm.proxy.claude_proxy_server"
+        ]
+      },
+      "src/merged_agentic_swarm/providers/key_pool.py": {
+        "classes": [
+          "KeyStatus",
+          "APIKeyInfo",
+          "KeyPoolManager"
+        ],
+        "functions": [
+          "__repr__",
+          "__init__",
+          "load_keys",
+          "add_key",
+          "get_key",
+          "_get_key_unlocked",
+          "mark_success",
+          "mark_rate_limited",
+          "get_summary",
+          "_get_summary_unlocked"
+        ],
+        "imports": [
+          "threading",
+          "enum",
+          "logging",
+          "time",
+          "typing",
+          "os",
+          "dataclasses"
+        ]
+      },
+      "src/merged_agentic_swarm/providers/multi_provider_fabric.py": {
+        "classes": [
+          "MultiProviderFabric"
+        ],
+        "functions": [
+          "_record_failure",
+          "_record_success",
+          "__init__",
+          "format_anthropic_to_openai",
+          "format_openai_to_anthropic_response",
+          "_build_route_list",
+          "dispatch_request"
+        ],
+        "imports": [
+          "urllib.request",
+          "threading",
+          "json",
+          "urllib.error",
+          "merged_agentic_swarm.providers.key_pool",
+          "time",
+          "typing",
+          "logging"
+        ]
+      },
+      "src/merged_agentic_swarm/providers/__init__.py": {
+        "classes": [],
+        "functions": [],
+        "imports": [
+          "merged_agentic_swarm.providers.multi_provider_fabric",
+          "merged_agentic_swarm.providers.key_pool"
+        ]
+      },
+      "src/merged_agentic_swarm/tools/agentic_cli.py": {
+        "classes": [],
+        "functions": [
+          "cmd_run",
+          "cmd_status",
+          "cmd_promote",
+          "cmd_config",
+          "main"
+        ],
+        "imports": [
+          "sys",
+          "merged_agentic_swarm.tools.agentic_orchestrator",
+          "json",
+          "merged_agentic_swarm.providers.multi_provider_fabric",
+          "merged_agentic_swarm.providers.key_pool",
+          "pathlib",
+          "merged_agentic_swarm.models.agent_models",
+          "os",
+          "logging",
+          "argparse",
+          "merged_agentic_swarm.tools.knowledge_cache"
+        ]
+      },
+      "src/merged_agentic_swarm/tools/token_savior.py": {
+        "classes": [
+          "TokenSavior"
+        ],
+        "functions": [
+          "compact_code_snippet",
+          "compact_bash_output",
+          "compress_prose_output"
+        ],
+        "imports": [
+          "logging",
+          "re"
+        ]
+      },
+      "src/merged_agentic_swarm/tools/agentic_orchestrator.py": {
+        "classes": [
+          "MultiLayeredAgenticOrchestrator"
+        ],
+        "functions": [
+          "__init__",
+          "_load_promoted_ids",
+          "_save_promoted_ids",
+          "_run_syntax_verification",
+          "_compact_registries",
+          "_apply_worker_outputs",
+          "_append_jsonl",
+          "_promote_cold_path",
+          "initialize_system",
+          "run_full_agentic_workflow"
+        ],
+        "imports": [
+          "merged_agentic_swarm.services.task_master_service",
+          "json",
+          "re",
+          "merged_agentic_swarm.services.progress_ledger_service",
+          "typing",
+          "os",
+          "merged_agentic_swarm.services.opencode_swarm_service",
+          "merged_agentic_swarm.proxy.claude_proxy_server",
+          "merged_agentic_swarm.services.wave_gate_service",
+          "merged_agentic_swarm.services.codebase_map_service",
+          "merged_agentic_swarm.services.agent_factory_service",
+          "merged_agentic_swarm.models.prd_models",
+          "merged_agentic_swarm.models.agent_models",
+          "time",
+          "hashlib",
+          "subprocess",
+          "pathlib",
+          "merged_agentic_swarm.tools.knowledge_cache",
+          "logging"
+        ]
+      },
+      "src/merged_agentic_swarm/tools/knowledge_cache.py": {
+        "classes": [
+          "KnowledgeCache"
+        ],
+        "functions": [
+          "__init__",
+          "load_cache",
+          "save_cache",
+          "add_learning",
+          "get_learning",
+          "search_learnings"
+        ],
+        "imports": [
+          "json",
+          "time",
+          "typing",
+          "os",
+          "logging"
+        ]
+      },
+      "src/merged_agentic_swarm/tools/__init__.py": {
+        "classes": [],
+        "functions": [],
+        "imports": [
+          "merged_agentic_swarm.tools.knowledge_cache",
+          "merged_agentic_swarm.tools.token_savior"
+        ]
+      },
+      "src/merged_agentic_swarm/services/task_spine_adapter.py": {
+        "classes": [
+          "TaskRecord",
+          "TaskSpineStore",
+          "_LockedScope"
+        ],
+        "functions": [
+          "_make_parser",
+          "main",
+          "__post_init__",
+          "to_dict",
+          "from_dict",
+          "__init__",
+          "_ensure_dir",
+          "_acquire_lock",
+          "_release_lock",
+          "_read_raw",
+          "_write_atomic",
+          "init",
+          "create",
+          "claim",
+          "complete",
+          "fail",
+          "block",
+          "update",
+          "list_tasks",
+          "inspect",
+          "attach_evidence",
+          "_locked",
+          "__init__",
+          "__enter__",
+          "__exit__"
+        ],
+        "imports": [
+          "sys",
+          "datetime",
+          "typing",
+          "json",
+          "fcntl",
+          "tempfile",
+          "uuid",
+          "__future__",
+          "os",
+          "dataclasses",
+          "argparse"
+        ]
+      },
+      "src/merged_agentic_swarm/services/wave_gate_service.py": {
+        "classes": [
+          "WaveGateController"
+        ],
+        "functions": [
+          "__init__",
+          "get_wave_state",
+          "_check_ownership",
+          "evaluate_gate_criteria",
+          "advance_wave"
+        ],
+        "imports": [
+          "merged_agentic_swarm.models.wave_models",
+          "merged_agentic_swarm.models.prd_models",
+          "merged_agentic_swarm.services.task_master_service",
+          "json",
+          "merged_agentic_swarm.services.codebase_map_service",
+          "fnmatch",
+          "time",
+          "os",
+          "logging"
+        ]
+      },
+      "src/merged_agentic_swarm/services/worker_runtime_adapter.py": {
+        "classes": [
+          "WorkerRuntimeAdapter"
+        ],
+        "functions": [
+          "_resolve_opencode_bin",
+          "_opencode_available",
+          "detect_mode",
+          "get_runtime_adapter",
+          "_get_opencode_bin",
+          "__init__",
+          "_next_port",
+          "launch_worker",
+          "launch_batch",
+          "_launch_via_opencode",
+          "_launch_via_native",
+          "_launch_via_fabric",
+          "shutdown"
+        ],
+        "imports": [
+          "urllib.request",
+          "threading",
+          "merged_agentic_swarm.providers.multi_provider_fabric",
+          "json",
+          "shutil",
+          "urllib.error",
+          "subprocess",
+          "merged_agentic_swarm.models.agent_models",
+          "concurrent.futures",
+          "typing",
+          "time",
+          "__future__",
+          "os",
+          "logging",
+          "uuid"
+        ]
+      },
+      "src/merged_agentic_swarm/services/codebase_map_service.py": {
+        "classes": [
+          "CodebaseMapService"
+        ],
+        "functions": [
+          "__init__",
+          "scan_repository",
+          "_parse_python_ast",
+          "detect_spec_gaps",
+          "_load_state",
+          "_save_state",
+          "close_spec_gap"
+        ],
+        "imports": [
+          "json",
+          "ast",
+          "merged_agentic_swarm.models.prd_models",
+          "typing",
+          "os",
+          "logging"
+        ]
+      },
+      "src/merged_agentic_swarm/services/opencode_swarm_service.py": {
+        "classes": [
+          "DurableAgentRouter",
+          "ConcurrencyRampController",
+          "OpenCodeSwarmManager"
+        ],
+        "functions": [
+          "get_durable_router",
+          "__init__",
+          "load",
+          "_parse_frontmatter",
+          "_read_body",
+          "_extract_keywords",
+          "_scan_agent_triggers",
+          "find_matching_agent",
+          "get_stats",
+          "get_current_max_workers",
+          "get_ramp_sequence",
+          "__init__",
+          "_initialize_worker_pool",
+          "get_available_worker",
+          "_get_available_worker_unlocked",
+          "_get_pool_id",
+          "execute_subtask_with_worker",
+          "execute_subtask_batch_parallel"
+        ],
+        "imports": [
+          "merged_agentic_swarm.models.prd_models",
+          "threading",
+          "merged_agentic_swarm.providers.multi_provider_fabric",
+          "json",
+          "re",
+          "merged_agentic_swarm.models.agent_models",
+          "pathlib",
+          "concurrent.futures",
+          "collections",
+          "time",
+          "typing",
+          "os",
+          "logging"
+        ]
+      },
+      "src/merged_agentic_swarm/services/agent_factory_service.py": {
+        "classes": [
+          "ChainRegistry",
+          "DurableAgentFactory"
+        ],
+        "functions": [
+          "__init__",
+          "load_registry",
+          "save_registry",
+          "register_spawn",
+          "__init__",
+          "purge_expired",
+          "_load_cold_agents_from_registry",
+          "_write_agent_spec_file",
+          "sync_agent_specs",
+          "spawn_from_learning"
+        ],
+        "imports": [
+          "datetime",
+          "json",
+          "pathlib",
+          "merged_agentic_swarm.models.agent_models",
+          "time",
+          "typing",
+          "os",
+          "logging",
+          "merged_agentic_swarm.tools.knowledge_cache"
+        ]
+      },
+      "src/merged_agentic_swarm/services/task_master_service.py": {
+        "classes": [
+          "TaskMasterService"
+        ],
+        "functions": [
+          "__init__",
+          "load_state",
+          "save_state",
+          "_estimate_turns",
+          "optimize_and_parse_prd",
+          "update_task_status",
+          "get_tasks_for_wave"
+        ],
+        "imports": [
+          "threading",
+          "merged_agentic_swarm.providers.multi_provider_fabric",
+          "json",
+          "merged_agentic_swarm.models.prd_models",
+          "time",
+          "os",
+          "logging"
+        ]
+      },
+      "src/merged_agentic_swarm/services/__init__.py": {
+        "classes": [],
+        "functions": [],
+        "imports": [
+          "merged_agentic_swarm.services.opencode_swarm_service",
+          "merged_agentic_swarm.services.task_master_service",
+          "merged_agentic_swarm.services.wave_gate_service",
+          "merged_agentic_swarm.services.progress_ledger_service",
+          "merged_agentic_swarm.services.codebase_map_service",
+          "merged_agentic_swarm.services.agent_factory_service"
+        ]
+      },
+      "src/merged_agentic_swarm/services/progress_ledger_service.py": {
+        "classes": [
+          "ObstaclePlaybookEngine",
+          "ProgressLedgerService"
+        ],
+        "functions": [
+          "__init__",
+          "match_and_remediate",
+          "__init__",
+          "load_ledger",
+          "save_ledger",
+          "log_progress",
+          "record_success_marker",
+          "handle_task_failure"
+        ],
+        "imports": [
+          "merged_agentic_swarm.services.task_master_service",
+          "threading",
+          "json",
+          "re",
+          "merged_agentic_swarm.models.ledger_models",
+          "time",
+          "typing",
+          "os",
+          "logging"
+        ]
+      }
+    }
+  }
+}

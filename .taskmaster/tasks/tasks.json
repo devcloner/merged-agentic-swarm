@@ -1,0 +1,75 @@
+{
+  "title": "Task Spine Fallback",
+  "epics": [
+    {
+      "id": "TASK-1785538081958223-0001",
+      "title": "Proxy Verification Test",
+      "description": "Verify proxy authentication across all tiers",
+      "wave_id": 1,
+      "priority": "P0",
+      "status": "completed",
+      "claimed_by": "worker-core-01",
+      "claimed_at": 1785538082.6553464,
+      "completed_at": 1785538082.8452158,
+      "evidence": [
+        {
+          "path": "/tmp/evidence_proxy.json",
+          "attached_at": 1785538083.1093476,
+          "description": "Proxy tier test results"
+        }
+      ],
+      "blocked_by": [],
+      "blocks": [],
+      "dependencies": [],
+      "subtasks": [],
+      "acceptance_criteria": []
+    },
+    {
+      "id": "TASK-1785538082151234-0001",
+      "title": "Worker Runtime Test",
+      "description": "Verify 1-2-4 worker ramp",
+      "wave_id": 2,
+      "priority": "P1",
+      "status": "in_progress",
+      "claimed_by": "worker-core-02",
+      "claimed_at": 1785538082.7483065,
+      "completed_at": null,
+      "evidence": [],
+      "blocked_by": [],
+      "blocks": [
+        "TASK-1785538082341179-0001"
+      ],
+      "dependencies": [],
+      "subtasks": [],
+      "acceptance_criteria": [],
+      "errors": [
+        {
+          "timestamp": 1785538082.92986,
+          "error": "Provider timeout on first attempt, retrying"
+        }
+      ]
+    },
+    {
+      "id": "TASK-1785538082341179-0001",
+      "title": "Learning Loop Test",
+      "description": "End-to-end learning promotion and reuse",
+      "wave_id": 3,
+      "priority": "P1",
+      "status": "blocked",
+      "claimed_by": null,
+      "claimed_at": null,
+      "completed_at": null,
+      "evidence": [],
+      "blocked_by": [
+        "TASK-1785538082151234-0001"
+      ],
+      "blocks": [],
+      "dependencies": [],
+      "subtasks": [],
+      "acceptance_criteria": []
+    }
+  ],
+  "spec_gaps": [],
+  "total_estimated_turns": 0,
+  "parsed_at": 1785538081.9582222
+}
