@@ -35,6 +35,15 @@ class TestCommandSafety:
         assert _command_safety_error("") is not None
         assert _command_safety_error('echo "unterminated') is not None
 
+    def test_run_command_tool_hints_uv(self):
+        """The run_command schema must steer models to the uv toolchain —
+        bare ``python`` exits 127 on this host (only uv manages the interpreter)."""
+        run_cmd = next(t for t in WORKER_TOOLS if t["function"]["name"] == "run_command")
+        description = run_cmd["function"]["description"]
+        param_desc = run_cmd["function"]["parameters"]["properties"]["command"]["description"]
+        assert "uv run python" in description
+        assert "uv run python" in param_desc
+
 
 class TestRealToolExecution:
     """Tools execute for real against a tmp workdir."""

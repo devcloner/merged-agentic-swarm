@@ -55,7 +55,8 @@ class TestApplyWorkerOutputs:
         count = self.orch._apply_worker_outputs(results)
         assert count == 1
         assert os.path.exists(abs_path)
-        assert open(abs_path).read() == "print(1)"
+        with open(abs_path, encoding="utf-8") as fh:
+            assert fh.read() == "print(1)"
 
     def test_simulation_worker_fails_gate(self):
         """A simulated worker result is status=failed, so all_ok is False.

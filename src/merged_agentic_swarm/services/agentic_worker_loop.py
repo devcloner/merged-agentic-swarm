@@ -75,11 +75,11 @@ RUN_COMMAND_TOOL: dict[str, Any] = {
     "type": "function",
     "function": {
         "name": "run_command",
-        "description": "Run a shell command inside the working repository (cwd = repo root) with a 60s timeout. Use for tests, linters, and git status. Destructive host-wide commands (sudo, git push, rm -rf on root paths) are refused.",
+        "description": "Run a shell command inside the working repository (cwd = repo root) with a 60s timeout. Use for tests, linters, and git status. Destructive host-wide commands (sudo, git push, rm -rf on root paths) are refused. NOTE: on this host Python is only available via the uv toolchain — always invoke it as 'uv run python ...', never bare 'python'.",
         "parameters": {
             "type": "object",
             "properties": {
-                "command": {"type": "string", "description": "The shell command to run, e.g. 'python hello.py'"},
+                "command": {"type": "string", "description": "The shell command to run, e.g. 'uv run python hello.py'"},
             },
             "required": ["command"],
         },
@@ -189,8 +189,10 @@ class AgenticWorkerLoop:
             "You are an autonomous software engineer executing one task inside a working "
             "repository. Use the provided tools (write_file, read_file, list_dir, "
             "run_command) to do REAL work: write real code, run real commands, and produce "
-            "real artifacts on disk. When the task is complete, reply with a short plain-text "
-            "summary and do NOT call any more tools."
+            "real artifacts on disk. Python is only available through the uv toolchain on "
+            "this host: always run it as 'uv run python ...', never bare 'python'. When the "
+            "task is complete, reply with a short plain-text summary and do NOT call any "
+            "more tools."
         )
 
         messages: list[dict[str, Any]] = [{"role": "user", "content": task_text}]
