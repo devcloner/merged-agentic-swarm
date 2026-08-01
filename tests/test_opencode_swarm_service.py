@@ -93,14 +93,22 @@ class TestOpenCodeSwarmManager:
         pid = self.manager._get_pool_id(WorkerRole.MASTER_ARCHITECT)
         assert pid == "general"
 
-    def test_execute_subtask_with_worker_fabric_simulation(self, make_subtask):
-        """Since fabric falls to simulation mode, the task should still complete."""
+    def test_execute_subtask_with_worker_fabric(self, make_subtask):
+        """A worker subtask goes through the agentic tool loop and reports honestly.
+
+        A simulated (offline-fallback) response must be reported as ``failed``,
+        never ``completed`` — simulation can never advance a gate.
+        """
         subtask = make_subtask(title="Test task", desc="Test description")
         result = self.manager.execute_subtask_with_worker(subtask, WorkerRole.CORE_ENGINEER)
-        # Should complete (even if simulation)
         assert result["status"] in ("completed", "failed")
+        assert "final_text" in result
+        assert "files_written" in result
+        assert "commands_run" in result
         if result["status"] == "completed":
-            assert "response" in result
+            assert not result.get("simulation_fallback", False)
+        else:
+            assert "reason" in result
 
     def test_execute_subtask_batch_parallel(self, make_subtask):
         subtasks = [make_subtask(title=f"Batch {i}", desc="Parallel test") for i in range(3)]

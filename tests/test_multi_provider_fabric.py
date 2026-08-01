@@ -56,6 +56,84 @@ class TestFormatConversion:
         result = self.fabric.format_openai_to_anthropic_response(openai_resp, "claude-3-7-sonnet")
         assert result["content"][0]["text"] == ""
 
+    def test_format_openai_with_tool_calls(self):
+        openai_resp = {
+            "choices": [{
+                "message": {
+                    "content": "",
+                    "tool_calls": [
+                        {
+                            "id": "call_1",
+                            "type": "function",
+                            "function": {"name": "add", "arguments": "{\"a\": 2, \"b\": 3}"},
+                        }
+                    ],
+                },
+                "finish_reason": "tool_calls",
+            }],
+            "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+        }
+        result = self.fabric.format_openai_to_anthropic_response(openai_resp, "claude-3-7-sonnet")
+        assert result["tool_calls"] == [{"id": "call_1", "name": "add", "input": {"a": 2, "b": 3}}]
+
+    def test_format_openai_bad_arguments_json(self):
+        openai_resp = {
+            "choices": [{
+                "message": {
+                    "content": "",
+                    "tool_calls": [
+                        {"id": "c1", "type": "function", "function": {"name": "x", "arguments": "not-json"}}
+                    ],
+                }
+            }],
+            "usage": {},
+        }
+        result = self.fabric.format_openai_to_anthropic_response(openai_resp, "claude-3-7-sonnet")
+        assert result["tool_calls"] == [{"id": "c1", "name": "x", "input": {}}]
+
+    def test_format_anthropic_tool_calls_roundtrip(self):
+        """format_anthropic_to_openai converts normalized tool_calls to OpenAI shape."""
+        messages = [
+            {"role": "assistant", "content": "", "tool_calls": [{"id": "c1", "name": "add", "input": {"a": 2, "b": 2}}]},
+            {"role": "tool", "tool_call_id": "c1", "content": "4"},
+        ]
+        result = self.fabric.format_anthropic_to_openai(messages)
+        assert result[0]["role"] == "assistant"
+        assert result[0]["tool_calls"][0]["function"]["name"] == "add"
+        assert result[0]["tool_calls"][0]["function"]["arguments"] == '{"a": 2, "b": 2}'
+        assert result[1]["role"] == "tool"
+        assert result[1]["tool_call_id"] == "c1"
+
+    def test_format_anthropic_to_anthropic_tool_blocks(self):
+        """format_anthropic_to_anthropic builds tool_use + tool_result blocks for /v1/messages."""
+        messages = [
+            {"role": "assistant", "content": "", "tool_calls": [{"id": "c1", "name": "add", "input": {"a": 1, "b": 1}}]},
+            {"role": "tool", "tool_call_id": "c1", "content": "2"},
+        ]
+        result = self.fabric.format_anthropic_to_anthropic(messages)
+        assert result[0]["role"] == "assistant"
+        assert result[0]["content"][0] == {"type": "tool_use", "id": "c1", "name": "add", "input": {"a": 1, "b": 1}}
+        assert result[1]["role"] == "user"
+        assert result[1]["content"][0]["type"] == "tool_result"
+        assert result[1]["content"][0]["tool_use_id"] == "c1"
+
+    def test_tools_to_anthropic_conversion(self):
+        tools = [{"type": "function", "function": {"name": "add", "description": "d", "parameters": {"type": "object", "properties": {"a": {"type": "number"}}}}},
+                 {"type": "function", "function": {"name": "sub", "description": "s", "parameters": {"type": "object", "properties": {}}}}]
+        converted = self.fabric._tools_to_anthropic(tools)
+        assert converted[0]["name"] == "add"
+        assert converted[0]["input_schema"] == {"type": "object", "properties": {"a": {"type": "number"}}}
+        assert converted[1]["name"] == "sub"
+
+    def test_extract_anthropic_tool_calls(self):
+        resp = {"content": [
+            {"type": "text", "text": "thinking"},
+            {"type": "tool_use", "id": "cu_1", "name": "write_file", "input": {"path": "x.py"}},
+        ]}
+        calls = self.fabric._extract_anthropic_tool_calls(resp)
+        assert calls == [{"id": "cu_1", "name": "write_file", "input": {"path": "x.py"}}]
+        assert self.fabric._extract_anthropic_tool_calls({"content": [{"type": "text", "text": "hi"}]}) is None
+
 
 class TestRouteBuilding:
     def setup_method(self):

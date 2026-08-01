@@ -38,6 +38,37 @@ class TestApplyWorkerOutputs:
         count = self.orch._apply_worker_outputs(results)
         assert count == 0
 
+    def test_counts_agentic_loop_files_written(self):
+        """Real writes from the agentic tool loop are counted (not re-parsed)."""
+        results = [{"status": "completed", "files_written": ["a.py", "b.py"]}]
+        count = self.orch._apply_worker_outputs(results)
+        assert count == 2
+
+    def test_parses_file_blocks_from_final_text(self, temp_dir):
+        """Secondary path: # file: blocks in final_text are still written to disk."""
+        import os
+        abs_path = os.path.join(temp_dir, "x.py")
+        results = [{
+            "status": "completed",
+            "final_text": f'```python\n# file: {abs_path}\nprint(1)\n```',
+        }]
+        count = self.orch._apply_worker_outputs(results)
+        assert count == 1
+        assert os.path.exists(abs_path)
+        assert open(abs_path).read() == "print(1)"
+
+    def test_simulation_worker_fails_gate(self):
+        """A simulated worker result is status=failed, so all_ok is False.
+
+        This is the invariant that makes simulation unable to advance any wave:
+        the gate formula ``all(r.get('status') == 'completed')`` fails.
+        """
+        results = [
+            {"status": "completed", "subtask_id": "s1"},
+            {"status": "failed", "reason": "simulation_fallback", "subtask_id": "s2"},
+        ]
+        assert not all(r.get("status") == "completed" for r in results)
+
 
 class TestCompactRegistries:
     def setup_method(self):

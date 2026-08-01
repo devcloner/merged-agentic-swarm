@@ -201,10 +201,12 @@ class MultiLayeredAgenticOrchestrator:
         return counts
 
     def _apply_worker_outputs(self, results: list[dict[str, Any]], wave_label: str = "") -> int:
-        """Parse worker response content for file writes and apply them to disk.
+        """Apply worker outputs to disk and count files written.
 
-        Scans each completed worker result for markdown code blocks preceded by a
-        ``# file: <path>`` comment and writes the block content to that path.
+        Primary path: agentic-loop workers already wrote files for real — count
+        their ``files_written`` list. Secondary path: text-only workers (e.g.
+        opencode mode) may emit ``# file: <path>`` markdown blocks inside their
+        final text; parse and write those as before.
         Returns the number of files written.
         """
         import re
@@ -214,13 +216,18 @@ class MultiLayeredAgenticOrchestrator:
             if result.get("status") != "completed":
                 continue
 
+            # Primary: real writes already on disk via the agentic tool loop.
+            files_written += len(result.get("files_written") or [])
+
+            # Secondary: text-only workers — pull text from final_text/response.
+            content = result.get("final_text", "") or ""
             response = result.get("response", {})
             if isinstance(response, dict):
-                content = response.get("content", "")
-            elif isinstance(response, str):
+                resp_text = response.get("content", "")
+                if isinstance(resp_text, str) and not content:
+                    content = resp_text
+            elif isinstance(response, str) and not content:
                 content = response
-            else:
-                continue
 
             if not content or not isinstance(content, str):
                 continue
@@ -439,15 +446,25 @@ class MultiLayeredAgenticOrchestrator:
                 )
                 results = [{"status": "error", "error": str(e)}]
             files_written = self._apply_worker_outputs(results, wave_label="W1")
-            # FIX-05: Only mark epic COMPLETED if ALL subtasks succeeded
+            # FIX-05: Only mark epic COMPLETED if ALL subtasks succeeded.
+            # A simulated (offline-fallback) worker result reports status="failed"
+            # with reason="simulation_fallback", so it can never pass this gate.
             all_ok = all(r.get("status") == "completed" for r in results)
             if all_ok:
                 default_task_master.update_task_status(epic.id, TaskStatus.COMPLETED)
             else:
                 failed = [r for r in results if r.get("status") != "completed"]
+                sim_failures = [r for r in failed if "simulation" in str(r.get("reason", ""))]
                 default_task_master.update_task_status(epic.id, TaskStatus.FAILED,
                     error_message=f"{len(failed)}/{len(results)} subtasks failed")
-                logger.warning(f"Wave 1 epic {epic.id}: {len(failed)}/{len(results)} subtasks failed")
+                if sim_failures:
+                    # Simulated work must NEVER advance a gate — log it distinctly.
+                    logger.error(
+                        f"Wave 1 epic {epic.id}: {len(sim_failures)} subtask(s) returned "
+                        f"SIMULATION FALLBACK — gate cannot pass. Workers received no live provider."
+                    )
+                else:
+                    logger.warning(f"Wave 1 epic {epic.id}: {len(failed)}/{len(results)} subtasks failed")
             default_progress_ledger.record_success_marker(
                 task_id=epic.id,
                 verifier_name="ProxyFabricVerifier",
@@ -523,15 +540,24 @@ class MultiLayeredAgenticOrchestrator:
             hot_agent = default_agent_factory.spawn_from_learning(learning_id, trigger_reason="Acute concurrency optimization", force_type=AgentType.HOT_MICRO_SPECIALIST)
             default_agent_factory.spawn_from_learning(learning_id, trigger_reason="Durable state persistence", force_type=AgentType.COLD_DURABLE)
 
-            # FIX-05: Only mark epic COMPLETED if ALL subtasks succeeded
+            # FIX-05: Only mark epic COMPLETED if ALL subtasks succeeded.
+            # Simulated (offline-fallback) results report status="failed", so they
+            # can never pass this gate.
             all_ok = all(r.get("status") == "completed" for r in results)
             if all_ok:
                 default_task_master.update_task_status(epic.id, TaskStatus.COMPLETED)
             else:
                 failed = [r for r in results if r.get("status") != "completed"]
+                sim_failures = [r for r in failed if "simulation" in str(r.get("reason", ""))]
                 default_task_master.update_task_status(epic.id, TaskStatus.FAILED,
                     error_message=f"{len(failed)}/{len(results)} subtasks failed")
-                logger.warning(f"Wave 2 epic {epic.id}: {len(failed)}/{len(results)} subtasks failed")
+                if sim_failures:
+                    logger.error(
+                        f"Wave 2 epic {epic.id}: {len(sim_failures)} subtask(s) returned "
+                        f"SIMULATION FALLBACK — gate cannot pass."
+                    )
+                else:
+                    logger.warning(f"Wave 2 epic {epic.id}: {len(failed)}/{len(results)} subtasks failed")
 
             default_progress_ledger.log_progress(
                 task_id=epic.id,
@@ -570,15 +596,24 @@ class MultiLayeredAgenticOrchestrator:
                 )
                 results = [{"status": "error", "error": str(e)}]
             files_written = self._apply_worker_outputs(results, wave_label="W3")
-            # FIX-05: Only mark epic COMPLETED if ALL subtasks succeeded
+            # FIX-05: Only mark epic COMPLETED if ALL subtasks succeeded.
+            # Simulated (offline-fallback) results report status="failed", so they
+            # can never pass this gate.
             all_ok = all(r.get("status") == "completed" for r in results)
             if all_ok:
                 default_task_master.update_task_status(epic.id, TaskStatus.COMPLETED)
             else:
                 failed = [r for r in results if r.get("status") != "completed"]
+                sim_failures = [r for r in failed if "simulation" in str(r.get("reason", ""))]
                 default_task_master.update_task_status(epic.id, TaskStatus.FAILED,
                     error_message=f"{len(failed)}/{len(results)} subtasks failed")
-                logger.warning(f"Wave 3 epic {epic.id}: {len(failed)}/{len(results)} subtasks failed")
+                if sim_failures:
+                    logger.error(
+                        f"Wave 3 epic {epic.id}: {len(sim_failures)} subtask(s) returned "
+                        f"SIMULATION FALLBACK — gate cannot pass."
+                    )
+                else:
+                    logger.warning(f"Wave 3 epic {epic.id}: {len(failed)}/{len(results)} subtasks failed")
             ver_result = self._run_syntax_verification()
             default_progress_ledger.record_success_marker(
                 task_id=epic.id,
@@ -616,13 +651,21 @@ class MultiLayeredAgenticOrchestrator:
                     logger.error(f"Error handler failed for epic {epic.id}: {he}")
                 results = [{"status": "error", "error": str(e)}]
             files_written = self._apply_worker_outputs(results, wave_label="W4")
+            # Simulated (offline-fallback) results report status="failed", so they
+            # can never pass this gate.
             all_ok = all(r.get("status") == "completed" for r in results)
             if all_ok:
                 default_task_master.update_task_status(epic.id, TaskStatus.COMPLETED)
             else:
                 failed = [r for r in results if r.get("status") != "completed"]
+                sim_failures = [r for r in failed if "simulation" in str(r.get("reason", ""))]
                 default_task_master.update_task_status(epic.id, TaskStatus.FAILED,
                     error_message=f"{len(failed)}/{len(results)} subtasks failed")
+                if sim_failures:
+                    logger.error(
+                        f"Wave 4 epic {epic.id}: {len(sim_failures)} subtask(s) returned "
+                        f"SIMULATION FALLBACK — gate cannot pass."
+                    )
             default_progress_ledger.log_progress(
                 task_id=epic.id,
                 subtask_id=None,

@@ -18,7 +18,7 @@ from typing import Any
 
 from merged_agentic_swarm.models.agent_models import AgentSpec, AgentType, WorkerPoolConfig, WorkerPoolState, WorkerRole
 from merged_agentic_swarm.models.prd_models import SubTask, TaskStatus
-from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric
+from merged_agentic_swarm.services.agentic_worker_loop import default_agentic_worker_loop
 
 logger = logging.getLogger("opencode_swarm")
 
@@ -323,7 +323,13 @@ class OpenCodeSwarmManager:
 
     def execute_subtask_with_worker(self, subtask: SubTask, role: WorkerRole) -> dict[str, Any]:
         """Dispatches a single subtask — first checks for a matching durable agent,
-        then falls back to the generic worker pool."""
+        then runs the agentic tool loop (real file/command work in the target repo).
+
+        ``SWARM_WORKER_MODE=fabric`` (default) runs the real tool loop through the
+        multi-provider fabric. ``SWARM_WORKER_MODE=opencode`` routes through the
+        opencode worker launcher (dormant until its credentials are repaired).
+        Simulated (offline-fallback) responses are never completions — they fail.
+        """
         pool_id = self._get_pool_id(role)
         routed_agent_id: str | None = None
         routed_agent_score: float = 0.0
@@ -365,18 +371,22 @@ class OpenCodeSwarmManager:
         start_time = time.time()
         logger.info(f"Worker {worker_id} ({role.value}) started subtask: {subtask.title}")
 
-        prompt = f"""Task Title: {subtask.title}
-Task Description: {subtask.description}
-Role: {role.value}
+        task = {
+            "title": subtask.title,
+            "description": subtask.description,
+        }
 
-Execute this task and produce required code or verification artifacts.
-"""
         try:
-            response = default_fabric.dispatch_request(
-                model_alias=WorkerRole.CORE_ENGINEER.value,  # routed agent uses default tier
-                messages=[{"role": "user", "content": prompt}],
-                system_prompt=system_prompt,
-            )
+            mode = os.environ.get("SWARM_WORKER_MODE", "fabric")
+            if mode == "opencode":
+                worker_result = self._run_opencode_worker(worker_id, role, system_prompt, task)
+            else:
+                worker_result = default_agentic_worker_loop.execute(
+                    subtask=task,
+                    system_prompt=system_prompt,
+                    model_alias=WorkerRole.CORE_ENGINEER.value,  # routed agent uses default tier
+                    workdir=self._target_repo_root(),
+                )
         except Exception as e:
             execution_time = time.time() - start_time
             subtask.status = TaskStatus.FAILED
@@ -392,26 +402,105 @@ Execute this task and produce required code or verification artifacts.
                 "role": role.value,
                 "execution_time_sec": round(execution_time, 2),
                 "error": str(e),
+                "reason": str(e),
             }
 
         execution_time = time.time() - start_time
-        subtask.status = TaskStatus.COMPLETED
-        subtask.completed_at = time.time()
+        status = worker_result.get("status", "failed")
+        reason = worker_result.get("reason")
+        final_text = worker_result.get("final_text", "")
+        files_written = worker_result.get("files_written", []) or []
+        commands_run = worker_result.get("commands_run", []) or []
 
-        self.state.completed_tasks += 1
-        self.state.record_pool_success(pool_id)
+        if status == "completed":
+            subtask.status = TaskStatus.COMPLETED
+            subtask.completed_at = time.time()
+            self.state.completed_tasks += 1
+            self.state.record_pool_success(pool_id)
+        else:
+            subtask.status = TaskStatus.FAILED
+            subtask.error_message = reason or "worker failed"
+            self.state.failed_tasks += 1
+            self.state.record_pool_failure(pool_id)
+            logger.warning(
+                f"Worker {worker_id} ({role.value}) failed subtask: {subtask.title} — {reason}"
+            )
+
         result = {
-            "status": "completed",
+            "status": status,
             "subtask_id": subtask.id,
             "worker_id": worker_id,
             "role": role.value,
             "execution_time_sec": round(execution_time, 2),
-            "response": response,
+            "final_text": final_text,
+            "files_written": files_written,
+            "commands_run": commands_run,
         }
+        if status == "failed":
+            result["error"] = reason or "unknown"
+            result["reason"] = reason or "unknown"
         if routed_agent_id:
             result["routed_agent"] = routed_agent_id
             result["routed_agent_score"] = routed_agent_score
         return result
+
+    @staticmethod
+    def _target_repo_root() -> str:
+        """Resolve the working repo the swarm writes into.
+
+        ``SWARM_TARGET_REPO`` env var wins; otherwise a sibling target repo
+        (e.g. ~/spotify-ai) is used when present, else the swarm repo itself.
+        """
+        configured = os.environ.get("SWARM_TARGET_REPO")
+        if configured:
+            return os.path.abspath(os.path.expanduser(configured))
+        for candidate in (
+            os.path.expanduser("~/spotify-ai"),
+            os.path.expanduser("~/merged-agentic-swarm"),
+        ):
+            if os.path.isdir(candidate):
+                return candidate
+        return os.getcwd()
+
+    def _run_opencode_worker(
+        self,
+        worker_id: str,
+        role: WorkerRole,
+        system_prompt: str,
+        task: dict[str, str],
+    ) -> dict[str, Any]:
+        """Run a subtask via the opencode worker launcher (SWARM_WORKER_MODE=opencode).
+
+        opencode requires valid credentials; until those are repaired the adapter
+        falls back to single-shot fabric dispatch (never simulation). Any status
+        other than a clean completion — including a simulated response — is
+        reported as failed.
+        """
+        from merged_agentic_swarm.services.worker_runtime_adapter import get_runtime_adapter
+
+        adapter = get_runtime_adapter(mode="opencode")
+        worker_spec = AgentSpec(
+            id=worker_id,
+            name=f"Swarm Worker ({role.value})",
+            role=role,
+            agent_type=AgentType.SWARM_WORKER,
+            system_prompt=system_prompt,
+        )
+        prompt = (
+            f"Task Title: {task['title']}\n"
+            f"Task Description: {task['description']}\n"
+            f"Role: {role.value}\n\n"
+            "Execute this task and produce required code or verification artifacts."
+        )
+        wresult = adapter.launch_worker(worker_spec, prompt)
+        status = "completed" if wresult.get("status") == "completed" else "failed"
+        return {
+            "status": status,
+            "reason": None if status == "completed" else wresult.get("evidence", "opencode worker failed"),
+            "final_text": wresult.get("evidence", ""),
+            "files_written": [],
+            "commands_run": [],
+        }
 
     def execute_subtask_batch_parallel(self, subtasks: list[SubTask], role: WorkerRole = WorkerRole.CORE_ENGINEER, wave_gate_level: int = 0) -> list[dict[str, Any]]:
         """Executes a batch of subtasks in parallel using ThreadPoolExecutor up to max pool capacity."""

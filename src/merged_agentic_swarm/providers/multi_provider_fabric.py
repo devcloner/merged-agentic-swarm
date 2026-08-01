@@ -139,33 +139,157 @@ class MultiProviderFabric:
     def __init__(self, key_pool=None):
         self.key_pool = key_pool or default_key_pool
 
+    @staticmethod
+    def _flatten_content_to_text(content: Any) -> str:
+        """Flatten Anthropic content blocks (or plain text) into a single text string."""
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            text_parts = []
+            for block in content:
+                if isinstance(block, dict) and block.get("type") == "text":
+                    text_parts.append(block.get("text", ""))
+                elif isinstance(block, str):
+                    text_parts.append(block)
+            return "\n".join(text_parts)
+        return ""
+
     def format_anthropic_to_openai(self, messages: list[dict[str, Any]], system_prompt: str | None = None) -> list[dict[str, Any]]:
+        """Convert normalized messages (Anthropic-shaped) to OpenAI Chat Completions format.
+
+        Handles assistant ``tool_calls`` and ``tool`` result messages so an
+        agentic tool loop can round-trip through OpenAI-format providers.
+        """
         openai_messages = []
         if system_prompt:
             openai_messages.append({"role": "system", "content": system_prompt})
         for msg in messages:
             role = msg.get("role", "user")
-            content = msg.get("content", "")
-            if isinstance(content, list):
-                # Flatten Anthropic content blocks to text string
-                text_parts = []
-                for block in content:
-                    if isinstance(block, dict) and block.get("type") == "text":
-                        text_parts.append(block.get("text", ""))
-                    elif isinstance(block, str):
-                        text_parts.append(block)
-                content = "\n".join(text_parts)
-            openai_messages.append({"role": role, "content": content})
+            content = self._flatten_content_to_text(msg.get("content", ""))
+            if role == "tool":
+                openai_messages.append({
+                    "role": "tool",
+                    "tool_call_id": msg.get("tool_call_id", ""),
+                    "content": content,
+                })
+            elif role == "assistant" and msg.get("tool_calls"):
+                openai_messages.append({
+                    "role": "assistant",
+                    "content": content,
+                    "tool_calls": [
+                        {
+                            "id": tc.get("id", ""),
+                            "type": "function",
+                            "function": {
+                                "name": tc.get("name", ""),
+                                "arguments": json.dumps(tc.get("input", {})),
+                            },
+                        }
+                        for tc in msg["tool_calls"]
+                    ],
+                })
+            else:
+                openai_messages.append({"role": role, "content": content})
         return openai_messages
+
+    @staticmethod
+    def _content_to_anthropic_blocks(content: Any) -> list[dict[str, Any]]:
+        """Normalize a content value into a list of Anthropic content blocks."""
+        if isinstance(content, str):
+            if content == "":
+                return []
+            return [{"type": "text", "text": content}]
+        if isinstance(content, list):
+            return content
+        return []
+
+    def format_anthropic_to_anthropic(self, messages: list[dict[str, Any]], system_prompt: str | None = None) -> list[dict[str, Any]]:
+        """Convert normalized messages to Anthropic Messages API format.
+
+        Used for Anthropic-compatible endpoints (``/v1/messages``, e.g. fcc-proxy).
+        Assistant ``tool_calls`` become ``tool_use`` blocks; ``tool`` results
+        become ``user``/``tool_result`` blocks per the Anthropic spec.
+        """
+        anthropic_messages: list[dict[str, Any]] = []
+        for msg in messages:
+            role = msg.get("role", "user")
+            if role == "assistant" and msg.get("tool_calls"):
+                blocks = self._content_to_anthropic_blocks(msg.get("content", ""))
+                for tc in msg["tool_calls"]:
+                    blocks.append({
+                        "type": "tool_use",
+                        "id": tc.get("id", ""),
+                        "name": tc.get("name", ""),
+                        "input": tc.get("input", {}),
+                    })
+                anthropic_messages.append({"role": "assistant", "content": blocks})
+            elif role == "tool":
+                anthropic_messages.append({
+                    "role": "user",
+                    "content": [{
+                        "type": "tool_result",
+                        "tool_use_id": msg.get("tool_call_id", ""),
+                        "content": self._flatten_content_to_text(msg.get("content", "")),
+                    }],
+                })
+            else:
+                anthropic_messages.append({
+                    "role": role,
+                    "content": self._content_to_anthropic_blocks(msg.get("content", "")),
+                })
+        return anthropic_messages
+
+    @staticmethod
+    def _tools_to_anthropic(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Convert OpenAI function-tool schemas to Anthropic ``tools`` payload entries."""
+        converted = []
+        for tool in tools:
+            fn = tool.get("function", tool)
+            converted.append({
+                "name": fn.get("name", ""),
+                "description": fn.get("description", ""),
+                "input_schema": fn.get("parameters", {"type": "object", "properties": {}}),
+            })
+        return converted
+
+    @staticmethod
+    def _extract_anthropic_tool_calls(resp_json: dict[str, Any]) -> list[dict[str, Any]] | None:
+        """Extract normalized tool calls from an Anthropic-format response's content blocks."""
+        content = resp_json.get("content")
+        if not isinstance(content, list):
+            return None
+        tool_calls = [
+            {"id": b.get("id", ""), "name": b.get("name", ""), "input": b.get("input", {})}
+            for b in content
+            if isinstance(b, dict) and b.get("type") == "tool_use"
+        ]
+        return tool_calls or None
 
     def format_openai_to_anthropic_response(self, openai_resp: dict[str, Any], model_alias: str) -> dict[str, Any]:
         """Converts OpenAI response payload to Anthropic messages payload format."""
         choices = openai_resp.get("choices", [])
         content_text = ""
+        tool_calls = None
         if choices:
             msg = choices[0].get("message", {})
             content_text = msg.get("content") or ""
-            if not content_text:
+            raw_tool_calls = msg.get("tool_calls")
+            if raw_tool_calls:
+                # Normalize OpenAI function calls so the agentic loop sees the same
+                # {id, name, input} shape it gets from Anthropic tool_use blocks.
+                tool_calls = []
+                for tc in raw_tool_calls:
+                    fn = tc.get("function", {})
+                    try:
+                        arguments = json.loads(fn.get("arguments", "{}"))
+                    except (json.JSONDecodeError, TypeError):
+                        arguments = {}
+                    tool_calls.append({
+                        "id": tc.get("id", ""),
+                        "name": fn.get("name", ""),
+                        "input": arguments,
+                    })
+            if not content_text and not tool_calls:
                 # Reasoning-only response (e.g. Gemini thinking models): extract from finish_reason context
                 finish_reason = choices[0].get("finish_reason", "")
                 if finish_reason == "length":
@@ -174,7 +298,7 @@ class MultiProviderFabric:
                     content_text = "[Model produced reasoning-only response with no visible text output.]"
 
         usage = openai_resp.get("usage", {})
-        return {
+        result = {
             "id": f"msg_{int(time.time()*1000)}",
             "type": "message",
             "role": "assistant",
@@ -192,6 +316,9 @@ class MultiProviderFabric:
                 "output_tokens": usage.get("completion_tokens", 0)
             }
         }
+        if tool_calls:
+            result["tool_calls"] = tool_calls
+        return result
 
     def _build_route_list(self, model_alias: str) -> list[dict[str, str]]:
         """Build route list, promoting the last successful provider for this alias to the front."""
@@ -203,8 +330,16 @@ class MultiProviderFabric:
                 routes.insert(0, routes.pop(idx))
         return routes
 
-    def dispatch_request(self, model_alias: str, messages: list[dict[str, Any]], system_prompt: str | None = None, max_tokens: int = 4096, temperature: float = 0.7) -> dict[str, Any]:
-        """Dispatches request across multi-backend provider fallback cascade."""
+    def dispatch_request(self, model_alias: str, messages: list[dict[str, Any]], system_prompt: str | None = None, max_tokens: int = 4096, temperature: float = 0.7, tools: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+        """Dispatches request across multi-backend provider fallback cascade.
+
+        ``tools`` is a list of OpenAI function-tool schemas. They are converted
+        per provider family (OpenAI ``type: function`` payload for chat-completions
+        providers; Anthropic ``name``/``input_schema`` for ``/v1/messages``
+        endpoints). When the model responds with tool calls, the returned dict
+        carries a normalized ``tool_calls: [{id, name, input}]`` key alongside the
+        standard Anthropic-shaped content.
+        """
         # Empty conversation is a malformed request — don't burn provider calls
         # (or cascade timeouts) on it; respond immediately like a 400 would.
         if not messages and not system_prompt:
@@ -256,13 +391,30 @@ class MultiProviderFabric:
                     logger.debug(f"No key available for provider {provider}, trying next in fabric chain.")
                     break
 
-                openai_msgs = self.format_anthropic_to_openai(messages, system_prompt)
-                payload = {
-                    "model": target_model,
-                    "messages": openai_msgs,
-                    "max_tokens": max_tokens,
-                    "temperature": temperature
-                }
+                # Anthropic-compatible endpoints (/v1/messages, e.g. fcc-proxy) take a
+                # top-level system + content-block messages + Anthropic tools; the
+                # OpenAI-format providers take system-as-message + function tools.
+                if "/v1/messages" in target_url:
+                    payload = {
+                        "model": target_model,
+                        "messages": self.format_anthropic_to_anthropic(messages, system_prompt),
+                        "max_tokens": max_tokens,
+                        "temperature": temperature,
+                    }
+                    if system_prompt:
+                        payload["system"] = system_prompt
+                    if tools:
+                        payload["tools"] = self._tools_to_anthropic(tools)
+                else:
+                    openai_msgs = self.format_anthropic_to_openai(messages, system_prompt)
+                    payload = {
+                        "model": target_model,
+                        "messages": openai_msgs,
+                        "max_tokens": max_tokens,
+                        "temperature": temperature,
+                    }
+                    if tools:
+                        payload["tools"] = tools
 
                 start_time = time.time()
                 try:
@@ -292,6 +444,9 @@ class MultiProviderFabric:
                         # If the response is already in Anthropic Messages format (e.g. fcc-proxy), return it directly.
                         if resp_json.get("type") == "message":
                             resp_json["model"] = model_alias  # override model name in response
+                            tool_calls = self._extract_anthropic_tool_calls(resp_json)
+                            if tool_calls:
+                                resp_json["tool_calls"] = tool_calls
                             return resp_json
 
                         return self.format_openai_to_anthropic_response(resp_json, model_alias)
