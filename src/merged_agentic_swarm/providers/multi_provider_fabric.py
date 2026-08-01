@@ -50,40 +50,42 @@ def _record_success(provider: str, model_alias: str | None = None):
             _last_successful_provider[model_alias] = provider
 
 # Fallback Routing Table
+#
+# NOTE: As of 2026-07-31, only Mistral has a verified working API key in this environment.
+# OpenCode (no credits), OpenRouter (invalid key), NVIDIA NIM (timeout).
+# Routes are ordered by verified status first, then by cost/depth.
+# See docs/agentic/audit/PROXY_VERIFICATION.md for the full audit.
 MODEL_FABRIC_ROUTES: dict[str, list[dict[str, str]]] = {
-    "claude-3-7-sonnet": [
-        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
-        {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions"},
-        {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://api.opencode.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
-        {"provider": "groq", "model": "llama-3.3-70b-versatile", "url": "https://api.groq.com/openai/v1/chat/completions"},
-        {"provider": "alibabacloud", "model": "qwen3.6-plus", "url": "https://ws-os3nbzniaeck95yo.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions"},
-        {"provider": "digitalocean", "model": "do-llama-3.3-70b", "url": "https://inference.do-ai.run/v1/chat/completions"},
-        {"provider": "amazonaws", "model": "anthropic.claude-3-5-sonnet-20241022-v2:0", "url": "https://bedrock-runtime.us-east-1.amazonaws.com/model/invoke"},
-    ],
-    "claude-3-5-sonnet": [
-        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
-        {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
-        {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://api.opencode.ai/v1/chat/completions"},
-        {"provider": "groq", "model": "llama-3.3-70b-versatile", "url": "https://api.groq.com/openai/v1/chat/completions"},
-        {"provider": "mistral", "model": "mistral-large-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "openrouter", "model": "anthropic/claude-3.5-sonnet", "url": "https://openrouter.ai/api/v1/chat/completions"}
-    ],
-    "claude-3-5-haiku": [
-        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
-        {"provider": "litellm", "model": "gemini-2.5-flash-lite", "url": "http://localhost:4000/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
-        {"provider": "groq", "model": "llama-3.3-70b-versatile", "url": "https://api.groq.com/openai/v1/chat/completions"},
-        {"provider": "alibabacloud", "model": "qwen3.6-flash", "url": "https://ws-os3nbzniaeck95yo.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions"}
-    ],
+    # ── deep tier (claude-3-opus) ──────────────────────────────────────────
     "claude-3-opus": [
+        {"provider": "mistral", "model": "codestral-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "mistral", "model": "mistral-large-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
-        {"provider": "litellm", "model": "gemini-2.5-pro", "url": "http://localhost:4000/v1/chat/completions"},
-        {"provider": "opencode", "model": "opencode_go/deepseek-v4-flash", "url": "https://api.opencode.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-pro", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
-        {"provider": "mistral", "model": "codestral-latest", "url": "https://api.mistral.ai/v1/chat/completions"}
-    ]
+    ],
+    # ── main tier (claude-3-7-sonnet) ──────────────────────────────────────
+    "claude-3-7-sonnet": [
+        {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+    ],
+    # ── main tier (claude-3-5-sonnet) ──────────────────────────────────────
+    "claude-3-5-sonnet": [
+        {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+    ],
+    # ── fast tier (claude-3-5-haiku) ───────────────────────────────────────
+    "claude-3-5-haiku": [
+        {"provider": "mistral", "model": "mistral-tiny", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+    ],
+    # ── general-purpose alias (fabCFA) — mirrors main tier ─────────────────
+    "fabCFA": [
+        {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+        {"provider": "fcc-proxy", "model": "opencode_go/deepseek-v4-flash", "url": "http://localhost:8080/v1/messages"},
+    ],
 }
 
 class MultiProviderFabric:
