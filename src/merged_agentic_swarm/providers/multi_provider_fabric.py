@@ -75,10 +75,10 @@ def _record_success(provider: str, model_alias: str | None = None):
 MODEL_FABRIC_ROUTES: dict[str, list[dict[str, Any]]] = {
     # ── deep tier (claude-3-opus) — strongest available models ─────────────
     "claude-3-opus": [
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-large-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "fcc-proxy", "model": "nvidia_nim/meta/llama-3.1-70b-instruct", "url": "http://localhost:8080/v1/messages"},
@@ -88,10 +88,10 @@ MODEL_FABRIC_ROUTES: dict[str, list[dict[str, Any]]] = {
     ],
     # ── main tier (claude-3-7-sonnet) ──────────────────────────────────────
     "claude-3-7-sonnet": [
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
@@ -100,10 +100,10 @@ MODEL_FABRIC_ROUTES: dict[str, list[dict[str, Any]]] = {
     ],
     # ── main tier (claude-3-5-sonnet) ──────────────────────────────────────
     "claude-3-5-sonnet": [
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
@@ -112,10 +112,10 @@ MODEL_FABRIC_ROUTES: dict[str, list[dict[str, Any]]] = {
     ],
     # ── fast tier (claude-3-5-haiku) — cheapest/latency-first ──────────────
     "claude-3-5-haiku": [
-        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "meta/llama-3.1-8b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-tiny", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "mistralai/mistral-nemotron", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "fcc-proxy", "model": "nvidia_nim/meta/llama-3.1-8b-instruct", "url": "http://localhost:8080/v1/messages"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
@@ -123,10 +123,10 @@ MODEL_FABRIC_ROUTES: dict[str, list[dict[str, Any]]] = {
     ],
     # ── general-purpose alias (fabCFA) — mirrors main tier ─────────────────
     "fabCFA": [
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"},
+        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},

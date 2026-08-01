@@ -70,6 +70,42 @@ class TestApplyWorkerOutputs:
         ]
         assert not all(r.get("status") == "completed" for r in results)
 
+    def test_logs_per_worker_real_work(self, caplog):
+        """Each completed worker's files_written/commands_run are logged —
+        the auditable trail that proves a gate advanced on real artifacts."""
+        import logging
+        results = [{
+            "status": "completed",
+            "worker_id": "opencode-worker-11",
+            "files_written": ["a.py", "b.py"],
+            "commands_run": ["uv run python a.py"],
+            "final_text": "done",
+        }]
+        with caplog.at_level(logging.INFO, logger="agentic_orchestrator"):
+            count = self.orch._apply_worker_outputs(results, wave_label="W1")
+        assert count == 2
+        assert any("opencode-worker-11" in r.message and "REAL WORK" in r.message and "a.py" in r.message for r in caplog.records)
+        assert any("W1 aggregate: 2 distinct real file(s), 1 distinct real command(s)" in r.message for r in caplog.records)
+
+    def test_counts_distinct_files_written(self):
+        """Repeated writes to the same path across loop iterations count once."""
+        results = [{"status": "completed", "files_written": ["a.py", "a.py", "b.py", "a.py"]}]
+        count = self.orch._apply_worker_outputs(results, wave_label="W1")
+        assert count == 2
+
+    def test_logs_text_only_worker(self, caplog):
+        """A completed worker that produced no files/commands is flagged honestly."""
+        import logging
+        results = [{
+            "status": "completed",
+            "worker_id": "opencode-worker-07",
+            "final_text": "no artifacts needed",
+        }]
+        with caplog.at_level(logging.INFO, logger="agentic_orchestrator"):
+            count = self.orch._apply_worker_outputs(results, wave_label="W2")
+        assert count == 0
+        assert any("produced no files/commands" in r.message and "opencode-worker-07" in r.message for r in caplog.records)
+
 
 class TestCompactRegistries:
     def setup_method(self):

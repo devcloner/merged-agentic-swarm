@@ -212,12 +212,29 @@ class MultiLayeredAgenticOrchestrator:
         import re
 
         files_written = 0
+        commands_run = 0
         for result in results:
             if result.get("status") != "completed":
                 continue
 
             # Primary: real writes already on disk via the agentic tool loop.
-            files_written += len(result.get("files_written") or [])
+            # Count DISTINCT files — a loop may write the same path repeatedly.
+            fw_list = sorted(set(result.get("files_written") or []))
+            cr_list = sorted(set(result.get("commands_run") or []))
+            files_written += len(fw_list)
+            commands_run += len(cr_list)
+            # Auditable per-worker real-work trail: gate counts alone cannot prove
+            # a worker produced artifacts, so surface the actual paths/commands.
+            if fw_list or cr_list:
+                logger.info(
+                    f"{wave_label} worker {result.get('worker_id', '?')} REAL WORK: "
+                    f"{len(fw_list)} file(s) {fw_list}; {len(cr_list)} command(s) {cr_list}"
+                )
+            elif result.get("final_text"):
+                logger.info(
+                    f"{wave_label} worker {result.get('worker_id', '?')} produced no "
+                    f"files/commands (text-only: {result.get('final_text', '')[:80]!r})"
+                )
 
             # Secondary: text-only workers — pull text from final_text/response.
             content = result.get("final_text", "") or ""
@@ -257,6 +274,10 @@ class MultiLayeredAgenticOrchestrator:
                 except Exception as e:
                     logger.error(f"Failed to write {raw_path} ({abs_path}): {e}")
 
+        logger.info(
+            f"{wave_label} aggregate: {files_written} distinct real file(s), "
+            f"{commands_run} distinct real command(s) across {len(results)} worker result(s)."
+        )
         return files_written
 
     def _append_jsonl(self, path: str, record: dict):
