@@ -36,6 +36,7 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "  Protected processes (never touched):"
             echo "    - fcc-server (port 8080)"
+            echo "    - routatic-proxy (port 3456)"
             echo "    - sub-agent-mcp (port 8000)"
             echo "    - docker-proxy"
             echo "    - Any PID not in our PID files"
@@ -51,7 +52,7 @@ done
 # -------------------------------------------------------------------------
 # Protected process check — never kill these
 # -------------------------------------------------------------------------
-PROTECTED_COMMANDS=("fcc-server" "sub-agent-mcp" "docker-proxy" "dockerd" "systemd" "sshd")
+PROTECTED_COMMANDS=("fcc-server" "routatic-proxy" "sub-agent-mcp" "docker-proxy" "dockerd" "systemd" "sshd")
 
 is_protected() {
     local pid="$1"

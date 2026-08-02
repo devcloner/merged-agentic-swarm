@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # verify_proxy.sh — Authenticated proxy verification
 # Tests each configured model tier against the live proxy endpoint.
+# Supports FCC (port 8080, default) and routatic-proxy (port 3456).
 set -euo pipefail
 
 PROXY_HOST="${PROXY_HOST:-127.0.0.1}"
@@ -9,6 +10,13 @@ PROXY_URL="http://${PROXY_HOST}:${PROXY_PORT}"
 AUTH_TOKEN="${ANTHROPIC_AUTH_TOKEN:-freecc}"
 TIMEOUT_SEC=30
 NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+# Detect proxy type from port for display
+case "$PROXY_PORT" in
+    3456) PROXY_TYPE="routatic-proxy" ;;
+    8080) PROXY_TYPE="fcc-proxy" ;;
+    *)    PROXY_TYPE="unknown" ;;
+esac
 
 declare -A TIERS=(
     ["deep"]="claude-3-opus"
@@ -33,6 +41,7 @@ check() {
 
 echo "============================================================"
 echo " PROXY VERIFICATION  |  $NOW"
+echo " Type    : $PROXY_TYPE"
 echo " Endpoint: $PROXY_URL"
 echo " Auth:     x-api-key (${AUTH_TOKEN:0:3}...)"
 echo "============================================================"

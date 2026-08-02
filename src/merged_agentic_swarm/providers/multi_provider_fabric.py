@@ -70,68 +70,94 @@ def _record_success(provider: str, model_alias: str | None = None):
 #               The env key is 401 "User not found" as of this audit, so these routes
 #               perma-ban on first hit and are skipped cheaply; kept so a valid key
 #               activates them automatically. 14 :free models exist on the platform.
+#   - litellm — local proxy on http://localhost:4000 (OpenAI-format). It fronts the
+#               same Gemini family through its own 35-key pool (see
+#               /home/ubuntu/deployments/litellm/config.yaml). Master key comes from
+#               LITELLM_PROXY_KEY via the key pool. Positioned right after the direct
+#               Gemini route so the two key pools back each other up; a 429 from
+#               litellm means its 35-key pool is exhausted and the cascade continues.
 # Routes are ordered verified-first (reliability × speed), then as fallbacks. Dead
 # providers fail fast (perma-ban on 401 / circuit breaker) and fall through.
 MODEL_FABRIC_ROUTES: dict[str, list[dict[str, Any]]] = {
     # ── deep tier (claude-3-opus) — strongest available models ─────────────
     "claude-3-opus": [
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
+        {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-large-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
+        {"provider": "litellm", "model": "gemini-3.6-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "fcc-proxy", "model": "nvidia_nim/meta/llama-3.1-70b-instruct", "url": "http://localhost:8080/v1/messages"},
         {"provider": "mistral", "model": "codestral-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions", "timeout": 60},
         {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
+        {"provider": "routatic-proxy", "model": "deepseek-v4-pro", "url": "http://localhost:3456/v1/messages", "timeout": 30},
+        {"provider": "routatic-proxy", "model": "deepseek-v4-flash", "url": "http://localhost:3456/v1/messages", "timeout": 30},
     ],
     # ── main tier (claude-3-7-sonnet) ──────────────────────────────────────
     "claude-3-7-sonnet": [
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
+        {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
+        {"provider": "litellm", "model": "gemini-3.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
+        {"provider": "routatic-proxy", "model": "deepseek-v4-pro", "url": "http://localhost:3456/v1/messages", "timeout": 30},
+        {"provider": "routatic-proxy", "model": "deepseek-v4-flash", "url": "http://localhost:3456/v1/messages", "timeout": 30},
     ],
     # ── main tier (claude-3-5-sonnet) ──────────────────────────────────────
     "claude-3-5-sonnet": [
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
+        {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
+        {"provider": "litellm", "model": "gemini-3.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
+        {"provider": "routatic-proxy", "model": "deepseek-v4-pro", "url": "http://localhost:3456/v1/messages", "timeout": 30},
+        {"provider": "routatic-proxy", "model": "deepseek-v4-flash", "url": "http://localhost:3456/v1/messages", "timeout": 30},
     ],
     # ── fast tier (claude-3-5-haiku) — cheapest/latency-first ──────────────
     "claude-3-5-haiku": [
         {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
+        {"provider": "litellm", "model": "gemini-2.5-flash-lite", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "meta/llama-3.1-8b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-tiny", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
+        {"provider": "litellm", "model": "gemini-3.5-flash-lite", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "mistralai/mistral-nemotron", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "fcc-proxy", "model": "nvidia_nim/meta/llama-3.1-8b-instruct", "url": "http://localhost:8080/v1/messages"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
+        {"provider": "routatic-proxy", "model": "deepseek-v4-pro", "url": "http://localhost:3456/v1/messages", "timeout": 30},
+        {"provider": "routatic-proxy", "model": "deepseek-v4-flash", "url": "http://localhost:3456/v1/messages", "timeout": 30},
     ],
     # ── general-purpose alias (fabCFA) — mirrors main tier ─────────────────
     "fabCFA": [
         {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
+        {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
+        {"provider": "litellm", "model": "gemini-3.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
         {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
         {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
         {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
+        {"provider": "routatic-proxy", "model": "deepseek-v4-pro", "url": "http://localhost:3456/v1/messages", "timeout": 30},
+        {"provider": "routatic-proxy", "model": "deepseek-v4-flash", "url": "http://localhost:3456/v1/messages", "timeout": 30},
     ],
 }
 

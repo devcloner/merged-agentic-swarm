@@ -1,5 +1,5 @@
 {
-  "_comment": "This environment has TWO proxy services. See docs/agentic/PROXY_GUIDE.md for details.",
+  "_comment": "This environment has THREE proxy services. See docs/agentic/PROXY_GUIDE.md for details.",
   "server": {
     "host": "127.0.0.1",
     "port": 8085,
@@ -14,6 +14,31 @@
     "implementation": "fcc-server (free-claude-code)",
     "description": "Handles actual ANTHROPIC_BASE_URL traffic. Authenticates with ANTHROPIC_AUTH_TOKEN=freecc.",
     "type": "openai_compatible"
+  },
+  "routatic_proxy": {
+    "enabled": true,
+    "host": "127.0.0.1",
+    "port": 3456,
+    "url": "http://127.0.0.1:3456",
+    "description": "Standalone model router via routatic-proxy (Homebrew 0.6.2). Does not interfere with FCC on port 8080.",
+    "use_case": "Run routatic-proxy independently when tuning FCC Claude or when FCC proxy causes model mismatches",
+    "start_command": "/home/linuxbrew/.linuxbrew/Cellar/routatic-proxy/0.6.2/bin/routatic-proxy serve -c /home/ubuntu/.config/routatic-proxy/config.json -p 3456 -b",
+    "env_vars": {
+      "ROUTATIC_PROXY_API": "freecc",
+      "OC_GO_CC_API_KEY": "sk-REDACTED"
+    },
+    "health_endpoint": "http://127.0.0.1:3456/health",
+    "models_endpoint": "http://127.0.0.1:3456/v1/models",
+    "anthropic_endpoint": "http://127.0.0.1:3456/v1/messages",
+    "openai_endpoint": "http://127.0.0.1:3456/v1/chat/completions",
+    "provider": "opencode-go",
+    "working_models": [
+      "deepseek-v4-pro",
+      "deepseek-v4-flash",
+      "qwen3.7-plus",
+      "qwen3.7-max"
+    ],
+    "notes": "opencode-zen provider has insufficient balance (CreditsError). opencode-go works with the configured API key."
   },
   "load_balancing": {
     "strategy": "round_robin_weighted",

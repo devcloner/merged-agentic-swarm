@@ -137,6 +137,10 @@ class KeyPoolManager:
                          or "freecc")
         self.add_key("fcc-proxy", fcc_proxy_key, key_id="fcc-proxy-main")
 
+        # 12. Routatic-proxy (localhost:3456) — standalone model router,
+        #     does not interfere with FCC on port 8080. Uses same ANTHROPIC_AUTH_TOKEN.
+        self.add_key("routatic-proxy", fcc_proxy_key, key_id="routatic-proxy-main")
+
         logger.info(f"Loaded key pools for providers: {list(self.keys_by_provider.keys())}")
 
     def add_key(self, provider: str, secret_value: str, key_id: str):

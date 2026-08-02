@@ -156,7 +156,7 @@ oc_version = "n/a"
 if oc_executable:
     oc_version = run([oc_binary, "--version"]) or "error"
 
-# ── Proxy on port 8080 ───────────────────────────────────────────────────
+# ── Proxy on port 8080 (FCC) ──────────────────────────────────────────
 proxy_reachable = False
 proxy_model_count = 0
 proxy_http_code = 0
@@ -174,6 +174,25 @@ try:
         proxy_reachable = True
 except Exception:
     proxy_http_code = 0
+
+# ── Routatic-proxy on port 3456 (standalone model router) ──────────────
+routatic_reachable = False
+routatic_model_count = 0
+routatic_http_code = 0
+try:
+    import urllib.request
+    req = urllib.request.Request(
+        "http://localhost:3456/v1/models",
+        headers={"Authorization": "Bearer freecc"}
+    )
+    resp = urllib.request.urlopen(req, timeout=10)
+    routatic_http_code = resp.getcode()
+    if routatic_http_code == 200:
+        body = json.loads(resp.read().decode())
+        routatic_model_count = len(body.get("data", []))
+        routatic_reachable = True
+except Exception:
+    routatic_http_code = 0
 
 # ── Port 4000 (expected dead) ────────────────────────────────────────────
 port4000_http_code = 0
@@ -257,6 +276,13 @@ report = {
         "reachable": proxy_reachable,
         "http_status": proxy_http_code,
         "model_count": proxy_model_count
+    },
+    "routatic_proxy_3456": {
+        "host": "localhost",
+        "port": 3456,
+        "reachable": routatic_reachable,
+        "http_status": routatic_http_code,
+        "model_count": routatic_model_count
     },
     "port_4000": {
         "host": "localhost",

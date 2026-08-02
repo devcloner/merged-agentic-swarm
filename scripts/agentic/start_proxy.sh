@@ -1,28 +1,35 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ── start_proxy.sh ───────────────────────────────────────────────────────────
-# Check whether the FCC proxy (fcc-server) is running on port 8080.
+# ── start_proxy.sh ───────────────────────────────────────────────────
+# Check whether a proxy (FCC on 8080 or routatic-proxy on 3456) is running.
 # Idempotent — exits 0 when already running, 1 when not running.
 #
 # Usage:
 #   scripts/agentic/start_proxy.sh [--help]
-# ──────────────────────────────────────────────────────────────────────────────
+#   scripts/agentic/start_proxy.sh [--routatic|--fcc]
+# ──────────────────────────────────────────────────────────────────────
 
-readonly PORT=8080
-readonly PROCESS_NAME="fcc-server"
+readonly FCC_PORT=8080
+readonly FCC_PROCESS_NAME="fcc-server"
+readonly ROUTATIC_PORT=3456
+readonly ROUTATIC_PROCESS_NAME="routatic-proxy"
 
-# ── Usage ────────────────────────────────────────────────────────────────────
+PROXY_TYPE="both"
+
+# ── Usage ────────────────────────────────────────────────────────────
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [--help]
+Usage: $(basename "$0") [--help] [--routatic|--fcc]
 
-Check whether the FCC proxy ($PROCESS_NAME) is running on port $PORT.
+Check whether a proxy is running on the configured port.
 If running: prints PID, port, and status, then exits 0.
 If not running: prints instructions and exits 1.
 
 Options:
-  --help    Show this help and exit.
+  --help       Show this help and exit.
+  --fcc        Check only FCC proxy (port $FCC_PORT).
+  --routatic   Check only routatic-proxy (port $ROUTATIC_PORT).
 EOF
 }
 
@@ -32,6 +39,14 @@ if [[ $# -gt 0 ]]; then
             usage
             exit 0
             ;;
+        --fcc)
+            PROXY_TYPE="fcc"
+            shift
+            ;;
+        --routatic)
+            PROXY_TYPE="routatic"
+            shift
+            ;;
         *)
             echo "ERROR: Unknown option: $1" >&2
             usage >&2
@@ -40,10 +55,12 @@ if [[ $# -gt 0 ]]; then
     esac
 fi
 
-# ── Check for fcc-server on port 8080 ────────────────────────────────────────
+# ── Check for a proxy on a given port ──────────────────────────────
 check_proxy() {
-    # ss -tlnp: show listening TCP sockets with process info.
-    # Match port 8080 and optionally filter for the process name.
+    local PORT="$1"
+    local PROCESS_NAME="$2"
+    local LABEL="$3"
+
     local ss_output
     ss_output=$(ss -tlnp "sport = :$PORT" 2>/dev/null) || true
 
@@ -51,16 +68,12 @@ check_proxy() {
         return 1
     fi
 
-    # Extract the PID from the ss output.
-    # Typical ss -tlnp line:
-    #   LISTEN 0 128 0.0.0.0:8080 0.0.0.0:* users:(("node",pid=12345,fd=18))
     local pid
     pid=$(echo "$ss_output" | grep -oP 'pid=\K[0-9]+' | head -n 1) || true
 
     if [[ -z "$pid" ]]; then
-        # Something is listening but we could not extract a PID (maybe root-owned).
         echo ""
-        echo "=== FCC Proxy Status ==="
+        echo "=== $LABEL Status ==="
         echo "  Port   : $PORT"
         echo "  Status : LISTENING (PID unknown — process may be owned by another user)"
         echo "  Process: $PROCESS_NAME (assumed)"
@@ -71,73 +84,84 @@ check_proxy() {
         return 0
     fi
 
-    # Confirm the process name matches (best-effort).
     local proc_name
     proc_name=$(ps -p "$pid" -o comm= 2>/dev/null || echo "unknown")
 
     echo ""
-    echo "=== FCC Proxy Status ==="
+    echo "=== $LABEL Status ==="
     echo "  PID     : $pid"
     echo "  Port    : $PORT"
     echo "  Process : $proc_name"
     echo "  Status  : RUNNING"
     echo ""
-    echo "FCC proxy is already running. No action needed."
+    echo "$LABEL is already running. No action needed."
     echo ""
 
     return 0
 }
 
-# ── Main ──────────────────────────────────────────────────────────────────────
-if check_proxy; then
-    exit 0
-fi
+# ── Main ──────────────────────────────────────────────────────────────
+case "$PROXY_TYPE" in
+    fcc)
+        if check_proxy "$FCC_PORT" "$FCC_PROCESS_NAME" "FCC Proxy"; then
+            exit 0
+        fi
+        echo ""
+        echo "=== FCC Proxy Status ==="
+        echo "  Port    : $FCC_PORT"
+        echo "  Process : $FCC_PROCESS_NAME"
+        echo "  Status  : NOT RUNNING"
+        echo ""
+        echo "fcc-server not running. It must be started manually or by system service."
+        exit 1
+        ;;
+    routatic)
+        if check_proxy "$ROUTATIC_PORT" "$ROUTATIC_PROCESS_NAME" "Routatic Proxy"; then
+            exit 0
+        fi
+        echo ""
+        echo "=== Routatic Proxy Status ==="
+        echo "  Port    : $ROUTATIC_PORT"
+        echo "  Process : $ROUTATIC_PROCESS_NAME"
+        echo "  Status  : NOT RUNNING"
+        echo ""
+        echo "routatic-proxy not running. Start it with:"
+        echo "  source ~/.local/bin/start-routatic-proxy.sh"
+        exit 1
+        ;;
+    both)
+        FCC_RUNNING=false
+        ROUTATIC_RUNNING=false
 
-# ── Not running — print status and instructions ──────────────────────────────
-echo ""
-echo "=== FCC Proxy Status ==="
-echo "  Port    : $PORT"
-echo "  Process : $PROCESS_NAME"
-echo "  Status  : NOT RUNNING"
-echo ""
+        if check_proxy "$FCC_PORT" "$FCC_PROCESS_NAME" "FCC Proxy" >/dev/null 2>&1; then
+            FCC_RUNNING=true
+        fi
+        if check_proxy "$ROUTATIC_PORT" "$ROUTATIC_PROCESS_NAME" "Routatic Proxy" >/dev/null 2>&1; then
+            ROUTATIC_RUNNING=true
+        fi
 
-echo "fcc-server not running. It must be started manually or by system service."
-echo ""
-echo "── Start instructions ─────────────────────────────────────────────────────"
-echo ""
+        if $FCC_RUNNING && $ROUTATIC_RUNNING; then
+            echo "Both proxies are running (FCC:$FCC_PORT, Routatic:$ROUTATIC_PORT)."
+            exit 0
+        fi
 
-# Check common service managers
-if command -v systemctl &>/dev/null; then
-    echo "systemd (if installed as a system service):"
-    echo "    sudo systemctl start fcc-server"
-    echo "    sudo systemctl status fcc-server"
-    echo ""
-    echo "Enable at boot:"
-    echo "    sudo systemctl enable fcc-server"
-    echo ""
-fi
+        echo ""
+        echo "=== Proxy Status ==="
+        if ! $FCC_RUNNING; then
+            echo "  FCC Proxy (port $FCC_PORT): NOT RUNNING"
+        fi
+        if ! $ROUTATIC_RUNNING; then
+            echo "  Routatic Proxy (port $ROUTATIC_PORT): NOT RUNNING"
+        fi
+        echo ""
 
-# Check for PM2
-if command -v pm2 &>/dev/null; then
-    echo "PM2 (if managed via PM2):"
-    echo "    pm2 start fcc-server"
-    echo "    pm2 list"
-    echo "    pm2 logs fcc-server"
-    echo ""
-fi
-
-# Generic manual start
-echo "Manual start (substitute with the actual binary/entrypoint):"
-echo "    cd <project-root>"
-echo "    nohup <fcc-server-binary> &>/var/log/fcc-server.log &"
-echo ""
-
-# Check for a Docker container
-if command -v docker &>/dev/null; then
-    echo "Docker (if containerised):"
-    echo "    docker ps -a --filter name=fcc-server"
-    echo "    docker start fcc-server"
-    echo ""
-fi
-
-exit 1
+        if ! $FCC_RUNNING; then
+            echo "fcc-server not running. It must be started manually or by system service."
+        fi
+        if ! $ROUTATIC_RUNNING; then
+            echo "routatic-proxy not running. Start it with:"
+            echo "  source ~/.local/bin/start-routatic-proxy.sh"
+        fi
+        exit 1
+        ;;
+esac
