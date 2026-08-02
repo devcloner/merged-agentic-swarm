@@ -1,11 +1,26 @@
 """
 Tests for services/opencode_swarm_service.py
 
-Coverage: ConcurrencyRampController, OpenCodeSwarmManager
-(_initialize_worker_pool, get_available_worker, _get_pool_id,
-execute_subtask_with_worker, execute_subtask_batch_parallel).
+Coverage: ConcurrencyRampController, DurableAgentRouter (real agents.jsonl +
+.markdown agent files), OpenCodeSwarmManager (pool init, round-robin, subtask
+dispatch incl. durable-agent routing, failure paths, opencode mode,
+_target_repo_root, batch parallel).
+
+The agentic worker loop (which makes real model calls and real file edits) is
+stubbed at the method level for the swarm manager's *decision* logic — status
+transitions, pool accounting, routing. The loop itself has its own real-behavior
+tests; the existing live test here still makes one real fabric call.
 """
+import json
+
 from merged_agentic_swarm.models.agent_models import WorkerRole
+from merged_agentic_swarm.models.prd_models import TaskStatus
+from merged_agentic_swarm.services import opencode_swarm_service as mod
+from merged_agentic_swarm.services.opencode_swarm_service import (
+    DurableAgentRouter,
+    OpenCodeSwarmManager,
+    get_durable_router,
+)
 
 
 class TestConcurrencyRampController:
@@ -116,3 +131,246 @@ class TestOpenCodeSwarmManager:
             subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=0
         )
         assert len(results) == 3
+
+
+def _router(agents_jsonl_content="", agents_dir=None):
+    """Build a real DurableAgentRouter over tmp JSONL + agent dir."""
+    import tempfile
+    from pathlib import Path
+
+    d = Path(tempfile.mkdtemp())
+    jsonl = d / "agents.jsonl"
+    jsonl.write_text(agents_jsonl_content, encoding="utf-8")
+    adir = agents_dir or d / "agents"
+    adir.mkdir(exist_ok=True)
+    router = DurableAgentRouter(agents_jsonl=str(jsonl), agents_dir=str(adir))
+    router.load()
+    return router
+
+
+class TestDurableAgentRouter:
+    def test_load_from_jsonl(self):
+        content = json.dumps({
+            "id": "agent-1",
+            "name": "Agent One",
+            "category": "python",
+            "system_prompt": "You are a python expert.",
+        }) + "\n"
+        router = _router(content)
+        assert router.get_stats()["total_agents"] == 1
+        assert "python" in router.get_stats()["categories"]
+
+    def test_load_from_markdown_frontmatter(self, tmp_path):
+        adir = tmp_path / "agents"
+        adir.mkdir()
+        (adir / "helper.md").write_text(
+            "---\nname: helper-agent\ncategory: build\npromoted_at: 2026-01-01\n"
+            "description: Build and compile helpers.\n---\n\n"
+            "Body content. Activate when building or compiling python modules.\n",
+            encoding="utf-8",
+        )
+        router = DurableAgentRouter(agents_jsonl=str(tmp_path / "missing.jsonl"), agents_dir=str(adir))
+        assert router.load() == 1
+        agent = router.get_stats()["total_agents"] and router._agents[0]
+        assert agent["id"] == "helper-agent"
+        assert agent["category"] == "build"
+        assert "Body content" in agent["body"]
+
+    def test_skips_bad_jsonl_lines(self, tmp_path):
+        jsonl = tmp_path / "agents.jsonl"
+        jsonl.write_text("not json\n", encoding="utf-8")
+        router = DurableAgentRouter(agents_jsonl=str(jsonl), agents_dir=str(tmp_path / "agents"))
+        assert router.load() == 0
+
+    def test_dedupes_by_id(self, tmp_path):
+        jsonl = tmp_path / "agents.jsonl"
+        jsonl.write_text(
+            json.dumps({"id": "dup", "category": "a"}) + "\n"
+            + json.dumps({"id": "dup", "category": "b"}) + "\n",
+            encoding="utf-8",
+        )
+        router = DurableAgentRouter(agents_jsonl=str(jsonl), agents_dir=str(tmp_path / "agents"))
+        assert router.load() == 1
+
+    def test_parse_frontmatter_and_body(self, tmp_path):
+        md = tmp_path / "a.md"
+        md.write_text(
+            "---\nname: z\ncategory: q\n---\nThis is the body.\n",
+            encoding="utf-8",
+        )
+        router = DurableAgentRouter(agents_jsonl="", agents_dir=str(tmp_path))
+        assert router._parse_frontmatter(md) == {"name": "z", "category": "q"}
+        assert router._read_body(md) == "This is the body."
+
+    def test_extract_keywords_drops_stopwords(self):
+        kw = DurableAgentRouter._extract_keywords("the quick brown fox jumps over the lazy dog")
+        assert "the" not in kw
+        assert "quick" in kw
+        assert "brown" in kw
+
+    def test_scan_agent_triggers(self):
+        agent = {
+            "body": "Activate when building python helpers.\n",
+            "system_prompt": "specialized in compiling.",
+        }
+        triggers = DurableAgentRouter()._scan_agent_triggers(agent)
+        assert isinstance(triggers, set)
+        assert "building" in triggers or "python" in triggers
+
+    def test_find_matching_agent_by_category_and_keywords(self):
+        content = json.dumps({
+            "id": "python-builder",
+            "name": "Python Builder",
+            "category": "python",
+            "system_prompt": "specialized in building and compiling python modules.",
+        }) + "\n"
+        router = _router(content)
+        from merged_agentic_swarm.models.prd_models import SubTask
+        task = SubTask(id="T1", title="python builder", description="compile a python module")
+        task.category = "python"
+        matched = router.find_matching_agent(task)
+        assert matched is not None
+        assert matched["id"] == "python-builder"
+        assert matched["_score"] >= 1.0
+
+    def test_find_matching_agent_no_match_returns_none(self):
+        content = json.dumps({
+            "id": "rust-expert",
+            "name": "Rust Expert",
+            "category": "rust",
+            "system_prompt": "specialized in rust lifetimes.",
+        }) + "\n"
+        router = _router(content)
+        from merged_agentic_swarm.models.prd_models import SubTask
+        task = SubTask(id="T1", title="javascript ui", description="build a react component")
+        task.category = "frontend"
+        assert router.find_matching_agent(task) is None
+
+    def test_get_durable_router_singleton(self):
+        r1 = get_durable_router()
+        r2 = get_durable_router()
+        assert r1 is r2
+        assert r1.get_stats()["loaded"] is True
+
+
+class TestExecuteSubtaskDecisionLogic:
+    def _manager(self):
+        return OpenCodeSwarmManager()
+
+    def test_routed_to_durable_agent(self, tmp_path, monkeypatch, make_subtask):
+        content = json.dumps({
+            "id": "router-agent",
+            "name": "Router Agent",
+            "category": "routing",
+            "system_prompt": "specialized in routing and building python code.",
+        }) + "\n"
+        router = _router(content)
+        monkeypatch.setattr(mod, "get_durable_router", lambda: router)
+        monkeypatch.setattr(
+            mod.default_agentic_worker_loop, "execute",
+            lambda **k: {"status": "completed", "final_text": "done", "files_written": [], "commands_run": []},
+        )
+        subtask = make_subtask(title="python routing", desc="build and fix python code")
+        subtask.category = "routing"
+        result = self._manager().execute_subtask_with_worker(subtask, WorkerRole.CORE_ENGINEER)
+        assert result["status"] == "completed"
+        assert result["routed_agent"] == "router-agent"
+        assert subtask.status == TaskStatus.COMPLETED
+
+    def test_no_worker_returns_error(self, monkeypatch, make_subtask):
+        monkeypatch.setattr(mod, "get_durable_router", lambda: _router(""))
+        manager = self._manager()
+        manager.workers = {}
+        manager.state.workers_by_role = {}
+        subtask = make_subtask()
+        result = manager.execute_subtask_with_worker(subtask, WorkerRole.CORE_ENGINEER)
+        assert result["status"] == "error"
+
+    def test_loop_exception_fails_subtask(self, monkeypatch, make_subtask):
+        monkeypatch.setattr(mod, "get_durable_router", lambda: _router(""))
+        def boom(**k):
+            raise RuntimeError("rate limit 429")
+        monkeypatch.setattr(mod.default_agentic_worker_loop, "execute", boom)
+        manager = self._manager()
+        subtask = make_subtask()
+        result = manager.execute_subtask_with_worker(subtask, WorkerRole.CORE_ENGINEER)
+        assert result["status"] == "failed"
+        assert "429" in result["error"]
+        assert subtask.status == TaskStatus.FAILED
+        assert manager.state.failed_tasks >= 1
+
+    def test_simulation_worker_fails(self, monkeypatch, make_subtask):
+        monkeypatch.setattr(mod, "get_durable_router", lambda: _router(""))
+        monkeypatch.setattr(
+            mod.default_agentic_worker_loop, "execute",
+            lambda **k: {"status": "failed", "reason": "simulation_fallback", "final_text": "fake"},
+        )
+        manager = self._manager()
+        subtask = make_subtask()
+        result = manager.execute_subtask_with_worker(subtask, WorkerRole.CORE_ENGINEER)
+        assert result["status"] == "failed"
+        assert result["reason"] == "simulation_fallback"
+        assert subtask.status == TaskStatus.FAILED
+        assert manager.state.failed_tasks >= 1
+
+    def test_opencode_mode_routes_to_opencode_worker(self, monkeypatch, make_subtask):
+        monkeypatch.setenv("SWARM_WORKER_MODE", "opencode")
+        monkeypatch.setattr(mod, "get_durable_router", lambda: _router(""))
+        monkeypatch.setattr(
+            mod.OpenCodeSwarmManager, "_run_opencode_worker",
+            lambda self, wid, role, sp, task: {"status": "completed", "reason": None,
+                                               "final_text": "opencode ok", "files_written": [], "commands_run": []},
+        )
+        subtask = make_subtask()
+        result = self._manager().execute_subtask_with_worker(subtask, WorkerRole.CORE_ENGINEER)
+        assert result["status"] == "completed"
+
+    def test_run_opencode_worker_completed(self, monkeypatch):
+        from merged_agentic_swarm.services import worker_runtime_adapter as wra
+
+        class FakeAdapter:
+            def launch_worker(self, spec, prompt):
+                assert spec.role == WorkerRole.CORE_ENGINEER
+                return {"status": "completed", "evidence": "opencode did it"}
+        monkeypatch.setattr(wra, "get_runtime_adapter", lambda mode: FakeAdapter())
+        result = self._manager()._run_opencode_worker(
+            "w1", WorkerRole.CORE_ENGINEER, "sp", {"title": "t", "description": "d"}
+        )
+        assert result["status"] == "completed"
+        assert result["final_text"] == "opencode did it"
+
+    def test_run_opencode_worker_failed(self, monkeypatch):
+        from merged_agentic_swarm.services import worker_runtime_adapter as wra
+
+        class FakeAdapter:
+            def launch_worker(self, spec, prompt):
+                return {"status": "failed", "evidence": "auth died"}
+        monkeypatch.setattr(wra, "get_runtime_adapter", lambda mode: FakeAdapter())
+        result = self._manager()._run_opencode_worker(
+            "w1", WorkerRole.CORE_ENGINEER, "sp", {"title": "t", "description": "d"}
+        )
+        assert result["status"] == "failed"
+        assert "auth died" in result["reason"]
+
+
+class TestTargetRepoRoot:
+    def test_env_var_wins(self, monkeypatch):
+        monkeypatch.setenv("SWARM_TARGET_REPO", "~/custom-target")
+        root = OpenCodeSwarmManager._target_repo_root()
+        assert "custom-target" in root
+
+    def test_defaults_to_existing_sibling_or_cwd(self, monkeypatch):
+        monkeypatch.delenv("SWARM_TARGET_REPO", raising=False)
+        root = OpenCodeSwarmManager._target_repo_root()
+        assert root  # resolves to a real dir
+
+    def test_getcwd_fallback(self, monkeypatch, tmp_path):
+        """When SWARM_TARGET_REPO is unset and no sibling target repo exists,
+        _target_repo_root falls back to getcwd."""
+        monkeypatch.delenv("SWARM_TARGET_REPO", raising=False)
+        # Neutralise the sibling-repo candidates so the fallback is reached.
+        monkeypatch.setattr(mod.os.path, "expanduser", lambda p: str(tmp_path / "missing-target"))
+        monkeypatch.setattr(mod.os.path, "isdir", lambda p: False)
+        monkeypatch.setattr(mod.os, "getcwd", lambda: str(tmp_path))
+        root = OpenCodeSwarmManager._target_repo_root()
+        assert root == str(tmp_path)

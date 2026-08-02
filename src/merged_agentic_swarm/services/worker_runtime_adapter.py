@@ -22,7 +22,7 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
 
-from merged_agentic_swarm.models.agent_models import AgentSpec, WorkerRole
+from merged_agentic_swarm.models.agent_models import AgentSpec, AgentType, WorkerRole
 from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric
 
 logger = logging.getLogger("worker_runtime_adapter")
@@ -120,7 +120,7 @@ class WorkerRuntimeAdapter:
                 f"opencode, native_subagent, direct_fabric, auto"
             )
         self.mode: str = mode
-        self._worker_processes: dict[str, subprocess.Popen[bytes]] = {}
+        self._worker_processes: dict[str, subprocess.Popen[str]] = {}
         self._lock = threading.Lock()
         self._port_counter: int = self.DEFAULT_PORT_BASE
 
@@ -213,7 +213,7 @@ class WorkerRuntimeAdapter:
                         id=f"batch-worker-{role.value}-{i:02d}",
                         name=f"Batch Worker {role.value}",
                         role=role,
-                        agent_type="swarm_worker",  # type: ignore[arg-type]
+                        agent_type=AgentType.SWARM_WORKER,
                         system_prompt=f"Execute the given task as a {role.value} specialist.",
                     ),
                     task,
@@ -266,7 +266,7 @@ class WorkerRuntimeAdapter:
                 stderr=subprocess.PIPE,
                 text=True,
             )
-            self._worker_processes[worker_spec.id] = proc  # type: ignore[assignment]
+            self._worker_processes[worker_spec.id] = proc
 
             # Give opencode serve a moment to start
             time.sleep(1.5)
@@ -324,9 +324,11 @@ class WorkerRuntimeAdapter:
                 evidence = content_blocks[0].get("text", str(response))
             else:
                 evidence = str(response)
-            is_sim = response.get("simulation_fallback", False)
-            status = "completed" if not is_sim else "partial (simulated)"
-            return status, evidence[:2000]
+            if response.get("simulation_fallback", False):
+                # Simulation is a hard failure, never a completion: it is
+                # fabricated work and must not pass any swarm gate.
+                return "failed", "simulation_fallback: " + evidence[:2000]
+            return "completed", evidence[:2000]
         except Exception as exc:
             return "failed", str(exc)
 

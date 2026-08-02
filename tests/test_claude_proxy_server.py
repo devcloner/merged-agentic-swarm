@@ -2,15 +2,135 @@
 Tests for proxy/claude_proxy_server.py
 
 Coverage: ClaudeProxyHandler (do_GET, do_POST), ProxyServerDaemon
-(start, stop), JSON response helpers.
+(start, stop), JSON response helpers, multipart audio parsing, and
+Whisper transcription forwarding (backend HTTP transport stubbed).
 """
 import json
 
 import pytest
 
+from merged_agentic_swarm.proxy import claude_proxy_server
 from merged_agentic_swarm.proxy.claude_proxy_server import (
     ProxyServerDaemon,
+    _forward_transcription,
+    _parse_multipart,
 )
+
+
+class _FakeResp:
+    def __init__(self, status_code=200, json_data=None, text=""):
+        self.status_code = status_code
+        self._json = json_data or {}
+        self.text = text
+
+    def json(self):
+        return self._json
+
+
+def _multipart_body(include_file=True):
+    parts = []
+    if include_file:
+        parts.append(
+            b'--boundary123\r\n'
+            b'Content-Disposition: form-data; name="file"; filename="test.wav"\r\n'
+            b'Content-Type: audio/wav\r\n'
+            b'\r\n'
+            b'WAVE-data-bytes\r\n'
+        )
+    parts.append(
+        b'--boundary123\r\n'
+        b'Content-Disposition: form-data; name="model"\r\n'
+        b'\r\n'
+        b'openai/whisper-large-v3\r\n'
+    )
+    parts.append(b'--boundary123--\r\n')
+    return b''.join(parts)
+
+
+class TestParseMultipart:
+    def test_parses_file_and_model(self):
+        body = _multipart_body()
+        file_data, file_name, model_name = _parse_multipart(
+            body, "multipart/form-data; boundary=boundary123"
+        )
+        assert file_data == b"WAVE-data-bytes"
+        assert file_name == "test.wav"
+        assert model_name == "openai/whisper-large-v3"
+
+    def test_no_file_field(self):
+        body = _multipart_body(include_file=False)
+        file_data, file_name, model_name = _parse_multipart(
+            body, "multipart/form-data; boundary=boundary123"
+        )
+        assert file_data is None
+        assert model_name == "openai/whisper-large-v3"
+
+    def test_missing_boundary(self):
+        file_data, file_name, model_name = _parse_multipart(b"", "multipart/form-data")
+        assert file_data is None and file_name is None and model_name is None
+
+    def test_default_model_when_no_model_field(self):
+        body = (
+            b'--boundary123\r\n'
+            b'Content-Disposition: form-data; name="file"; filename="a.mp3"\r\n'
+            b'\r\n'
+            b'MP3DATA\r\n'
+            b'--boundary123--\r\n'
+        )
+        _, file_name, model_name = _parse_multipart(body, "multipart/form-data; boundary=boundary123")
+        assert file_name == "a.mp3"
+        assert model_name == "openai/whisper-large-v3"
+
+
+class TestForwardTranscription:
+    def test_success_returns_json(self, monkeypatch):
+        monkeypatch.setattr(
+            claude_proxy_server.requests, "post",
+            lambda *a, **k: _FakeResp(200, {"text": "hello world"}),
+        )
+        result = _forward_transcription(b"WAVE", "a.wav", "openai/whisper-large-v3")
+        assert result == {"text": "hello world"}
+
+    def test_connection_error_returns_503(self, monkeypatch):
+        def boom(*a, **k):
+            raise claude_proxy_server.requests.exceptions.ConnectionError("down")
+
+        monkeypatch.setattr(claude_proxy_server.requests, "post", boom)
+        code, body = _forward_transcription(b"WAVE", "a.wav", "model")
+        assert code == 503
+        assert "unavailable" in body["error"]
+
+    def test_generic_exception_returns_500(self, monkeypatch):
+        def boom(*a, **k):
+            raise RuntimeError("bad gateway")
+
+        monkeypatch.setattr(claude_proxy_server.requests, "post", boom)
+        code, body = _forward_transcription(b"WAVE", "a.wav", "model")
+        assert code == 500
+        assert "Transcription error" in body["error"]
+
+    def test_backend_error_returns_status(self, monkeypatch):
+        monkeypatch.setattr(
+            claude_proxy_server.requests, "post",
+            lambda *a, **k: _FakeResp(502, text="upstream failed"),
+        )
+        code, body = _forward_transcription(b"WAVE", "a.wav", "model")
+        assert code == 502
+        assert "NIM transcription failed" in body["error"]
+
+    def test_unknown_extension_defaults_to_wav(self, monkeypatch):
+        captured = {}
+
+        def fake_post(url, **kwargs):
+            captured["files"] = kwargs["files"]
+            return _FakeResp(200, {"text": "ok"})
+
+        monkeypatch.setattr(claude_proxy_server.requests, "post", fake_post)
+        _forward_transcription(b"WAVE", "noext", "model")
+        name, data, mime = captured["files"]["file"]
+        assert name == "noext"
+        assert data == b"WAVE"
+        assert mime == "audio/wav"
 
 
 class TestProxyServerDaemon:
@@ -136,3 +256,94 @@ class TestClaudeProxyHandler:
         )
         resp = urllib.request.urlopen(req, timeout=10)
         assert resp.status == 200
+
+    def test_post_chat_completions_openai_conversion(self, monkeypatch):
+        """POST /v1/chat/completions converts an Anthropic response to OpenAI shape."""
+        import urllib.request
+        from merged_agentic_swarm.proxy import claude_proxy_server as mod
+
+        def fake_dispatch(**kwargs):
+            assert kwargs["model_alias"] == "claude-3-7-sonnet"
+            return {
+                "id": "msg_123",
+                "content": [{"type": "text", "text": "converted reply"}],
+                "usage": {"input_tokens": 5, "output_tokens": 3},
+            }
+
+        monkeypatch.setattr(mod.default_fabric, "dispatch_request", fake_dispatch)
+        payload = json.dumps({
+            "model": "claude-3-7-sonnet",
+            "messages": [{"role": "user", "content": "Hi"}],
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/chat/completions",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        resp = urllib.request.urlopen(req, timeout=10)
+        assert resp.status == 200
+        data = json.loads(resp.read().decode("utf-8"))
+        assert data["object"] == "chat.completion"
+        assert data["choices"][0]["message"]["content"] == "converted reply"
+        assert data["id"] == "msg_123"
+
+    def test_post_audio_transcriptions_success(self, monkeypatch):
+        """Multipart audio POST → forwarded to Whisper backend → JSON response."""
+        import urllib.request
+        from merged_agentic_swarm.proxy import claude_proxy_server as mod
+
+        monkeypatch.setattr(
+            mod.requests, "post",
+            lambda *a, **k: _FakeResp(200, {"text": "transcribed"}),
+        )
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/audio/transcriptions",
+            data=_multipart_body(),
+            headers={"Content-Type": "multipart/form-data; boundary=boundary123"},
+            method="POST",
+        )
+        resp = urllib.request.urlopen(req, timeout=10)
+        assert resp.status == 200
+        data = json.loads(resp.read().decode("utf-8"))
+        assert data["text"] == "transcribed"
+
+    def test_post_audio_transcriptions_no_file(self, monkeypatch):
+        """Multipart POST without a file field → 400."""
+        import urllib.request
+        from urllib.error import HTTPError
+        from merged_agentic_swarm.proxy import claude_proxy_server as mod
+
+        monkeypatch.setattr(
+            mod.requests, "post",
+            lambda *a, **k: _FakeResp(200, {"text": "unused"}),
+        )
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/audio/transcriptions",
+            data=_multipart_body(include_file=False),
+            headers={"Content-Type": "multipart/form-data; boundary=boundary123"},
+            method="POST",
+        )
+        with pytest.raises(HTTPError) as exc:
+            urllib.request.urlopen(req, timeout=10)
+        assert exc.value.code == 400
+
+    def test_post_audio_transcriptions_backend_down(self, monkeypatch):
+        """Backend connection failure → 503 with unavailable message."""
+        import urllib.request
+        from urllib.error import HTTPError
+        from merged_agentic_swarm.proxy import claude_proxy_server as mod
+
+        def boom(*a, **k):
+            raise mod.requests.exceptions.ConnectionError("nim not running")
+
+        monkeypatch.setattr(mod.requests, "post", boom)
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/audio/transcriptions",
+            data=_multipart_body(),
+            headers={"Content-Type": "multipart/form-data; boundary=boundary123"},
+            method="POST",
+        )
+        with pytest.raises(HTTPError) as exc:
+            urllib.request.urlopen(req, timeout=10)
+        assert exc.value.code == 503
