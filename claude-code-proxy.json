@@ -1,5 +1,5 @@
 {
-  "_comment": "This environment has THREE proxy services. See docs/agentic/PROXY_GUIDE.md for details.",
+  "_comment": "This environment has THREE proxy services. See docs/agentic/audit/PROXY_VERIFICATION.md for details.",
   "server": {
     "host": "127.0.0.1",
     "port": 8085,

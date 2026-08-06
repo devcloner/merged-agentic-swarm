@@ -50,7 +50,7 @@ Steps: update version in `pyproject.toml` → run `uv lock` → commit together.
 - **Install uv**: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - **Run files**: Always use `uv run` instead of raw `python`.
 - **Formatter**: Ruff with py314 target.
-- **CI**: Run `./scripts/ci.sh` (macOS/Linux) or `.\scripts\ci.ps1` (Windows) before pushing.
+- **CI**: Run `./scripts/ci.sh` (macOS/Linux) before pushing. Windows checks run via GitHub Actions (`windows-ci.yml` — `uv run pytest -m "not live"`; there is no `scripts/ci.ps1`).
 - **Test patterns**:
   - Full suite: `uv run pytest -v --tb=short`
   - Single file: `uv run pytest tests/path/to/test.py -v`

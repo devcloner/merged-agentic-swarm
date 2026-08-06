@@ -52,3 +52,5 @@ Thumbs.db
 # ── Generated run reports ──
 reports/*.json
 reports/*.md
+config/runtime/*.generated.json
+config/runtime/smoke-test-results.json

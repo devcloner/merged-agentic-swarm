@@ -7,7 +7,7 @@ provider-aware model fabric, and a cold-path knowledge learning loop.
 waves of OpenCode workers, verifies the integration with an adversarial gate, and promotes
 validated learnings into durable agent specs — so the system gets better across runs.
 
-**Current version:** 1.6.0 · Python ≥3.14 · **Status:** active development
+**Current version:** 1.12.2 · Python ≥3.14 · **Status:** active development
 
 ---
 
@@ -118,9 +118,9 @@ The swarm dispatches workers through the **ultraswarm** runner
 Each run promotes validated findings from the hot cache into three cold registries under
 `docs/agentic/registry/`:
 
-- **`knowledge.jsonl`** — proven solutions (78 entries)
-- **`agents.jsonl`** — durable agent specs (22 entries)
-- **`chain.jsonl`** — spawn chain entries (22 entries)
+- **`knowledge.jsonl`** — proven solutions (162 entries)
+- **`agents.jsonl`** — durable agent specs (98 entries)
+- **`chain.jsonl`** — spawn chain entries (50 entries)
 
 `agentic-cli status` reports the counts. Promotion requires evidence, a claim, and a task
 link (see `opencode-swarm.json` → `promotion_policy`).
@@ -147,7 +147,7 @@ uv run pytest tests/test_agentic_cli.py -v
 - `docs/swarm_project_prd.md` — project PRD
 - `docs/agentic/` — agent registry, providers, registry data
 - `docs/stack-analysis-2026-08-06.md` — deep audit (49 verified findings, ranked priorities)
-- `docs/agentic/PROXY_GUIDE.md` — the local proxy stack (fcc-server, routatic, litellm)
+- `docs/agentic/audit/PROXY_VERIFICATION.md` — the local proxy stack (fcc-server, routatic, litellm)
 
 ## Known issues
 
