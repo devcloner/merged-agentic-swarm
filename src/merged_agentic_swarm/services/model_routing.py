@@ -33,6 +33,17 @@ DEFAULT_TIER_BY_ROLE: dict[str, str] = {
     "test-engineer": "main",
     "sec-a11y-auditor": "deep",
     "codebase-ast-mapper": "main",
+    # WorkerRole enum values (models/agent_models.py) — so swarm workers dispatch
+    # per-role instead of every worker sharing one hardcoded alias.
+    "master_architect": "deep",
+    "codebase_mapper": "main",
+    "spec_gap_closer": "main",
+    "core_engineer": "main",
+    "refactor_specialist": "main",
+    "unit_tester": "main",
+    "security_verifier": "fast",
+    "hot_micro_specialist": "fast",
+    "cold_durable": "main",
 }
 DEFAULT_LITELLM_ALIAS = "smart-auto"
 
@@ -54,6 +65,18 @@ def _load_registry() -> dict[str, Any]:
     except OSError, ValueError:
         logger.warning("Provider registry missing/unreadable; using code-side role routing fallback.")
     return {}
+
+
+def reload_registry() -> dict[str, Any]:
+    """Clear the cached registry and reload it from disk.
+
+    Called after the provider registry file is rewritten (e.g. the web UI models
+    PUT) so subsequent role resolutions observe the updated aliases without a
+    process restart.
+    """
+    global _registry_cache
+    _registry_cache = None
+    return _load_registry()
 
 
 def resolve_litellm_model_for_role(role: str) -> str:

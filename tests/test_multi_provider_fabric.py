@@ -6,6 +6,7 @@ _build_route_list, dispatch_request (simulation fallback), circuit breaker,
 perma-ban.
 """
 
+import json
 import time
 from unittest.mock import MagicMock, patch
 
@@ -421,3 +422,56 @@ class TestLitellmPresenceInRoutes:
 
         for model_alias, routes in mpf.MODEL_FABRIC_ROUTES.items():
             assert any(route.get("provider") == "litellm" for route in routes), model_alias
+
+    def test_litellm_alias_routes_lead_with_litellm(self):
+        """Worker-tier aliases route through the litellm gateway FIRST (42-key
+        Gemini pool), with a direct-gemini fallback second."""
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
+
+        for alias in ("gemini-batch", "gemini-batch-lite", "fast-flash", "smart-auto"):
+            routes = mpf.MODEL_FABRIC_ROUTES[alias]
+            assert routes[0]["provider"] == "litellm"
+            assert routes[0]["model"] == alias
+            assert routes[0]["url"] == "http://localhost:4000/v1/chat/completions"
+            assert routes[1]["provider"] == "gemini"
+            assert routes[1]["url"] == "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+
+
+class TestFabricRouteOverlay:
+    def test_overlay_overrides_per_alias_and_reload_refreshes(self, tmp_path, monkeypatch):
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
+
+        overlay = tmp_path / "fabric-routes.json"
+        overlay.write_text(
+            json.dumps({"routes": {"fast-flash": [{"provider": "nvidia_nim", "model": "z-ai/glm-5.2"}]}}),
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(mpf, "_FABRIC_ROUTES_OVERLAY_PATH", overlay)
+        monkeypatch.setattr(mpf, "_fabric_routes_overlay", None)
+
+        fabric = mpf.MultiProviderFabric()
+        # Overlay wins for the aliased route.
+        routes = fabric._build_route_list("fast-flash")
+        assert routes[0]["provider"] == "nvidia_nim"
+        assert routes[0]["model"] == "z-ai/glm-5.2"
+        # Untouched aliases still use the code-default routes.
+        code_routes = fabric._build_route_list("gemini-batch")
+        assert code_routes[0]["provider"] == "litellm"
+        # Reload after the file changes -> new overlay applies.
+        overlay.write_text(
+            json.dumps({"routes": {"fast-flash": [{"provider": "mistral", "model": "mistral-large-latest"}]}}),
+            encoding="utf-8",
+        )
+        mpf.reload_fabric_routes()
+        routes = fabric._build_route_list("fast-flash")
+        assert routes[0]["provider"] == "mistral"
+
+    def test_missing_overlay_falls_back_to_code_defaults(self, tmp_path, monkeypatch):
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
+
+        monkeypatch.setattr(mpf, "_FABRIC_ROUTES_OVERLAY_PATH", tmp_path / "nonexistent.json")
+        monkeypatch.setattr(mpf, "_fabric_routes_overlay", None)
+        fabric = mpf.MultiProviderFabric()
+        routes = fabric._build_route_list("gemini-batch")
+        assert routes[0]["provider"] == "litellm"
+        assert routes[0]["url"] == "http://localhost:4000/v1/chat/completions"

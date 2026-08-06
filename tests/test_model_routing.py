@@ -37,6 +37,15 @@ class TestResolveLitellmModelForRole:
     def test_unknown_role_falls_back_to_smart_auto(self):
         assert mr.resolve_litellm_model_for_role("no-such-role") == "smart-auto"
 
+    def test_worker_role_maps_via_code_fallback(self):
+        # WorkerRole enum values (models/agent_models.py) resolve per-role instead
+        # of sharing one hardcoded alias.
+        assert mr.resolve_litellm_model_for_role("core_engineer") == "gemini-batch-lite"
+        assert mr.resolve_litellm_model_for_role("security_verifier") == "fast-flash"
+        assert mr.resolve_litellm_model_for_role("master_architect") == "gemini-batch"
+        assert mr.resolve_litellm_model_for_role("hot_micro_specialist") == "fast-flash"
+        assert mr.resolve_litellm_model_for_role("unit_tester") == "gemini-batch-lite"
+
     def test_empty_string_role_falls_back_to_smart_auto(self):
         assert mr.resolve_litellm_model_for_role("") == "smart-auto"
 
@@ -79,6 +88,35 @@ class TestLitellmModelForFabricRoute:
 
     def test_unknown_route_returns_none(self):
         assert mr.litellm_model_for_fabric_route("no-such-alias") is None
+
+
+class TestReloadRegistry:
+    def setup_method(self):
+        mr._registry_cache = None
+
+    def test_reload_registry_reloads_after_change(self, tmp_path):
+        """reload_registry() clears the cache so an updated registry file is seen."""
+        reg = tmp_path / "PROVIDER_REGISTRY.json"
+        reg.write_text(json.dumps({"role_routing": {"tiers": {"deep": "gemini-batch"}}}), encoding="utf-8")
+        with patch.object(mr, "_REGISTRY_PATH", reg):
+            mr._registry_cache = None
+            assert mr.resolve_litellm_model_for_role("deep") == "gemini-batch"
+            # Rewrite the file on disk, then reload — stale cache must not hide it.
+            reg.write_text(json.dumps({"role_routing": {"tiers": {"deep": "custom-deep"}}}), encoding="utf-8")
+            mr.reload_registry()
+            assert mr.resolve_litellm_model_for_role("deep") == "custom-deep"
+
+    def test_reload_registry_missing_file_uses_code_fallback(self, tmp_path):
+        reg = tmp_path / "PROVIDER_REGISTRY.json"  # does not exist
+        with patch.object(mr, "_REGISTRY_PATH", reg):
+            mr.reload_registry()
+            assert mr.resolve_litellm_model_for_role("deep") == "gemini-batch"
+
+    def test_reload_registry_returns_loaded_registry(self, tmp_path):
+        reg = tmp_path / "PROVIDER_REGISTRY.json"
+        reg.write_text(json.dumps({"role_routing": {"tiers": {"deep": "gemini-batch"}}}), encoding="utf-8")
+        with patch.object(mr, "_REGISTRY_PATH", reg):
+            assert mr.reload_registry()["role_routing"]["tiers"]["deep"] == "gemini-batch"
 
 
 class TestRegistryFile:

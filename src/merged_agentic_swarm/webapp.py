@@ -12,8 +12,12 @@ inline CSS/JS, no build step) for inspecting and probing the swarm:
   GET  /api/profiles        swarm profiles from swarm_profiles.load_profiles().
   PUT  /api/profiles/{name} update one profile in swarm-profiles.json.
   GET  /api/models          litellm live aliases + role -> alias mapping.
+  PUT  /api/models/{role}   set one role -> alias mapping in PROVIDER_REGISTRY.json.
+  GET  /api/chains          merged fabric chain view (code defaults + overlay).
+  PUT  /api/chains/{alias}  upsert one chain alias into fabric-routes.json.
+  GET  /api/run-plan        resolve a profile into a run plan WITHOUT executing.
+  POST /api/run             start a REAL agentic workflow in a background thread.
   POST /api/latency-test    streaming TTFB/total latency probe against litellm.
-  POST /api/run-plan        resolve a profile into a run plan WITHOUT executing.
 
 The dashboard is served at GET /. It renders provider/proxy status, the latest
 run report summary + timeline, reports, profiles, the model routing table, and
@@ -27,8 +31,10 @@ plus a separate uvicorn entry point (``agentic-ui``).
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
+import threading
 import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -40,9 +46,12 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse
 from starlette.routing import Route
 
+from merged_agentic_swarm.providers import multi_provider_fabric
 from merged_agentic_swarm.providers.key_pool import default_key_pool
 from merged_agentic_swarm.providers.multi_provider_fabric import MODEL_FABRIC_ROUTES
 from merged_agentic_swarm.services import model_routing, swarm_profiles
+
+logger = logging.getLogger("webapp")
 
 # ── Paths & litellm endpoints ───────────────────────────────────────────────
 
@@ -60,6 +69,12 @@ DEFAULT_RAMP = [4, 8, 16, 24, 40]
 PROFILE_KEYS = {"description", "waves", "default_tier", "model_alias", "gates", "worker_roles"}
 
 _REPORT_NAME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+
+# Chain alias / role alias identifiers must be a sane dotted/dashed token.
+_ALIAS_RE = re.compile(r"[A-Za-z][A-Za-z0-9._-]*")
+
+# Optional per-alias fabric route overlay merged over the code MODEL_FABRIC_ROUTES.
+_FABRIC_ROUTES_PATH = _REPO_ROOT / "docs" / "agentic" / "fabric-routes.json"
 
 
 # ── Helpers (all read-only; no secrets ever leave these functions) ─────────
@@ -173,6 +188,106 @@ def _write_profiles(profiles: dict) -> None:
     tmp.write_text(json.dumps(profiles, indent=2) + "\n", encoding="utf-8")
     os.replace(tmp, path)
     swarm_profiles._profiles_cache = None
+
+
+def _write_registry_roles(role: str, alias: str) -> None:
+    """Persist one role -> alias mapping into PROVIDER_REGISTRY.json atomically.
+
+    The rest of the registry (tiers, policy, backends, …) is preserved verbatim.
+    The parsed-registry cache is invalidated so the next resolution re-reads disk;
+    ``model_routing.reload_registry()`` is also invoked when available so other
+    callers that cache the registry observe the change immediately.
+    """
+    path = model_routing._REGISTRY_PATH
+    try:
+        with open(path, encoding="utf-8") as f:
+            registry = json.load(f)
+    except OSError, ValueError:
+        registry = {}
+    if not isinstance(registry, dict):
+        registry = {}
+    role_routing = registry.get("role_routing")
+    if not isinstance(role_routing, dict):
+        role_routing = {}
+        registry["role_routing"] = role_routing
+    roles = role_routing.get("roles")
+    if not isinstance(roles, dict):
+        roles = {}
+        role_routing["roles"] = roles
+    roles[role] = alias
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+    os.replace(tmp, path)
+    model_routing._registry_cache = None
+    reload_registry = getattr(model_routing, "reload_registry", None)
+    if reload_registry is not None:
+        reload_registry()
+
+
+def _load_fabric_overlay() -> dict:
+    """fabric-routes.json as {"routes": {alias: [route, …]}}; {} when absent."""
+    try:
+        with open(_FABRIC_ROUTES_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict):
+            return data
+    except OSError, ValueError:
+        pass
+    return {}
+
+
+def _fabric_chains() -> dict:
+    """Merged fabric chain view: code MODEL_FABRIC_ROUTES overlaid per alias."""
+    merged: dict = {}
+    for alias, routes in MODEL_FABRIC_ROUTES.items():
+        merged[alias] = [dict(route) for route in routes]
+    overlay = _load_fabric_overlay()
+    table = overlay.get("routes")
+    if isinstance(table, dict):
+        merged.update(table)
+    return merged
+
+
+def _write_fabric_overlay(alias: str, routes: list[dict]) -> None:
+    """Upsert one chain alias into fabric-routes.json atomically."""
+    path = _FABRIC_ROUTES_PATH
+    overlay = _load_fabric_overlay()
+    table = overlay.get("routes")
+    if not isinstance(table, dict):
+        table = {}
+        overlay["routes"] = table
+    table[alias] = routes
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(overlay, indent=2) + "\n", encoding="utf-8")
+    os.replace(tmp, path)
+    reload_fabric = getattr(multi_provider_fabric, "reload_fabric_routes", None)
+    if reload_fabric is not None:
+        reload_fabric()
+
+
+def _spawn_agentic_run(profile: dict, alias: str, prd: str) -> threading.Thread:
+    """Start a real agentic workflow on a background daemon thread (returns now).
+
+    ``run_full_agentic_workflow`` is called with keyword arguments only — its
+    signature is being extended with a trailing optional ``gates`` kwarg.
+    """
+    from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+
+    def _runner() -> None:
+        try:
+            orchestrator = MultiLayeredAgenticOrchestrator()
+            orchestrator.run_full_agentic_workflow(
+                prd_content=prd,
+                ramp_sequence=profile.get("waves") or None,
+                default_model=alias,
+                gates=profile.get("gates"),
+            )
+        except Exception:
+            logger.exception("agentic run failed in background thread")
+
+    thread = threading.Thread(target=_runner, name="agentic-run", daemon=True)
+    thread.start()
+    return thread
 
 
 def _role_mapping() -> dict[str, str]:
@@ -325,6 +440,66 @@ async def handle_models(request: Request) -> JSONResponse:
     return JSONResponse({"aliases": aliases, "error": error, "role_mapping": _role_mapping()})
 
 
+async def handle_model_role_update(request: Request) -> JSONResponse:
+    role = request.path_params["role"]
+    if not isinstance(role, str) or not role.strip():
+        return JSONResponse({"error": "role must be a non-empty string"}, status_code=400)
+    try:
+        body = await request.json()
+    except ValueError:
+        return JSONResponse({"error": "invalid JSON body"}, status_code=400)
+    if not isinstance(body, dict):
+        return JSONResponse({"error": "body must be a JSON object"}, status_code=400)
+    alias = body.get("alias")
+    if not isinstance(alias, str) or not _ALIAS_RE.fullmatch(alias):
+        return JSONResponse({"error": "alias must match ^[A-Za-z][A-Za-z0-9._-]*$"}, status_code=400)
+    _write_registry_roles(role, alias)
+    return JSONResponse({"ok": True, "role": role, "alias": alias, "role_mapping": _role_mapping()})
+
+
+async def handle_chains(request: Request) -> JSONResponse:
+    return JSONResponse({"chains": _fabric_chains()})
+
+
+async def handle_chain_update(request: Request) -> JSONResponse:
+    alias = request.path_params["alias"]
+    if not isinstance(alias, str) or not _ALIAS_RE.fullmatch(alias):
+        return JSONResponse({"error": f"invalid chain alias: {alias}"}, status_code=400)
+    try:
+        body = await request.json()
+    except ValueError:
+        return JSONResponse({"error": "invalid JSON body"}, status_code=400)
+    if not isinstance(body, dict):
+        return JSONResponse({"error": "body must be a JSON object"}, status_code=400)
+    routes = body.get("routes")
+    if not isinstance(routes, list) or not routes:
+        return JSONResponse({"error": "routes must be a non-empty list"}, status_code=400)
+    cleaned: list[dict] = []
+    for i, route in enumerate(routes):
+        if not isinstance(route, dict):
+            return JSONResponse({"error": f"route {i} must be an object"}, status_code=400)
+        provider = route.get("provider")
+        if not isinstance(provider, str) or not provider.strip():
+            return JSONResponse({"error": f"route {i}: provider must be a non-empty string"}, status_code=400)
+        model = route.get("model")
+        if not isinstance(model, str) or not model.strip():
+            return JSONResponse({"error": f"route {i}: model must be a non-empty string"}, status_code=400)
+        entry: dict = {"provider": provider, "model": model}
+        url = route.get("url")
+        if url is not None:
+            if not isinstance(url, str) or not url.strip():
+                return JSONResponse({"error": f"route {i}: url must be a string"}, status_code=400)
+            entry["url"] = url
+        timeout = route.get("timeout")
+        if timeout is not None:
+            if isinstance(timeout, bool) or not isinstance(timeout, (int, float)):
+                return JSONResponse({"error": f"route {i}: timeout must be a number"}, status_code=400)
+            entry["timeout"] = timeout
+        cleaned.append(entry)
+    _write_fabric_overlay(alias, cleaned)
+    return JSONResponse({"ok": True, "alias": alias, "routes": cleaned, "chains": _fabric_chains()})
+
+
 async def handle_latency_test(request: Request) -> JSONResponse:
     try:
         body = await request.json()
@@ -374,6 +549,30 @@ async def handle_run_plan(request: Request) -> JSONResponse:
     )
 
 
+async def handle_run(request: Request) -> JSONResponse:
+    """Start a real agentic workflow in a background daemon thread; return now."""
+    try:
+        body = await request.json()
+    except ValueError:
+        return JSONResponse({"error": "invalid JSON body"}, status_code=400)
+    if not isinstance(body, dict):
+        return JSONResponse({"error": "body must be a JSON object"}, status_code=400)
+    name = body.get("profile")
+    if not isinstance(name, str) or not name:
+        return JSONResponse({"error": "profile is required"}, status_code=400)
+    prd = body.get("prd")
+    if not isinstance(prd, str) or not prd.strip():
+        return JSONResponse({"error": "prd is required"}, status_code=400)
+    try:
+        profile = swarm_profiles.resolve_profile(name)
+    except KeyError:
+        return JSONResponse({"error": f"unknown profile: {name}"}, status_code=404)
+    alias = swarm_profiles.resolve_model_alias_for_profile(name)
+    thread = _spawn_agentic_run(profile, alias, prd)
+    request.app.state.last_run_thread = thread
+    return JSONResponse({"started": True, "profile": name, "model_alias": alias})
+
+
 # ── App factory ─────────────────────────────────────────────────────────────
 
 
@@ -404,8 +603,12 @@ def create_app(transport: httpx.AsyncBaseTransport | None = None) -> Starlette:
             Route("/api/profiles", handle_profiles, methods=["GET"]),
             Route("/api/profiles/{name}", handle_profile_update, methods=["PUT"]),
             Route("/api/models", handle_models, methods=["GET"]),
+            Route("/api/models/{role}", handle_model_role_update, methods=["PUT"]),
+            Route("/api/chains", handle_chains, methods=["GET"]),
+            Route("/api/chains/{alias}", handle_chain_update, methods=["PUT"]),
             Route("/api/latency-test", handle_latency_test, methods=["POST"]),
             Route("/api/run-plan", handle_run_plan, methods=["POST"]),
+            Route("/api/run", handle_run, methods=["POST"]),
         ],
         lifespan=lifespan,
     )
@@ -489,6 +692,14 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
       <button id="plan-btn">Resolve plan (no run)</button>
     </div>
     <pre id="run-plan-result">…</pre>
+    <h3>Run Profile — executes for real</h3>
+    <form id="run-form" class="row">
+      <select id="run-profile" style="min-width:110px"></select>
+      <textarea name="prd" rows="3" placeholder="# title&#10;&#10;body" required style="min-width:300px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px"></textarea>
+      <button type="submit">Start run</button>
+    </form>
+    <p class="bad" style="font-size:12px;margin:6px 0 0">Warning: this starts a real agentic workflow in the background.</p>
+    <span id="run-result" class="dim"></span>
   </section>
 
   <section>
@@ -497,6 +708,25 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
     <div id="model-aliases"><p class="dim">Loading…</p></div>
     <h3>Role → Alias</h3>
     <div id="role-mapping"><p class="dim">Loading…</p></div>
+    <h3>Edit Role Alias</h3>
+    <form id="role-form" class="row">
+      <input name="role" placeholder="role, e.g. deep" required style="width:140px">
+      <input name="alias" placeholder="alias, e.g. gemini-batch" required style="min-width:180px">
+      <button type="submit">Save role</button>
+    </form>
+    <span id="role-result" class="dim"></span>
+  </section>
+
+  <section>
+    <h2>Fabric Chains</h2>
+    <div id="chains"><p class="dim">Loading…</p></div>
+    <h3>Edit Chain Alias</h3>
+    <form id="chain-form" class="row">
+      <input name="alias" placeholder="chain alias, e.g. claude-3-7-sonnet" required style="min-width:190px">
+      <textarea name="routes" rows="3" placeholder='[{"provider":"gemini","model":"gemini-2.5-flash","timeout":30}]' required style="min-width:280px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px"></textarea>
+      <button type="submit">Save chain</button>
+    </form>
+    <span id="chain-result" class="dim"></span>
   </section>
 
   <section>
@@ -605,8 +835,23 @@ function renderProfiles(profiles) {
     "<tr><td class='mono'>" + esc(name) + "</td><td>" + esc(p.description) + "</td><td>" + esc((p.waves || []).join(", ")) + "</td><td>" + esc(p.default_tier) + "</td><td>" + esc((p.worker_roles || []).join(", ")) + "</td></tr>"
   );
   el.innerHTML = rows.length ? table(["name", "description", "waves", "tier", "roles"], rows) : '<p class="dim">No profiles.</p>';
-  const sel = document.getElementById("plan-profile");
-  sel.innerHTML = Object.keys(profiles || {}).map(n => "<option value='" + esc(n) + "'>" + esc(n) + "</option>").join("");
+  const opts = Object.keys(profiles || {}).map(n => "<option value='" + esc(n) + "'>" + esc(n) + "</option>").join("");
+  document.getElementById("plan-profile").innerHTML = opts;
+  document.getElementById("run-profile").innerHTML = opts;
+}
+
+function renderChains(chains) {
+  const el = document.getElementById("chains");
+  const rows = Object.entries(chains || {}).map(([alias, routes]) =>
+    "<tr><td class='mono'><a data-alias='" + esc(alias) + "'>" + esc(alias) + "</a></td><td class='mono'>" + (routes || []).map(r => esc(r.provider) + "/" + esc(r.model)).join("<br>") + "</td></tr>"
+  );
+  el.innerHTML = rows.length ? table(["alias", "route chain (provider/model)"], rows) : '<p class="dim">No fabric chains.</p>';
+  el.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+    const f = document.getElementById("chain-form");
+    f.alias.value = a.dataset.alias;
+    f.routes.value = JSON.stringify(chains[a.dataset.alias], null, 2);
+    document.getElementById("chain-result").textContent = "Loaded " + a.dataset.alias + " — edit and Save chain to persist.";
+  }));
 }
 
 function renderModels(models) {
@@ -656,16 +901,73 @@ document.getElementById("plan-btn").addEventListener("click", async () => {
   } catch (err) { pre.textContent = "error: " + err; }
 });
 
+document.getElementById("role-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const out = document.getElementById("role-result");
+  out.textContent = "Saving role…";
+  try {
+    const r = await fetch("/api/models/" + encodeURIComponent(f.role.value.trim()), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ alias: f.alias.value.trim() })
+    });
+    const data = await r.json();
+    if (!r.ok) { out.textContent = "error: " + (data.error || r.status); return; }
+    out.textContent = "Saved " + f.role.value.trim() + " -> " + f.alias.value.trim();
+    load();
+  } catch (err) { out.textContent = "error: " + err; }
+});
+
+document.getElementById("chain-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const out = document.getElementById("chain-result");
+  let routes;
+  try { routes = JSON.parse(f.routes.value); }
+  catch { out.textContent = "error: routes must be valid JSON"; return; }
+  out.textContent = "Saving chain…";
+  try {
+    const r = await fetch("/api/chains/" + encodeURIComponent(f.alias.value.trim()), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ routes: routes })
+    });
+    const data = await r.json();
+    if (!r.ok) { out.textContent = "error: " + (data.error || r.status); return; }
+    out.textContent = "Saved chain " + f.alias.value.trim();
+    load();
+  } catch (err) { out.textContent = "error: " + err; }
+});
+
+document.getElementById("run-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const out = document.getElementById("run-result");
+  out.textContent = "Starting run…";
+  try {
+    const r = await fetch("/api/run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ profile: document.getElementById("run-profile").value, prd: f.prd.value })
+    });
+    const data = await r.json();
+    if (!r.ok) { out.textContent = "error: " + (data.error || r.status); return; }
+    out.textContent = "Started " + data.profile + " (" + data.model_alias + ") — watch System Status / Reports.";
+  } catch (err) { out.textContent = "error: " + err; }
+});
+
 async function load() {
   try {
-    const [status, profiles, models, reports] = await Promise.all([
-      getJSON("/api/status"), getJSON("/api/profiles"), getJSON("/api/models"), getJSON("/api/reports")
+    const [status, profiles, models, reports, chains] = await Promise.all([
+      getJSON("/api/status"), getJSON("/api/profiles"), getJSON("/api/models"), getJSON("/api/reports"), getJSON("/api/chains")
     ]);
     renderStatus(status);
     renderTimeline(status);
     renderProfiles(profiles);
     renderModels(models);
     renderReports(reports);
+    renderChains(chains.chains);
   } catch (err) {
     document.body.insertAdjacentHTML("afterbegin", "<p style='color:#e74c3c;padding:10px 24px'>Failed to load: " + esc(err) + "</p>");
   }

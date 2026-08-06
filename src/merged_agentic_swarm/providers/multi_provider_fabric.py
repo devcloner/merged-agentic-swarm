@@ -7,6 +7,7 @@ import json
 import logging
 import threading
 import time
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -78,6 +79,170 @@ def _record_success(provider: str, model_alias: str | None = None):
 #               LITELLM_PROXY_KEY via the key pool. Positioned right after the direct
 #               Gemini route so the two key pools back each other up; a 429 from
 #               litellm means its 35-key pool is exhausted and the cascade continues.
+# Shared fallback cascades for the litellm virtual-alias routes below
+# (gemini-batch / gemini-batch-lite / fast-flash / smart-auto). Worker sub-agents
+# resolve to one of these aliases via services/model_routing.py; each alias route
+# LEADS with the litellm gateway (42-key rotating Gemini pool) so sub-agents are
+# served by the pool first, with direct Gemini + the nvidia_nim/mistral cascade
+# as fallbacks. The cascades mirror the tier routes above (opus / sonnet / haiku
+# classes).
+_OPUS_CLASS_CASCADE: list[dict[str, Any]] = [
+    {
+        "provider": "nvidia_nim",
+        "model": "meta/llama-3.1-70b-instruct",
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    },
+    {"provider": "mistral", "model": "mistral-large-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+    {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash-lite",
+        "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "timeout": 30,
+    },
+    {
+        "provider": "litellm",
+        "model": "gemini-3.6-flash",
+        "url": "http://localhost:4000/v1/chat/completions",
+        "timeout": 30,
+    },
+    {
+        "provider": "nvidia_nim",
+        "model": "openai/gpt-oss-20b",
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    },
+    {
+        "provider": "nvidia_nim",
+        "model": "z-ai/glm-5.2",
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    },
+    {
+        "provider": "fcc-proxy",
+        "model": "nvidia_nim/meta/llama-3.1-70b-instruct",
+        "url": "http://localhost:8080/v1/messages",
+    },
+    {"provider": "mistral", "model": "codestral-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+    {
+        "provider": "nvidia_nim",
+        "model": "meta/llama-3.3-70b-instruct",
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        "timeout": 60,
+    },
+    {
+        "provider": "openrouter",
+        "model": "deepseek/deepseek-chat-v3.1:free",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+    },
+    {
+        "provider": "routatic-proxy",
+        "model": "deepseek-v4-pro",
+        "url": "http://localhost:3456/v1/messages",
+        "timeout": 30,
+    },
+    {
+        "provider": "routatic-proxy",
+        "model": "deepseek-v4-flash",
+        "url": "http://localhost:3456/v1/messages",
+        "timeout": 30,
+    },
+]
+_SONNET_CLASS_CASCADE: list[dict[str, Any]] = [
+    {
+        "provider": "nvidia_nim",
+        "model": "meta/llama-3.1-70b-instruct",
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    },
+    {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+    {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash-lite",
+        "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "timeout": 30,
+    },
+    {
+        "provider": "litellm",
+        "model": "gemini-3.5-flash",
+        "url": "http://localhost:4000/v1/chat/completions",
+        "timeout": 30,
+    },
+    {
+        "provider": "nvidia_nim",
+        "model": "openai/gpt-oss-20b",
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    },
+    {
+        "provider": "nvidia_nim",
+        "model": "z-ai/glm-5.2",
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    },
+    {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
+    {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+    {
+        "provider": "openrouter",
+        "model": "deepseek/deepseek-chat-v3.1:free",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+    },
+    {
+        "provider": "routatic-proxy",
+        "model": "deepseek-v4-pro",
+        "url": "http://localhost:3456/v1/messages",
+        "timeout": 30,
+    },
+    {
+        "provider": "routatic-proxy",
+        "model": "deepseek-v4-flash",
+        "url": "http://localhost:3456/v1/messages",
+        "timeout": 30,
+    },
+]
+_HAIKU_CLASS_CASCADE: list[dict[str, Any]] = [
+    {
+        "provider": "nvidia_nim",
+        "model": "meta/llama-3.1-8b-instruct",
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    },
+    {"provider": "mistral", "model": "mistral-tiny", "url": "https://api.mistral.ai/v1/chat/completions"},
+    {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash",
+        "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        "timeout": 30,
+    },
+    {
+        "provider": "litellm",
+        "model": "gemini-3.5-flash-lite",
+        "url": "http://localhost:4000/v1/chat/completions",
+        "timeout": 30,
+    },
+    {
+        "provider": "nvidia_nim",
+        "model": "mistralai/mistral-nemotron",
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+    },
+    {
+        "provider": "fcc-proxy",
+        "model": "nvidia_nim/meta/llama-3.1-8b-instruct",
+        "url": "http://localhost:8080/v1/messages",
+    },
+    {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
+    {
+        "provider": "openrouter",
+        "model": "deepseek/deepseek-chat-v3.1:free",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+    },
+    {
+        "provider": "routatic-proxy",
+        "model": "deepseek-v4-pro",
+        "url": "http://localhost:3456/v1/messages",
+        "timeout": 30,
+    },
+    {
+        "provider": "routatic-proxy",
+        "model": "deepseek-v4-flash",
+        "url": "http://localhost:3456/v1/messages",
+        "timeout": 30,
+    },
+]
+
 # Routes are ordered verified-first (reliability × speed), then as fallbacks. Dead
 # providers fail fast (perma-ban on 401 / circuit breaker) and fall through.
 MODEL_FABRIC_ROUTES: dict[str, list[dict[str, Any]]] = {
@@ -400,7 +565,105 @@ MODEL_FABRIC_ROUTES: dict[str, list[dict[str, Any]]] = {
             "timeout": 30,
         },
     ],
+    # ── litellm virtual-alias routes (worker sub-agent tiers) ────────────────
+    # Role resolution (services/model_routing.py) maps worker roles to these
+    # aliases. PRIMARY route is the litellm gateway (http://localhost:4000)
+    # serving the alias, then a direct-gemini fallback, then the cascade above.
+    "gemini-batch": [
+        {
+            "provider": "litellm",
+            "model": "gemini-batch",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        *_OPUS_CLASS_CASCADE,
+    ],
+    "gemini-batch-lite": [
+        {
+            "provider": "litellm",
+            "model": "gemini-batch-lite",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        *_SONNET_CLASS_CASCADE,
+    ],
+    "fast-flash": [
+        {
+            "provider": "litellm",
+            "model": "fast-flash",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        *_HAIKU_CLASS_CASCADE,
+    ],
+    "smart-auto": [
+        {
+            "provider": "litellm",
+            "model": "smart-auto",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        *_SONNET_CLASS_CASCADE,
+    ],
 }
+
+# ── Fabric-route overlay (docs/agentic/fabric-routes.json) ─────────────────
+# The web UI (webapp.py GET/PUT /api/chains) persists per-alias route overrides
+# here; at dispatch time the overlay wins over the code-default routes per alias.
+_FABRIC_ROUTES_OVERLAY_PATH = Path(__file__).resolve().parents[3] / "docs" / "agentic" / "fabric-routes.json"
+_fabric_routes_overlay: dict[str, list[dict[str, Any]]] | None = None
+
+
+def _load_fabric_routes_overlay() -> dict[str, list[dict[str, Any]]]:
+    """Load the per-alias route overlay (cached); {} when missing or unreadable."""
+    global _fabric_routes_overlay
+    if _fabric_routes_overlay is not None:
+        return _fabric_routes_overlay
+    try:
+        with open(_FABRIC_ROUTES_OVERLAY_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+        routes = data.get("routes") if isinstance(data, dict) else None
+        if isinstance(routes, dict):
+            _fabric_routes_overlay = {
+                alias: [dict(route) for route in routes_list]
+                for alias, routes_list in routes.items()
+                if isinstance(alias, str) and isinstance(routes_list, list) and routes_list
+            }
+        else:
+            _fabric_routes_overlay = {}
+    except OSError, ValueError:
+        _fabric_routes_overlay = {}
+    return _fabric_routes_overlay
+
+
+def reload_fabric_routes() -> None:
+    """Clear the overlay cache so the next dispatch re-reads the JSON file."""
+    global _fabric_routes_overlay
+    _fabric_routes_overlay = None
 
 
 class MultiProviderFabric:
@@ -604,8 +867,17 @@ class MultiProviderFabric:
         return result
 
     def _build_route_list(self, model_alias: str) -> list[dict[str, str]]:
-        """Build route list, promoting the last successful provider for this alias to the front."""
-        routes = list(MODEL_FABRIC_ROUTES.get(model_alias, MODEL_FABRIC_ROUTES["claude-3-7-sonnet"]))
+        """Build route list, promoting the last successful provider for this alias to the front.
+
+        A per-alias override from the fabric-routes overlay
+        (docs/agentic/fabric-routes.json, editable via the web UI PUT /api/chains)
+        wins over the code-default routes for that alias.
+        """
+        overlay_routes = _load_fabric_routes_overlay().get(model_alias)
+        if overlay_routes:
+            routes = [dict(route) for route in overlay_routes]
+        else:
+            routes = list(MODEL_FABRIC_ROUTES.get(model_alias, MODEL_FABRIC_ROUTES["claude-3-7-sonnet"]))
         last_provider = _last_successful_provider.get(model_alias)
         if last_provider:
             idx = next((i for i, r in enumerate(routes) if r["provider"] == last_provider), None)

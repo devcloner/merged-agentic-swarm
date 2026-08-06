@@ -11,6 +11,7 @@ from merged_agentic_swarm.services.cloudcli_service import CloudCLIClient, Cloud
 from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService, default_codebase_mapper
 from merged_agentic_swarm.services.model_routing import (
     litellm_model_for_fabric_route,
+    reload_registry,
     resolve_litellm_model_for_role,
 )
 from merged_agentic_swarm.services.opencode_swarm_service import OpenCodeSwarmManager, default_swarm_manager
@@ -48,6 +49,7 @@ __all__ = [
     "list_profiles",
     "litellm_model_for_fabric_route",
     "load_profiles",
+    "reload_registry",
     "resolve_litellm_model_for_role",
     "resolve_model_alias_for_profile",
     "resolve_profile",

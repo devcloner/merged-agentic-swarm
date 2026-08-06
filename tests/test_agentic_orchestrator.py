@@ -117,6 +117,29 @@ class TestRunFullAgenticWorkflow:
         assert result["status"] == "failed"
         assert result["wave"] == 0
 
+    def test_workflow_gates_disabled_does_not_abort(self, monkeypatch, tmp_path):
+        """gates=False keeps advance_wave() running (state advances) but a
+        non-passing gate no longer aborts the workflow — it continues and succeeds."""
+        orch = self._stub_workflow(monkeypatch, tmp_path, advance=(False, "gate blocked"))
+        result = orch.run_full_agentic_workflow("# PRD", gates=False)
+        assert result["status"] == "success"
+        assert result["waves_completed"] == 4
+
+    def test_workflow_logs_deploy_events(self, monkeypatch, tmp_path):
+        """A run emits proxy_deployed (after init) and run_deployed (pre-wave)
+        log_progress entries so the report timeline shows the deploy steps."""
+        orch = self._stub_workflow(monkeypatch, tmp_path)
+        actions: list[object] = []
+        monkeypatch.setattr(
+            orch_mod.default_progress_ledger,
+            "log_progress",
+            lambda **k: actions.append(k.get("action")),
+        )
+        result = orch.run_full_agentic_workflow("# PRD", default_model="gemini-batch")
+        assert result["status"] == "success"
+        assert "proxy_deployed" in actions
+        assert "run_deployed" in actions
+
     def test_workflow_simulation_failure_logged_and_epic_failed(self, monkeypatch, tmp_path, caplog):
         sim_result = {
             "status": "failed",
@@ -161,13 +184,16 @@ class TestRunFullAgenticWorkflow:
         assert sorted(seen) == [1, 2, 3, 4]
 
     def test_workflow_threads_profile_ramp_and_model(self, monkeypatch, tmp_path):
-        """A provided ramp_sequence reaches every swarm batch, and default_model is
-        recorded as the model on every log_progress entry (run-report timeline)."""
+        """A provided ramp_sequence reaches every swarm batch, default_model is
+        recorded as the model on every log_progress entry (run-report timeline),
+        and the profile model is threaded into every swarm batch as model_alias."""
         orch = self._stub_workflow(monkeypatch, tmp_path)
         batch_calls: list[tuple[int, object]] = []
+        batch_aliases: list[object] = []
 
-        def recording(subtasks, role=None, wave_gate_level=0, ramp_sequence=None):
+        def recording(subtasks, role=None, wave_gate_level=0, ramp_sequence=None, model_alias=None):
             batch_calls.append((wave_gate_level, ramp_sequence))
+            batch_aliases.append(model_alias)
             return [
                 {
                     "status": "completed",
@@ -189,6 +215,7 @@ class TestRunFullAgenticWorkflow:
         assert result["status"] == "success"
         assert [level for level, _ in batch_calls] == [1, 2, 3, 4]
         assert all(ramp == [2, 4, 8] for _, ramp in batch_calls)
+        assert all(alias == "gemini-batch" for alias in batch_aliases)
         assert seen_models
         assert all(model == "gemini-batch" for model in seen_models)
 

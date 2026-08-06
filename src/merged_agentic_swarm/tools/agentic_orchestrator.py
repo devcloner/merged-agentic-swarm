@@ -414,11 +414,29 @@ class MultiLayeredAgenticOrchestrator:
             "timestamp": time.time(),
         }
 
+    def _abort_on_gate_failure(self, passed: bool, reason: str, wave: int, gates: bool | None) -> dict[str, Any] | None:
+        """Return an abort result when a gate fails and gates are enforced.
+
+        ``advance_wave()`` has already run (wave state advances regardless); this
+        only decides whether a non-passing gate aborts the workflow. When
+        ``gates is False`` (profile gates disabled) the failure is logged at
+        warning and the workflow continues. When ``None``/``True`` the abort
+        behavior is preserved exactly.
+        """
+        if passed:
+            return None
+        if gates is False:
+            logger.warning(f"gates disabled by profile — Wave {wave} gate failed ({reason}); continuing")
+            return None
+        logger.error(f"Wave {wave} gate FAILED: {reason}. Aborting workflow.")
+        return {"status": "failed", "reason": f"Wave {wave} gate failed: {reason}", "wave": wave}
+
     def run_full_agentic_workflow(
         self,
         prd_content: str,
         ramp_sequence: list[int] | None = None,
         default_model: str | None = None,
+        gates: bool | None = None,
     ) -> dict[str, Any]:
         """Runs the complete self-healing 6-step agent-to-agent workflow.
 
@@ -426,7 +444,11 @@ class MultiLayeredAgenticOrchestrator:
         wave_gate_level -> worker-count mapping follows the profile's ramp instead
         of the hard-coded [4, 8, 16, 24, 40]. ``default_model`` (when set) is
         recorded as the ``model`` on each progress-ledger log_progress entry so the
-        run-report timeline carries the model tier that served the run.
+        run-report timeline carries the model tier that served the run, and is
+        threaded into every swarm batch as ``model_alias`` (profile runs only).
+        ``gates`` honors the profile's ``gates`` flag: when ``False`` every
+        ``advance_wave()`` call still runs (state advances) but a non-passing gate
+        logs a warning and continues instead of aborting the workflow.
         """
         logger.info("=== STARTING MULTI-LAYERED AGENTIC WORKFLOW ===")
 
@@ -435,12 +457,36 @@ class MultiLayeredAgenticOrchestrator:
         swarm_kwargs: dict[str, Any] = {}
         if ramp_sequence is not None:
             swarm_kwargs["ramp_sequence"] = ramp_sequence
+        if default_model is not None:
+            # Profile runs pin every worker to the profile's resolved alias;
+            # non-profile runs omit it so per-role defaults apply.
+            swarm_kwargs["model_alias"] = default_model
         ledger_kwargs: dict[str, Any] = {}
         if default_model is not None:
             ledger_kwargs["model"] = default_model
 
         # Step 0: System Init & Proxy Check
         self.initialize_system()
+        default_progress_ledger.log_progress(
+            task_id="INIT",
+            subtask_id=None,
+            worker_id="system",
+            wave_id=0,
+            action="proxy_deployed",
+            status="completed",
+            details={"proxy": "localhost:8085"},
+            **ledger_kwargs,
+        )
+        default_progress_ledger.log_progress(
+            task_id="INIT",
+            subtask_id=None,
+            worker_id="system",
+            wave_id=0,
+            action="run_deployed",
+            status="completed",
+            details={"model_alias": default_model},
+            **ledger_kwargs,
+        )
 
         # Step 1: PRD Optimization & Parsing via Task Master AI
         logger.info("--- Step 1: Optimizing and Parsing PRD via Task Master AI ---")
@@ -468,9 +514,9 @@ class MultiLayeredAgenticOrchestrator:
         # Validate Wave 0 Gate
         passed_w0, reason_w0 = default_wave_controller.advance_wave()
         logger.info(f"Wave 0 Gate Status: {passed_w0} ({reason_w0})")
-        if not passed_w0:
-            logger.error(f"Wave 0 gate FAILED: {reason_w0}. Aborting workflow.")
-            return {"status": "failed", "reason": f"Wave 0 gate failed: {reason_w0}", "wave": 0}
+        abort_w0 = self._abort_on_gate_failure(passed_w0, reason_w0, 0, gates)
+        if abort_w0 is not None:
+            return abort_w0
 
         # Step 3: Wave 1 - Key Pool Proxy & Fabric Gate
         logger.info("--- Step 3: Wave 1 Execution (Key Pool Proxy & Model Fabric) ---")
@@ -525,9 +571,9 @@ class MultiLayeredAgenticOrchestrator:
 
         passed_w1, reason_w1 = default_wave_controller.advance_wave()
         logger.info(f"Wave 1 Gate Status: {passed_w1} ({reason_w1})")
-        if not passed_w1:
-            logger.error(f"Wave 1 gate FAILED: {reason_w1}. Aborting workflow.")
-            return {"status": "failed", "reason": f"Wave 1 gate failed: {reason_w1}", "wave": 1}
+        abort_w1 = self._abort_on_gate_failure(passed_w1, reason_w1, 1, gates)
+        if abort_w1 is not None:
+            return abort_w1
 
         # Step 4: Wave 2 - OpenCode 40-Worker Swarm & Durable Agent Factory
         logger.info("--- Step 4: Wave 2 Execution (OpenCode Swarm & Durable Agents) ---")
@@ -630,9 +676,9 @@ class MultiLayeredAgenticOrchestrator:
 
         passed_w2, reason_w2 = default_wave_controller.advance_wave()
         logger.info(f"Wave 2 Gate Status: {passed_w2} ({reason_w2})")
-        if not passed_w2:
-            logger.error(f"Wave 2 gate FAILED: {reason_w2}. Aborting workflow.")
-            return {"status": "failed", "reason": f"Wave 2 gate failed: {reason_w2}", "wave": 2}
+        abort_w2 = self._abort_on_gate_failure(passed_w2, reason_w2, 2, gates)
+        if abort_w2 is not None:
+            return abort_w2
 
         # Cold-path promotion after Wave 2: promote learnings to registries
         cold_2 = self._promote_cold_path(phase_label="wave_2")
@@ -699,9 +745,9 @@ class MultiLayeredAgenticOrchestrator:
         default_wave_controller.record_verification_results(ver_result)
         passed_w3, reason_w3 = default_wave_controller.advance_wave()
         logger.info(f"Wave 3 Gate Status: {passed_w3} ({reason_w3})")
-        if not passed_w3:
-            logger.error(f"Wave 3 gate FAILED: {reason_w3}. Aborting workflow.")
-            return {"status": "failed", "reason": f"Wave 3 gate failed: {reason_w3}", "wave": 3}
+        abort_w3 = self._abort_on_gate_failure(passed_w3, reason_w3, 3, gates)
+        if abort_w3 is not None:
+            return abort_w3
 
         # Step 5.5: Wave 4 - Synthesis & Final Reporting
         logger.info("--- Step 5.5: Wave 4 Execution (Synthesis & Final Reporting) ---")

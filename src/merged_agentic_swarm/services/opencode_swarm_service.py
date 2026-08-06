@@ -20,6 +20,7 @@ from typing import Any
 from merged_agentic_swarm.models.agent_models import AgentSpec, AgentType, WorkerPoolConfig, WorkerPoolState, WorkerRole
 from merged_agentic_swarm.models.prd_models import SubTask, TaskStatus
 from merged_agentic_swarm.services.agentic_worker_loop import default_agentic_worker_loop
+from merged_agentic_swarm.services.model_routing import resolve_litellm_model_for_role
 
 logger = logging.getLogger("opencode_swarm")
 
@@ -369,9 +370,15 @@ class OpenCodeSwarmManager:
         """Map a WorkerRole to a pool-health bucket key."""
         return _POOL_ID_MAP.get(role.value, "general")
 
-    def execute_subtask_with_worker(self, subtask: SubTask, role: WorkerRole) -> dict[str, Any]:
+    def execute_subtask_with_worker(
+        self, subtask: SubTask, role: WorkerRole, model_alias: str | None = None
+    ) -> dict[str, Any]:
         """Dispatches a single subtask — first checks for a matching durable agent,
         then runs the agentic tool loop (real file/command work in the target repo).
+
+        ``model_alias`` (when set) forces the fabric alias for this worker;
+        when None each worker resolves its own per-role litellm alias via
+        ``resolve_litellm_model_for_role``.
 
         ``SWARM_WORKER_MODE=fabric`` (default) runs the real tool loop through the
         multi-provider fabric. ``SWARM_WORKER_MODE=opencode`` routes through the
@@ -431,10 +438,14 @@ class OpenCodeSwarmManager:
             if mode == "opencode":
                 worker_result = self._run_opencode_worker(worker_id, role, system_prompt, task)
             else:
+                if model_alias is None:
+                    # Per-role litellm alias (e.g. core_engineer -> gemini-batch-lite,
+                    # security_verifier -> fast-flash); an explicit alias wins when set.
+                    model_alias = resolve_litellm_model_for_role(role.value)
                 worker_result = default_agentic_worker_loop.execute(
                     subtask=task,
                     system_prompt=system_prompt,
-                    model_alias=WorkerRole.CORE_ENGINEER.value,  # routed agent uses default tier
+                    model_alias=model_alias,
                     workdir=self._target_repo_root(),
                 )
         except Exception as e:
@@ -556,6 +567,7 @@ class OpenCodeSwarmManager:
         role: WorkerRole = WorkerRole.CORE_ENGINEER,
         wave_gate_level: int = 0,
         ramp_sequence: list[int] | None = None,
+        model_alias: str | None = None,
     ) -> list[dict[str, Any]]:
         """Executes a batch of subtasks in parallel using ThreadPoolExecutor up to max pool capacity.
 
@@ -563,11 +575,21 @@ class OpenCodeSwarmManager:
         wave_gate_level -> worker-count mapping when provided; the controller
         default ([4, 8, 16, 24, 40]) is used when None. The resolved worker count
         is always clamped to ``config.max_total_workers``.
+
+        ``model_alias`` (when set) forces the fabric alias for EVERY worker in
+        the batch; when None each worker resolves its own per-role alias inside
+        ``execute_subtask_with_worker``. The kwarg is only forwarded to the
+        worker when set, so the default call path stays unchanged.
         """
         results = []
         max_workers = self.ramp_controller.get_current_max_workers(wave_gate_level, ramp_sequence)
+        submit_kwargs = {}
+        if model_alias is not None:
+            submit_kwargs["model_alias"] = model_alias
         with ThreadPoolExecutor(max_workers=min(max_workers, self.config.max_total_workers)) as executor:
-            future_to_subtask = {executor.submit(self.execute_subtask_with_worker, st, role): st for st in subtasks}
+            future_to_subtask = {
+                executor.submit(self.execute_subtask_with_worker, st, role, **submit_kwargs): st for st in subtasks
+            }
             for future in as_completed(future_to_subtask):
                 try:
                     res = future.result()

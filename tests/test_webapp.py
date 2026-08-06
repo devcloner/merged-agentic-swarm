@@ -3,13 +3,17 @@ Tests for merged_agentic_swarm.webapp — the control-panel JSON API + dashboard
 
 Coverage: /api/status (key pools + backends, no secret values), /api/reports
 list + detail (404 + path-traversal guard), GET/PUT /api/profiles round-trip
-against a tmp registry, /api/models role mapping (litellm fetch monkeypatched),
-/api/latency-test with a mocked httpx streaming transport, /api/run-plan, and
-the HTML dashboard. No test touches the network or a real API key.
+against a tmp registry, /api/models role mapping (litellm fetch monkeypatched)
++ PUT /api/models/{role} registry write, GET/PUT /api/chains overlay merge,
+/api/latency-test with a mocked httpx streaming transport, /api/run-plan,
+POST /api/run background workflow kick-off, and the HTML dashboard. No test
+touches the network or a real API key, and neither PROVIDER_REGISTRY.json nor
+fabric-routes.json is ever written from a test.
 """
 
 import json
 import os
+from pathlib import Path
 from unittest.mock import patch
 
 import httpx
@@ -19,6 +23,7 @@ from starlette.testclient import TestClient
 import merged_agentic_swarm.services.model_routing as mr
 from merged_agentic_swarm import webapp
 from merged_agentic_swarm.services import swarm_profiles
+from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
 
 
 @pytest.fixture(autouse=True)
@@ -294,6 +299,188 @@ class TestRunPlan:
         assert client.post("/api/run-plan", json={}).status_code == 400
 
 
+class TestModelRoleUpdate:
+    def test_model_role_update_writes_registry_and_reloads(self, tmp_path, client):
+        real_registry_before = mr._REGISTRY_PATH.read_text(encoding="utf-8")
+        target = tmp_path / "PROVIDER_REGISTRY.json"
+        target.write_text(real_registry_before, encoding="utf-8")
+        with patch.object(mr, "_REGISTRY_PATH", target), patch.object(mr, "reload_registry") as spy:
+            resp = client.put("/api/models/deep", json={"alias": "smart-auto"})
+            assert resp.status_code == 200
+            data = resp.json()
+        assert data["ok"] is True
+        assert data["role"] == "deep"
+        assert data["role_mapping"]["deep"] == "smart-auto"
+        # The write path persisted role_routing.roles atomically.
+        on_disk = json.loads(target.read_text(encoding="utf-8"))
+        assert on_disk["role_routing"]["roles"]["deep"] == "smart-auto"
+        assert on_disk["tiers"]  # untouched top-level keys preserved
+        spy.assert_called_once_with()
+        # The real PROVIDER_REGISTRY.json was never modified.
+        assert mr._REGISTRY_PATH.read_text(encoding="utf-8") == real_registry_before
+
+    def test_model_role_update_allows_new_role(self, tmp_path, client):
+        target = tmp_path / "PROVIDER_REGISTRY.json"
+        target.write_text(mr._REGISTRY_PATH.read_text(encoding="utf-8"), encoding="utf-8")
+        with patch.object(mr, "_REGISTRY_PATH", target):
+            resp = client.put("/api/models/brand-new-role", json={"alias": "fast-flash"})
+        assert resp.status_code == 200
+        assert resp.json()["role_mapping"]["brand-new-role"] == "fast-flash"
+
+    def test_model_role_update_invalid_400(self, tmp_path, client):
+        target = tmp_path / "PROVIDER_REGISTRY.json"
+        target.write_text("{}", encoding="utf-8")
+        with patch.object(mr, "_REGISTRY_PATH", target):
+            # alias must match ^[A-Za-z][A-Za-z0-9._-]*$
+            assert client.put("/api/models/deep", json={"alias": "bad alias!"}).status_code == 400
+            assert client.put("/api/models/deep", json={"alias": "2fast"}).status_code == 400
+            assert client.put("/api/models/deep", json={"alias": 123}).status_code == 400
+            assert client.put("/api/models/deep", json={"alias": ""}).status_code == 400
+            assert client.put("/api/models/deep", json={}).status_code == 400
+            # role must be a non-empty string
+            assert client.put("/api/models/%20%20", json={"alias": "ok-alias"}).status_code == 400
+            assert (
+                client.put(
+                    "/api/models/deep", content=b"not-json", headers={"content-type": "application/json"}
+                ).status_code
+                == 400
+            )
+        # Nothing was written to the throwaway registry.
+        assert json.loads(target.read_text(encoding="utf-8")) == {}
+
+
+class TestChains:
+    @pytest.fixture
+    def overlay_path(self, tmp_path):
+        """Point webapp at a throwaway fabric-routes.json (never the real file)."""
+        target = tmp_path / "fabric-routes.json"
+        target.write_text(json.dumps({"routes": {}}) + "\n", encoding="utf-8")
+        with patch.object(webapp, "_FABRIC_ROUTES_PATH", target):
+            yield target
+
+    def test_chains_get_merges_defaults_and_overlay(self, overlay_path, client):
+        # Seed the overlay: override one code alias + add a brand-new alias.
+        overlay_path.write_text(
+            json.dumps(
+                {
+                    "routes": {
+                        "claude-3-7-sonnet": [
+                            {"provider": "gemini", "model": "override-model", "url": "http://x", "timeout": 5}
+                        ],
+                        "my-custom-chain": [{"provider": "mistral", "model": "mistral-tiny"}],
+                    }
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        chains = client.get("/api/chains").json()["chains"]
+        # Code-default aliases still present with their route chain.
+        assert "claude-3-5-haiku" in chains
+        assert chains["claude-3-5-haiku"][0]["provider"] == "gemini"
+        # Overlay wins per alias.
+        assert chains["claude-3-7-sonnet"] == [
+            {"provider": "gemini", "model": "override-model", "url": "http://x", "timeout": 5}
+        ]
+        # New aliases from the overlay are added.
+        assert chains["my-custom-chain"] == [{"provider": "mistral", "model": "mistral-tiny"}]
+
+    def test_chains_put_upserts_overlay_and_merges(self, tmp_path, client):
+        real_path = Path(webapp.__file__).resolve().parents[2] / "docs" / "agentic" / "fabric-routes.json"
+        real_before = real_path.read_text(encoding="utf-8")
+        target = tmp_path / "fabric-routes.json"
+        target.write_text(json.dumps({"routes": {}}) + "\n", encoding="utf-8")
+        with patch.object(webapp, "_FABRIC_ROUTES_PATH", target):
+            resp = client.put(
+                "/api/chains/my-chain",
+                json={
+                    "routes": [{"provider": "gemini", "model": "gemini-2.5-flash", "url": "http://g", "timeout": 30}]
+                },
+            )
+            assert resp.status_code == 200
+            data = resp.json()
+            assert data["ok"] is True
+            assert data["alias"] == "my-chain"
+            assert data["routes"][0]["model"] == "gemini-2.5-flash"
+            # The merged GET reflects the upsert immediately.
+            chains = client.get("/api/chains").json()["chains"]
+            assert chains["my-chain"] == [
+                {"provider": "gemini", "model": "gemini-2.5-flash", "url": "http://g", "timeout": 30}
+            ]
+        # The overlay file was persisted.
+        on_disk = json.loads(target.read_text(encoding="utf-8"))
+        assert on_disk["routes"]["my-chain"] == [
+            {"provider": "gemini", "model": "gemini-2.5-flash", "url": "http://g", "timeout": 30}
+        ]
+        # The real docs/agentic/fabric-routes.json was never touched.
+        assert real_path.read_text(encoding="utf-8") == real_before
+
+    def test_chains_put_invalid_400(self, overlay_path, client):
+        assert client.put("/api/chains/bad%20alias", json={"routes": []}).status_code == 400
+        assert client.put("/api/chains/2cool", json={"routes": []}).status_code == 400
+        assert client.put("/api/chains/my-chain", json={}).status_code == 400
+        assert client.put("/api/chains/my-chain", json={"routes": []}).status_code == 400
+        assert client.put("/api/chains/my-chain", json={"routes": "nope"}).status_code == 400
+        assert client.put("/api/chains/my-chain", json={"routes": [{"model": "x"}]}).status_code == 400
+        assert client.put("/api/chains/my-chain", json={"routes": [{"provider": "x"}]}).status_code == 400
+        assert (
+            client.put(
+                "/api/chains/my-chain", json={"routes": [{"provider": "x", "model": "y", "timeout": "30"}]}
+            ).status_code
+            == 400
+        )
+        # Nothing was written to the overlay.
+        assert json.loads(overlay_path.read_text(encoding="utf-8")) == {"routes": {}}
+
+
+class TestRun:
+    def test_run_starts_workflow_in_background(self, client):
+        captured = {}
+
+        def fake_run(self, **kwargs):
+            captured.update(kwargs)
+            return {"started": True}
+
+        # Keep the patch active until the daemon thread has run — otherwise the
+        # real workflow (which executes for real) would kick off once reverted.
+        with patch.object(MultiLayeredAgenticOrchestrator, "run_full_agentic_workflow", fake_run):
+            resp = client.post("/api/run", json={"profile": "patch", "prd": "# title\n\nbody"})
+            thread = client.app.state.last_run_thread
+            assert thread is not None and thread.daemon
+            thread.join(timeout=10)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data == {"started": True, "profile": "patch", "model_alias": "fast-flash"}
+        assert captured["prd_content"] == "# title\n\nbody"
+        assert captured["ramp_sequence"] == [4]
+        assert captured["default_model"] == "fast-flash"
+        assert captured["gates"] is False
+
+    def test_run_learning_profile_forwards_none_ramp(self, client):
+        captured = {}
+
+        def fake_run(self, **kwargs):
+            captured.update(kwargs)
+            return {"started": True}
+
+        with patch.object(MultiLayeredAgenticOrchestrator, "run_full_agentic_workflow", fake_run):
+            resp = client.post("/api/run", json={"profile": "learning", "prd": "# title\n\nbody"})
+            client.app.state.last_run_thread.join(timeout=10)
+        assert resp.status_code == 200
+        assert captured["ramp_sequence"] is None
+        assert captured["gates"] is False
+
+    def test_run_unknown_profile_404(self, client):
+        assert client.post("/api/run", json={"profile": "nope", "prd": "x"}).status_code == 404
+
+    def test_run_missing_prd_400(self, client):
+        assert client.post("/api/run", json={"profile": "patch"}).status_code == 400
+
+    def test_run_missing_profile_400(self, client):
+        assert client.post("/api/run", json={"prd": "x"}).status_code == 400
+
+
 def test_dashboard_html(client):
     resp = client.get("/")
     assert resp.status_code == 200
@@ -301,3 +488,8 @@ def test_dashboard_html(client):
     assert "Agentic Swarm Control Panel" in resp.text
     assert "latency-test" in resp.text
     assert "run-plan" in resp.text
+    # New forms: role alias editing, chain editing, and the real-run kicker.
+    assert "role-form" in resp.text
+    assert "chain-form" in resp.text
+    assert "run-form" in resp.text
+    assert "executes for real" in resp.text

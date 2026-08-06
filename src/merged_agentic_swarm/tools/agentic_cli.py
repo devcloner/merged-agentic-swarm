@@ -38,10 +38,15 @@ def cmd_run(args):
             sys.exit(1)
         ramp_sequence = profile.get("waves", []) or None  # empty waves -> default ramp
         default_model = resolve_model_alias_for_profile(profile_name)
-        run_kwargs = {"ramp_sequence": ramp_sequence, "default_model": default_model}
+        run_kwargs = {
+            "ramp_sequence": ramp_sequence,
+            "default_model": default_model,
+            "gates": profile.get("gates"),
+        }
         print(f"Using swarm profile: {profile_name}")
         print(f"  Wave ramp:     {ramp_sequence or '[4, 8, 16, 24, 40] (default)'}")
         print(f"  Model alias:   {default_model}")
+        print(f"  Gates:         {profile.get('gates', True)}")
         print()
 
     try:

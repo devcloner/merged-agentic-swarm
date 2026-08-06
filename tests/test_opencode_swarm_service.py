@@ -261,6 +261,37 @@ class TestOpenCodeSwarmManager:
         )
         assert captured["max_workers"] == 12
 
+    def test_batch_parallel_threads_explicit_model_alias(self, monkeypatch, make_subtask):
+        """An explicit model_alias on the batch is threaded into every worker."""
+        manager = OpenCodeSwarmManager()
+        captured: dict[str, object] = {}
+
+        def recording(st, role, model_alias=None):
+            captured["model_alias"] = model_alias
+            return {"status": "completed", "subtask_id": st.id, "worker_id": "w"}
+
+        monkeypatch.setattr(manager, "execute_subtask_with_worker", recording)
+        subtasks = [make_subtask(task_id="T-alias")]
+        manager.execute_subtask_batch_parallel(
+            subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=0, model_alias="fast-flash"
+        )
+        assert captured["model_alias"] == "fast-flash"
+
+    def test_batch_parallel_omits_alias_when_none(self, monkeypatch, make_subtask):
+        """With model_alias=None the worker receives no alias kwarg — each worker
+        resolves its own per-role alias (backward-compatible default path)."""
+        manager = OpenCodeSwarmManager()
+        captured: dict[str, object] = {}
+
+        def recording(st, role, **kwargs):
+            captured["kwargs"] = kwargs
+            return {"status": "completed", "subtask_id": st.id, "worker_id": "w"}
+
+        monkeypatch.setattr(manager, "execute_subtask_with_worker", recording)
+        subtasks = [make_subtask(task_id="T-none")]
+        manager.execute_subtask_batch_parallel(subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=0)
+        assert "model_alias" not in captured["kwargs"]
+
 
 def _router(agents_jsonl_content="", agents_dir=None):
     """Build a real DurableAgentRouter over tmp JSONL + agent dir."""
@@ -436,6 +467,41 @@ class TestExecuteSubtaskDecisionLogic:
         subtask = make_subtask()
         result = manager.execute_subtask_with_worker(subtask, WorkerRole.CORE_ENGINEER)
         assert result["status"] == "error"
+
+    def test_execute_subtask_resolves_per_role_alias_when_none(self, monkeypatch, make_subtask):
+        """model_alias=None resolves the role's litellm alias and feeds it to the
+        worker loop (no shared hardcoded alias across roles)."""
+        monkeypatch.setattr(mod, "get_durable_router", lambda: _router(""))
+        captured: dict[str, object] = {}
+
+        def capture(**k):
+            captured["model_alias"] = k.get("model_alias")
+            return {"status": "completed", "final_text": "done", "files_written": [], "commands_run": []}
+
+        monkeypatch.setattr(mod.default_agentic_worker_loop, "execute", capture)
+        monkeypatch.setattr(mod, "resolve_litellm_model_for_role", lambda role: f"alias-for-{role}")
+        subtask = make_subtask()
+        result = self._manager().execute_subtask_with_worker(subtask, WorkerRole.CORE_ENGINEER)
+        assert result["status"] == "completed"
+        assert captured["model_alias"] == "alias-for-core_engineer"
+
+    def test_execute_subtask_uses_explicit_model_alias(self, monkeypatch, make_subtask):
+        """An explicit model_alias is passed through untouched (no re-resolution)."""
+        monkeypatch.setattr(mod, "get_durable_router", lambda: _router(""))
+        captured: dict[str, object] = {}
+
+        def capture(**k):
+            captured["model_alias"] = k.get("model_alias")
+            return {"status": "completed", "final_text": "done", "files_written": [], "commands_run": []}
+
+        monkeypatch.setattr(mod.default_agentic_worker_loop, "execute", capture)
+        monkeypatch.setattr(mod, "resolve_litellm_model_for_role", lambda role: "should-not-be-used")
+        subtask = make_subtask()
+        result = self._manager().execute_subtask_with_worker(
+            subtask, WorkerRole.CORE_ENGINEER, model_alias="fast-flash"
+        )
+        assert result["status"] == "completed"
+        assert captured["model_alias"] == "fast-flash"
 
     def test_loop_exception_fails_subtask(self, monkeypatch, make_subtask):
         monkeypatch.setattr(mod, "get_durable_router", lambda: _router(""))
