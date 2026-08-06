@@ -1,9 +1,12 @@
 [project]
 name = "merged-agentic-swarm"
-version = "1.5.0"
+version = "1.5.1"
 description = "Multi-agent orchestration system with 5-phase workflow, 40-worker pools, and cold-path knowledge promotion"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "httpx>=0.28.1",
+    "starlette>=1.3.1",
+]
 
 [project.scripts]
 agentic-cli = "merged_agentic_swarm.tools.agentic_cli:main"

@@ -15,6 +15,7 @@ from typing import Any
 
 import requests
 
+from merged_agentic_swarm.fast_pool import warm_all
 from merged_agentic_swarm.providers.key_pool import default_key_pool
 from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric
 
@@ -237,7 +238,17 @@ class ProxyServerDaemon:
         self.server = ThreadedHTTPServer((self.host, self.port), ClaudeProxyHandler)
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
+        # Best-effort pre-warm in a daemon thread so startup is never blocked:
+        # primes the shared DNS cache and establishes warm connections for
+        # first-request latency reduction.
+        threading.Thread(target=self._prewarm, daemon=True).start()
         logger.info(f"Claude API Key Pool Proxy running on http://{self.host}:{self.port}")
+
+    @staticmethod
+    def _prewarm() -> None:
+        results = warm_all()
+        ok = sum(1 for v in results.values() if v)
+        logger.info(f"Connection pool pre-warmed: {ok}/{len(results)} provider hosts reachable")
 
     def stop(self):
         if self.server:

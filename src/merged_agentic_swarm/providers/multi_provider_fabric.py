@@ -6,10 +6,11 @@ import json
 import logging
 import threading
 import time
-import urllib.error
-import urllib.request
 from typing import Any
 
+import httpx
+
+from merged_agentic_swarm.fast_pool import dispatch as pool_dispatch
 from merged_agentic_swarm.providers.key_pool import default_key_pool
 
 logger = logging.getLogger("model_fabric")
@@ -447,54 +448,72 @@ class MultiProviderFabric:
                     headers = {
                         "Content-Type": "application/json",
                         "Authorization": f"Bearer {key_info.secret_value}",
-                        "User-Agent": "MergedAgenticSwarm/1.0",
                     }
 
                     req_data = json.dumps(payload).encode("utf-8")
-                    req = urllib.request.Request(target_url, data=req_data, headers=headers, method="POST")
 
                     is_local = any(host in target_url for host in ["localhost", "127.0.0.1"])
                     # Per-route timeout override: some free backends (e.g. NVIDIA NIM's
                     # llama-3.3-70b) are slow-but-alive and need more than the default
                     # 10s before they'd be falsely declared dead.
                     timeout = route.get("timeout", 5.0 if is_local else 10.0)
-                    with urllib.request.urlopen(req, timeout=timeout) as response:
-                        res_body = response.read().decode("utf-8")
-                        resp_json = json.loads(res_body)
-                        latency = (time.time() - start_time) * 1000
-                        tokens = resp_json.get("usage", {}).get("total_tokens", 0)
 
-                        self.key_pool.mark_success(key_info, latency_ms=latency, tokens=tokens)
-                        _record_success(provider, model_alias=model_alias)
+                    response = pool_dispatch(target_url, req_data, headers, timeout)
+                    try:
+                        resp_json = response.json()
+                    except ValueError:
+                        # Non-JSON (or empty) body from a 2xx response — the
+                        # provider is misbehaving; treat as a provider failure
+                        # so the cascade moves on instead of crashing.
+                        raise httpx.RequestError(
+                            f"Provider {provider} returned a non-JSON body (HTTP {response.status_code})",
+                            request=response.request,
+                        ) from None
+                    if not isinstance(resp_json, dict):
+                        raise httpx.RequestError(
+                            f"Provider {provider} returned a non-object JSON body ({type(resp_json).__name__})",
+                            request=response.request,
+                        )
+                    latency = (time.time() - start_time) * 1000
+                    tokens = resp_json.get("usage", {}).get("total_tokens", 0)
 
-                        # If the response is already in Anthropic Messages format (e.g. fcc-proxy), return it directly.
-                        if resp_json.get("type") == "message":
-                            resp_json["model"] = model_alias  # override model name in response
-                            tool_calls = self._extract_anthropic_tool_calls(resp_json)
-                            if tool_calls:
-                                resp_json["tool_calls"] = tool_calls
-                            return resp_json
+                    self.key_pool.mark_success(key_info, latency_ms=latency, tokens=tokens)
+                    _record_success(provider, model_alias=model_alias)
 
-                        return self.format_openai_to_anthropic_response(resp_json, model_alias)
+                    # If the response is already in Anthropic Messages format (e.g. fcc-proxy), return it directly.
+                    if resp_json.get("type") == "message":
+                        resp_json["model"] = model_alias  # override model name in response
+                        tool_calls = self._extract_anthropic_tool_calls(resp_json)
+                        if tool_calls:
+                            resp_json["tool_calls"] = tool_calls
+                        return resp_json
 
-                except urllib.error.HTTPError as e:
-                    err_text = e.read().decode("utf-8", errors="ignore") if hasattr(e, "read") else str(e)
-                    logger.warning(f"HTTPError {e.code} on provider {provider} (model {target_model}): {err_text[:200]}")
-                    if e.code == 401:
+                    return self.format_openai_to_anthropic_response(resp_json, model_alias)
+
+                except httpx.HTTPStatusError as e:
+                    err_text = e.response.text[:200]
+                    status_code = e.response.status_code
+                    logger.warning(f"HTTPError {status_code} on provider {provider} (model {target_model}): {err_text}")
+                    if status_code == 401:
                         # Auth failure — provider-level, perma-ban and move on.
-                        last_error = f"HTTP {e.code}: {err_text[:200]}"
-                        _record_failure(provider, http_code=e.code)
+                        last_error = f"HTTP {status_code}: {err_text}"
+                        _record_failure(provider, http_code=status_code)
                         break
-                    if e.code in (429, 503):
+                    if status_code in (429, 503):
                         # Key-level throttle — cool this key down, rotate to another.
                         self.key_pool.mark_rate_limited(key_info, cooldown_seconds=60.0)
-                        last_error = f"HTTP {e.code}: {err_text[:200]}"
+                        last_error = f"HTTP {status_code}: {err_text}"
                         continue
                     # Other HTTP errors — provider-level failure, trip breaker.
-                    last_error = f"HTTP {e.code}: {err_text[:200]}"
-                    _record_failure(provider, http_code=e.code)
+                    last_error = f"HTTP {status_code}: {err_text}"
+                    _record_failure(provider, http_code=status_code)
                     break
-                except Exception as e:
+                except httpx.TimeoutException as e:
+                    logger.warning(f"Timeout calling provider {provider}: {e}")
+                    last_error = str(e)
+                    _record_failure(provider)
+                    break
+                except httpx.RequestError as e:
                     logger.warning(f"Error calling provider {provider}: {e}")
                     last_error = str(e)
                     _record_failure(provider)

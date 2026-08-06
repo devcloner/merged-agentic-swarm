@@ -14,6 +14,8 @@ docs/archive/
 tools/token-savior/
 src/merged_agentic_swarm/tools/token-savior/
 .opencode/bin/
+.ultraswarm/
+.ultraswarm-plan.json
 
 # ── Python ──────────────────────────────────────────────────────
 __pycache__/
@@ -45,3 +47,4 @@ Thumbs.db
 *.swp
 *.swo
 *.tmp
+.GitHubBoard/

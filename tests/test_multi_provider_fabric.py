@@ -5,7 +5,6 @@ Coverage: format_anthropic_to_openai, format_openai_to_anthropic_response,
 _build_route_list, dispatch_request (simulation fallback), circuit breaker,
 perma-ban.
 """
-import json
 import time
 from unittest.mock import MagicMock, patch
 
@@ -234,16 +233,17 @@ class TestDispatchRequest:
         assert "simulation_fallback" in result
         assert result["simulation_fallback"] is True
 
-    @patch("urllib.request.urlopen")
-    def test_dispatch_successful_call(self, mock_urlopen):
+    @patch("merged_agentic_swarm.providers.multi_provider_fabric.pool_dispatch")
+    def test_dispatch_successful_call(self, mock_dispatch):
         """Test a successful API call returns formatted Anthropic response."""
         mock_response = MagicMock()
-        mock_response.read.return_value = json.dumps({
+        mock_response.status_code = 200
+        mock_response.request = MagicMock()
+        mock_response.json.return_value = {
             "choices": [{"message": {"content": "Hello from API"}, "finish_reason": "stop"}],
             "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
-        }).encode("utf-8")
-        mock_response.__enter__.return_value = mock_response
-        mock_urlopen.return_value = mock_response
+        }
+        mock_dispatch.return_value = mock_response
 
         _permanently_dead.clear()
         import merged_agentic_swarm.providers.multi_provider_fabric as mpf
@@ -254,8 +254,77 @@ class TestDispatchRequest:
         fabric = MultiProviderFabric()
         result = fabric.dispatch_request("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
 
-        # litellm is local and may respond; just check the response is valid
         assert result["role"] == "assistant"
+        assert result["content"][0]["text"] == "Hello from API"
+        assert mock_dispatch.call_count == 1
+
+    @patch("merged_agentic_swarm.providers.multi_provider_fabric.pool_dispatch")
+    def test_dispatch_non_dict_json_body_falls_through(self, mock_dispatch):
+        """A 2xx with a non-dict JSON body must cascade, not crash on .get()."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.request = MagicMock()
+        mock_response.json.return_value = ["not", "a", "dict"]
+        mock_dispatch.return_value = mock_response
+
+        _permanently_dead.clear()
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
+        mpf._permanently_dead.clear()
+        mpf._circuit_breaker.clear()
+        mpf._circuit_open_until.clear()
+        mpf._last_successful_provider.clear()
+        fabric = MultiProviderFabric()
+        result = fabric.dispatch_request("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
+
+        # Non-dict body is a provider failure → every route fails → simulation fallback
+        assert result.get("simulation_fallback") is True
+
+    @patch("merged_agentic_swarm.providers.multi_provider_fabric.pool_dispatch")
+    def test_dispatch_non_json_body_falls_through(self, mock_dispatch):
+        """A 2xx with an empty/non-JSON body must cascade, not raise JSONDecodeError."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.request = MagicMock()
+        mock_response.json.side_effect = ValueError("No JSON object could be decoded")
+        mock_dispatch.return_value = mock_response
+
+        _permanently_dead.clear()
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
+        mpf._permanently_dead.clear()
+        mpf._circuit_breaker.clear()
+        mpf._circuit_open_until.clear()
+        mpf._last_successful_provider.clear()
+        fabric = MultiProviderFabric()
+        result = fabric.dispatch_request("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
+
+        assert result.get("simulation_fallback") is True
+
+    @patch("merged_agentic_swarm.providers.multi_provider_fabric.pool_dispatch")
+    def test_dispatch_http_status_error_triggers_cascade(self, mock_dispatch):
+        """4xx/5xx from dispatch() must be caught by HTTPStatusError handling."""
+        import httpx
+
+        mock_response = MagicMock()
+        mock_response.status_code = 429
+        mock_response.text = '{"error":"rate limited"}'
+        mock_response.request = MagicMock()
+        mock_dispatch.side_effect = httpx.HTTPStatusError(
+            "Rate limited",
+            request=MagicMock(),
+            response=mock_response,
+        )
+
+        _permanently_dead.clear()
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
+        mpf._permanently_dead.clear()
+        mpf._circuit_breaker.clear()
+        mpf._circuit_open_until.clear()
+        mpf._last_successful_provider.clear()
+        fabric = MultiProviderFabric()
+        result = fabric.dispatch_request("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
+
+        # Every route 429s → simulation fallback
+        assert result.get("simulation_fallback") is True
 
     def test_skip_perma_banned_provider(self):
         """Provider under perma-ban should be skipped."""
