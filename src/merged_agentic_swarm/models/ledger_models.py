@@ -44,6 +44,7 @@ class ProgressLogEntry:
     wave_id: int
     action: str
     status: str
+    model: str | None = None  # which model/alias served this step (None = not recorded)
     timestamp: float = field(default_factory=time.time)
     tokens_used: int = 0
     learning_generated: str | None = None

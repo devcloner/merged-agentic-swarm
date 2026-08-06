@@ -133,6 +133,7 @@ class ProgressLedgerService:
         tokens_used: int = 0,
         learning_generated: str | None = None,
         details: dict[str, Any] | None = None,
+        model: str | None = None,
     ) -> ProgressLogEntry:
         with self._lock:
             entry = ProgressLogEntry(
@@ -147,6 +148,7 @@ class ProgressLedgerService:
                 tokens_used=tokens_used,
                 learning_generated=learning_generated,
                 details=details or {},
+                model=model,
             )
             self.log_entries.append(entry)
             self.save_ledger()

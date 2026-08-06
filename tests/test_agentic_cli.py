@@ -37,7 +37,21 @@ def _args(**overrides):
     a.title = overrides.get("title", "Test Title")
     a.verbose = overrides.get("verbose", False)
     a.progress = overrides.get("progress", None)
+    a.ledger = overrides.get("ledger", None)
+    a.out = overrides.get("out", None)
     return a
+
+
+def _fake_saved(md_path="r.md", json_path="r.json"):
+    """Fake save_run_report return, so auto-save never writes into the real repo."""
+    return {"report": {"status": "success"}, "json_path": json_path, "md_path": md_path}
+
+
+def _patch_auto_save(monkeypatch, saved=None):
+    monkeypatch.setattr(
+        "merged_agentic_swarm.services.report_service.save_run_report",
+        lambda *a, **k: saved if saved is not None else _fake_saved(),
+    )
 
 
 def _main_with_args(argv):
@@ -126,6 +140,7 @@ class TestCmdRun:
             "merged_agentic_swarm.tools.agentic_orchestrator.MultiLayeredAgenticOrchestrator.run_full_agentic_workflow",
             fake_run,
         )
+        _patch_auto_save(monkeypatch)
         result = agentic_cli.cmd_run(_args(prd=str(prd)))
         out = capsys.readouterr().out
         assert result["status"] == "completed"
@@ -143,6 +158,7 @@ class TestCmdRun:
             "merged_agentic_swarm.tools.agentic_orchestrator.MultiLayeredAgenticOrchestrator.run_full_agentic_workflow",
             fake_run,
         )
+        _patch_auto_save(monkeypatch)
         agentic_cli.cmd_run(_args(prd=str(prd), verbose=True))
         out = capsys.readouterr().out
         assert "Full result:" in out
@@ -316,3 +332,150 @@ class TestMain:
         _main_with_args(["config"])
         out = capsys.readouterr().out
         assert "Key Pool" in out
+
+
+def _ledger_json(logs, snapshot=None):
+    return {
+        "logs": logs,
+        "success_markers": [
+            {"id": "MARKER-0001", "task_id": "EPIC-1", "verifier_name": "V", "timestamp": 1700000000.0}
+        ],
+        "task_master_snapshot": snapshot or {"title": "Test PRD", "epics": []},
+    }
+
+
+def _ledger_log(entry_id, task_id, wave_id, action, status, model=None, tokens=0):
+    return {
+        "entry_id": entry_id,
+        "task_id": task_id,
+        "subtask_id": None,
+        "worker_id": "w1",
+        "wave_id": wave_id,
+        "action": action,
+        "status": status,
+        "timestamp": 1700000000.0,
+        "tokens_used": tokens,
+        "model": model,
+    }
+
+
+class TestCmdProviders:
+    def _setup(self, tmp_path, monkeypatch):
+        from merged_agentic_swarm.providers.key_pool import KeyPoolManager
+
+        env = tmp_path / "env.txt"
+        env.write_text("GEMINI_API_KEY=test-gemini-key\nGROQ_API_KEY=test-groq-key\n", encoding="utf-8")
+        monkeypatch.setattr(
+            "merged_agentic_swarm.providers.key_pool.default_key_pool", KeyPoolManager(env_file_path=str(env))
+        )
+        monkeypatch.setattr(
+            "merged_agentic_swarm.providers.multi_provider_fabric.MODEL_FABRIC_ROUTES",
+            {"claude-3-7-sonnet": [{"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://x"}]},
+        )
+        reg = tmp_path / "docs" / "agentic" / "providers"
+        reg.mkdir(parents=True, exist_ok=True)
+        (reg / "PROVIDER_REGISTRY.json").write_text(
+            json.dumps(
+                {
+                    "backends": {
+                        "litellm": {
+                            "base_url": "http://localhost:4000/v1/chat/completions",
+                            "auth_env": "LITELLM_PROXY_KEY",
+                            "status": "available",
+                        }
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(agentic_cli, "_REPO_ROOT", tmp_path)
+
+    def test_providers_renders_key_names_env_names_and_routes(self, tmp_path, capsys, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        agentic_cli.cmd_providers(None)
+        out = capsys.readouterr().out
+        assert "gemini-1" in out
+        assert "groq-main" in out
+        assert "LITELLM_PROXY_KEY" in out
+        assert "gemini-2.5-flash" in out
+
+    def test_providers_never_leaks_key_values(self, tmp_path, capsys, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        agentic_cli.cmd_providers(None)
+        out = capsys.readouterr().out
+        assert "test-gemini-key" not in out
+        assert "test-groq-key" not in out
+
+    def test_providers_through_main(self, tmp_path, capsys, monkeypatch):
+        self._setup(tmp_path, monkeypatch)
+        _main_with_args(["providers"])
+        out = capsys.readouterr().out
+        assert "PROVIDER & PROXY INVENTORY" in out
+
+
+class TestCmdReport:
+    def _write_ledger(self, tmp_path, model="gemini-2.5-flash"):
+        return _write(
+            tmp_path,
+            "ledger.json",
+            json.dumps(_ledger_json([_ledger_log("LOG-00001", "EPIC-1", 1, "testing", "completed", model=model)])),
+        )
+
+    def test_report_writes_both_files_with_model_timeline(self, tmp_path, capsys, monkeypatch):
+        ledger = self._write_ledger(tmp_path)
+        monkeypatch.setattr(agentic_cli, "_REPO_ROOT", tmp_path)
+        out_dir = tmp_path / "reports"
+        saved = agentic_cli.cmd_report(_args(ledger=str(ledger), out=str(out_dir)))
+        out = capsys.readouterr().out
+        assert "RUN REPORT" in out
+        assert "gemini-2.5-flash" in out
+        assert saved["json_path"].exists() and saved["md_path"].exists()
+        parsed = json.loads(saved["json_path"].read_text(encoding="utf-8"))
+        assert parsed["timeline"][0]["model"] == "gemini-2.5-flash"
+        assert "## Timeline" in saved["md_path"].read_text(encoding="utf-8")
+
+    def test_report_missing_ledger_writes_empty_report(self, tmp_path, capsys, monkeypatch):
+        monkeypatch.setattr(agentic_cli, "_REPO_ROOT", tmp_path)
+        out_dir = tmp_path / "reports"
+        saved = agentic_cli.cmd_report(_args(ledger=str(tmp_path / "missing.json"), out=str(out_dir)))
+        assert saved["json_path"].exists() and saved["md_path"].exists()
+
+    def test_report_through_main(self, tmp_path, capsys, monkeypatch):
+        ledger = self._write_ledger(tmp_path, model=None)
+        monkeypatch.setattr(agentic_cli, "_REPO_ROOT", tmp_path)
+        _main_with_args(["report", "--ledger", str(ledger), "--out", str(tmp_path / "reports")])
+        out = capsys.readouterr().out
+        assert "RUN REPORT" in out
+        assert "## Timeline" in out
+
+
+class TestCmdRunAutoSave:
+    def test_run_auto_saves_report_on_success(self, tmp_path, capsys, monkeypatch):
+        prd = _write(tmp_path, "prd.md", "# PRD\n")
+
+        def fake_run(self, prd):
+            return {"status": "success", "waves_completed": 4}
+
+        monkeypatch.setattr(
+            "merged_agentic_swarm.tools.agentic_orchestrator.MultiLayeredAgenticOrchestrator.run_full_agentic_workflow",
+            fake_run,
+        )
+        _patch_auto_save(monkeypatch, _fake_saved(md_path="reports/fake.md", json_path="reports/fake.json"))
+        agentic_cli.cmd_run(_args(prd=str(prd)))
+        out = capsys.readouterr().out
+        assert "Report:          reports/fake.md" in out
+        assert "Report JSON:     reports/fake.json" in out
+
+    def test_run_does_not_autosave_on_failure(self, tmp_path, capsys, monkeypatch):
+        prd = _write(tmp_path, "prd.md", "# PRD\n")
+
+        def fake_run(self, prd):
+            return {"status": "failed", "reason": "gate"}
+
+        monkeypatch.setattr(
+            "merged_agentic_swarm.tools.agentic_orchestrator.MultiLayeredAgenticOrchestrator.run_full_agentic_workflow",
+            fake_run,
+        )
+        agentic_cli.cmd_run(_args(prd=str(prd)))
+        out = capsys.readouterr().out
+        assert "Report:" not in out

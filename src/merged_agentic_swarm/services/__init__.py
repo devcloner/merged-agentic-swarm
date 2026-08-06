@@ -9,6 +9,10 @@ from merged_agentic_swarm.services.agent_factory_service import (
 )
 from merged_agentic_swarm.services.cloudcli_service import CloudCLIClient, CloudCLIError
 from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService, default_codebase_mapper
+from merged_agentic_swarm.services.model_routing import (
+    litellm_model_for_fabric_route,
+    resolve_litellm_model_for_role,
+)
 from merged_agentic_swarm.services.opencode_swarm_service import OpenCodeSwarmManager, default_swarm_manager
 from merged_agentic_swarm.services.progress_ledger_service import (
     ObstaclePlaybookEngine,
@@ -35,4 +39,6 @@ __all__ = [
     "default_swarm_manager",
     "default_task_master",
     "default_wave_controller",
+    "litellm_model_for_fabric_route",
+    "resolve_litellm_model_for_role",
 ]

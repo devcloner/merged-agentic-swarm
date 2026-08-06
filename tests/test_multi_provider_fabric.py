@@ -410,3 +410,14 @@ class TestDispatchRequest:
         # breaker trips and the provider is skipped at the front of the cascade.
         assert mpf._circuit_breaker["gemini"] >= mpf.CIRCUIT_BREAKER_THRESHOLD
         assert "gemini" in mpf._circuit_open_until
+
+
+class TestLitellmPresenceInRoutes:
+    """Role routing maps worker roles to litellm aliases, so every fabric tier
+    must keep a reachable litellm backend entry in its route list."""
+
+    def test_each_fabric_alias_has_litellm_route(self):
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
+
+        for model_alias, routes in mpf.MODEL_FABRIC_ROUTES.items():
+            assert any(route.get("provider") == "litellm" for route in routes), model_alias

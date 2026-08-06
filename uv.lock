@@ -163,7 +163,7 @@ wheels = [
 
 [[package]]
 name = "merged-agentic-swarm"
-version = "1.6.1"
+version = "1.7.0"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },

@@ -1,6 +1,6 @@
 """
 Merged Agentic Swarm — CLI Entry Point
-Provides run, status, promote, and config subcommands.
+Provides run, status, promote, config, providers, and report subcommands.
 """
 
 import argparse
@@ -49,6 +49,19 @@ def cmd_run(args):
                 f"{cp.get('total_durable_agents', 0)} agents promoted"
             )
         print()
+
+        # Auto-save a run report after a successful orchestrator run
+        if result.get("status") in ("success", "completed"):
+            from merged_agentic_swarm.services import report_service
+
+            try:
+                saved = report_service.save_run_report(_REPO_ROOT)
+            except Exception as e:
+                logger.warning(f"Auto-save run report failed: {e}")
+            else:
+                print(f"  Report:          {saved['md_path']}")
+                print(f"  Report JSON:     {saved['json_path']}")
+                print()
 
         if args.verbose:
             print("Full result:")
@@ -217,6 +230,81 @@ def cmd_config(args):
     print(f"Swarm: {cfg.max_total_workers} max workers, roles={list(cfg.role_allocations.keys())}")
 
 
+def cmd_providers(args):
+    """Show a provider + proxy inventory: key pools, fabric routes, registry backends."""
+    from merged_agentic_swarm.providers.key_pool import default_key_pool
+    from merged_agentic_swarm.providers.multi_provider_fabric import MODEL_FABRIC_ROUTES
+
+    print("=" * 60)
+    print("PROVIDER & PROXY INVENTORY")
+    print("=" * 60)
+
+    print("\nKey Pools (key_id -> active/total):")
+    summary = default_key_pool.get_summary()
+    if summary:
+        for provider, info in summary.items():
+            key_names = ", ".join(k.key_id for k in default_key_pool.keys_by_provider.get(provider, []))
+            print(
+                f"  {provider:18s} {info.get('active_keys', '?')!s:>3}/{info.get('total_keys', '?')!s:<3} active"
+                f"  keys=[{key_names}]"
+            )
+    else:
+        print("  (no key pools loaded)")
+
+    print("\nFabric Routes (MODEL_FABRIC_ROUTES):")
+    for alias, routes in MODEL_FABRIC_ROUTES.items():
+        print(f"  {alias}:")
+        for route in routes:
+            print(f"    -> {route['provider']:16s} {route['model']}")
+
+    reg_path = _REPO_ROOT / "docs" / "agentic" / "providers" / "PROVIDER_REGISTRY.json"
+    print("\nRegistry Backends (PROVIDER_REGISTRY.json):")
+    if reg_path.exists():
+        try:
+            with open(reg_path) as f:
+                registry = json.load(f)
+            backends = registry.get("backends", {})
+            if backends:
+                for name, backend in backends.items():
+                    print(
+                        f"  {name:18s} {backend.get('status', '?')!s:12s} "
+                        f"auth={backend.get('auth_env', '?')!s:45s} {backend.get('base_url', '?')}"
+                    )
+            else:
+                print("  (no backends registered)")
+        except Exception as e:
+            print(f"  ERROR reading provider registry: {e}")
+    else:
+        print(f"  (provider registry not found at {reg_path})")
+    print()
+
+
+def cmd_report(args):
+    """Generate and persist a run report, rendering a readable timeline."""
+    from merged_agentic_swarm.services.report_service import render_report_md, save_run_report
+
+    reports_dir = Path(args.out) if getattr(args, "out", None) else None
+    try:
+        saved = save_run_report(
+            _REPO_ROOT,
+            ledger_file=getattr(args, "ledger", None) or None,
+            reports_dir=reports_dir,
+        )
+    except Exception as e:
+        logger.exception("Report generation failed")
+        print(f"ERROR: Report generation failed: {e}")
+        sys.exit(1)
+
+    print("=" * 60)
+    print("RUN REPORT")
+    print("=" * 60)
+    print(render_report_md(saved["report"]).strip())
+    print(f"JSON report:  {saved['json_path']}")
+    print(f"Markdown:     {saved['md_path']}")
+    print()
+    return saved
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Merged Agentic Swarm CLI",
@@ -227,6 +315,9 @@ def main():
   agentic-cli status
   agentic-cli promote
   agentic-cli config
+  agentic-cli providers
+  agentic-cli report
+  agentic-cli report --out /tmp/reports
         """,
     )
     sub = parser.add_subparsers(dest="command")
@@ -247,6 +338,14 @@ def main():
 
     p_config = sub.add_parser("config", help="Show configuration state")
     p_config.set_defaults(func=cmd_config)
+
+    p_providers = sub.add_parser("providers", help="Show provider & proxy inventory")
+    p_providers.set_defaults(func=cmd_providers)
+
+    p_report = sub.add_parser("report", help="Generate and persist a run report")
+    p_report.add_argument("--ledger", help="Path to progress ledger JSON (default: live ledger)")
+    p_report.add_argument("--out", help="Output directory for the report (default: <repo>/reports)")
+    p_report.set_defaults(func=cmd_report)
 
     args = parser.parse_args()
     if args.command is None:

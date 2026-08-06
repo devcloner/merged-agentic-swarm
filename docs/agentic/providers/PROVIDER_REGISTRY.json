@@ -37,6 +37,29 @@
     "degrade_on_rate_limit": true,
     "degrade_on_budget_pressure": true
   },
+  "role_routing": {
+    "provider": "litellm",
+    "default": "smart-auto",
+    "tiers": {
+      "deep": "gemini-batch",
+      "main": "gemini-batch-lite",
+      "fast": "fast-flash"
+    },
+    "roles": {
+      "cc-orchestrator": "gemini-batch",
+      "tm-operator": "gemini-batch-lite",
+      "spawn-gate": "gemini-batch-lite",
+      "prd-decomposer": "gemini-batch",
+      "spec-gap-detector": "gemini-batch-lite",
+      "budget-route-auditor": "fast-flash",
+      "domain-module-worker": "gemini-batch-lite",
+      "type-hardening-worker": "fast-flash",
+      "test-engineer": "gemini-batch-lite",
+      "sec-a11y-auditor": "gemini-batch",
+      "codebase-ast-mapper": "gemini-batch-lite"
+    },
+    "notes": "Sub-agent role routing: maps worker roles/tiers to litellm virtual Gemini aliases on 127.0.0.1:4000 (aliases verified live via /v1/models on 2026-08-06). Tier aliases are primary; per-role aliases mirror policy.default_tier_by_role. Unknown roles resolve to the default (smart-auto)."
+  },
   "backends": {
     "litellm": {
       "type": "openai_compatible",
