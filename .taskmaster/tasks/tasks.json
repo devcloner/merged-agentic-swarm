@@ -1,75 +1,416 @@
 {
-  "title": "Task Spine Fallback",
+  "title": "Agentic Codebase Optimization for Spotify AI Analytics",
+  "summary": "PRD parsed into 6 epics with 20 subtasks, 24 estimated turns. Fabric AI response received (type=list).",
   "epics": [
     {
-      "id": "TASK-1785538081958223-0001",
-      "title": "Proxy Verification Test",
-      "description": "Verify proxy authentication across all tiers",
+      "id": "EPIC-00",
+      "title": "Codebase Mapping & Spec Gap Resolution",
+      "description": "Perform AST symbol mapping, repository inspection, and close initial spec gaps before mass edits.",
+      "wave_id": 0,
+      "priority": "P0",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "TASK-00-1",
+          "title": "AST Codebase Scan",
+          "description": "Scan repository files and symbol exports",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.4309978,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-00-2",
+          "title": "Spec Gap Analysis",
+          "description": "Cross-reference PRD goals against repository state",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.4309998,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-00-3",
+          "title": "Context Map Generation",
+          "description": "Build dependency graph of all services and modules",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.431001,
+          "completed_at": null
+        }
+      ],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "AST mapping complete",
+        "Zero unhandled spec gaps in Wave 0"
+      ],
+      "spec_gaps": [],
+      "created_at": 1786007186.4310079,
+      "updated_at": 1786007186.4310079
+    },
+    {
+      "id": "EPIC-01",
+      "title": "Key Pool Proxy & Multi-Backend Model Fabric Setup",
+      "description": "Configure multi-provider API key rotation pool, HTTP proxy server, and fallback cascade for model fabric.",
       "wave_id": 1,
       "priority": "P0",
-      "status": "completed",
-      "claimed_by": "worker-core-01",
-      "claimed_at": 1785538082.6553464,
-      "completed_at": 1785538082.8452158,
-      "evidence": [
+      "status": "pending",
+      "subtasks": [
         {
-          "path": "/tmp/evidence_proxy.json",
-          "attached_at": 1785538083.1093476,
-          "description": "Proxy tier test results"
+          "id": "TASK-01-1",
+          "title": "Key Pool Rotation",
+          "description": "Implement multi-provider key rotation & quota handling",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 2,
+          "created_at": 1786007186.4310098,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-01-2",
+          "title": "Claude API Proxy",
+          "description": "Deploy Anthropic & OpenAI compatible endpoint server",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.4310107,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-01-3",
+          "title": "Fallback Cascade",
+          "description": "Wire degrade policies across all 8 backends",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.431012,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-01-4",
+          "title": "Proxy Health Endpoint",
+          "description": "Add /health and /status to Python proxy server",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.431013,
+          "completed_at": null
         }
       ],
-      "blocked_by": [],
-      "blocks": [],
       "dependencies": [],
-      "subtasks": [],
-      "acceptance_criteria": []
+      "acceptance_criteria": [
+        "Proxy server running on port 8085",
+        "Multi-backend model fabric fallback operational"
+      ],
+      "spec_gaps": [],
+      "created_at": 1786007186.4310145,
+      "updated_at": 1786007186.4310145
     },
     {
-      "id": "TASK-1785538082151234-0001",
-      "title": "Worker Runtime Test",
-      "description": "Verify 1-2-4 worker ramp",
+      "id": "EPIC-02",
+      "title": "OpenCode 40-Worker Swarm & Durable Agent Factory",
+      "description": "Initialize 40-worker pool architecture and durable agent factory with knowledge-box spawn chain.",
       "wave_id": 2,
       "priority": "P1",
-      "status": "in_progress",
-      "claimed_by": "worker-core-02",
-      "claimed_at": 1785538082.7483065,
-      "completed_at": null,
-      "evidence": [],
-      "blocked_by": [],
-      "blocks": [
-        "TASK-1785538082341179-0001"
-      ],
-      "dependencies": [],
-      "subtasks": [],
-      "acceptance_criteria": [],
-      "errors": [
+      "status": "pending",
+      "subtasks": [
         {
-          "timestamp": 1785538082.92986,
-          "error": "Provider timeout on first attempt, retrying"
+          "id": "TASK-02-1",
+          "title": "Worker Pool Dispatcher",
+          "description": "Manage 40 concurrent workers across 7 roles",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 3,
+          "created_at": 1786007186.4310167,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-02-2",
+          "title": "Spawn Chain Registry",
+          "description": "Link validated learnings to HOT and COLD agents",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.4310176,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-02-3",
+          "title": "Concurrency Ramp Controller",
+          "description": "Ramp workers [4\u21928\u219216\u219224\u219240] with gate checks",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 2,
+          "created_at": 1786007186.431023,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-02-4",
+          "title": "Role-based Worker Template",
+          "description": "Define prompt templates per role",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.4310236,
+          "completed_at": null
         }
-      ]
+      ],
+      "dependencies": [
+        "EPIC-01"
+      ],
+      "acceptance_criteria": [
+        "40-worker pools configured",
+        "Hot & Cold agent spawning functional"
+      ],
+      "spec_gaps": [],
+      "created_at": 1786007186.4310248,
+      "updated_at": 1786007186.4310248
     },
     {
-      "id": "TASK-1785538082341179-0001",
-      "title": "Learning Loop Test",
-      "description": "End-to-end learning promotion and reuse",
+      "id": "EPIC-03",
+      "title": "Wave Gates & Self-Healing Progress Ledger",
+      "description": "Enforce gated wave execution, progress ledger logging, success markers, and obstacle playbooks.",
       "wave_id": 3,
       "priority": "P1",
-      "status": "blocked",
-      "claimed_by": null,
-      "claimed_at": null,
-      "completed_at": null,
-      "evidence": [],
-      "blocked_by": [
-        "TASK-1785538082151234-0001"
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "TASK-03-1",
+          "title": "Wave Gate Controller",
+          "description": "Validate gate criteria before advancing waves",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.431026,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-03-2",
+          "title": "Self-Healing Playbooks",
+          "description": "Auto-remediate runtime errors & log progress",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.431027,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-03-3",
+          "title": "Progress Report Generator",
+          "description": "Emit live completion percentages per phase/pool",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.4310281,
+          "completed_at": null
+        }
       ],
-      "blocks": [],
-      "dependencies": [],
-      "subtasks": [],
-      "acceptance_criteria": []
+      "dependencies": [
+        "EPIC-02"
+      ],
+      "acceptance_criteria": [
+        "Gated execution verified",
+        "Continuous progress ledger synced to Task Master"
+      ],
+      "spec_gaps": [],
+      "created_at": 1786007186.4310293,
+      "updated_at": 1786007186.4310293
+    },
+    {
+      "id": "EPIC-04",
+      "title": "Learning & Recovery Fabric",
+      "description": "Wire hot-path anomaly detection and cold-path knowledge promotion into durable agents.",
+      "wave_id": 3,
+      "priority": "P2",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "TASK-04-1",
+          "title": "Anomaly Detection \u2192 Hot Cache",
+          "description": "Log runtime anomalies to .opencode/knowledge_cache.json",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.431031,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-04-2",
+          "title": "Micro-Specialist Spawning",
+          "description": "Spawn temporary agents for acute failures (5-min TTL)",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.4310317,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-04-3",
+          "title": "Cold-Path Promotion Pipeline",
+          "description": "Normalize hot-cache entries \u2192 knowledge.jsonl \u2192 agent spec",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.4310331,
+          "completed_at": null
+        }
+      ],
+      "dependencies": [
+        "EPIC-02",
+        "EPIC-03"
+      ],
+      "acceptance_criteria": [
+        "Anomaly \u2192 cache \u2192 specialist pipeline verified",
+        "Cold-path registry promotion functional"
+      ],
+      "spec_gaps": [],
+      "created_at": 1786007186.431034,
+      "updated_at": 1786007186.4310343
+    },
+    {
+      "id": "EPIC-05",
+      "title": "Synthesis & Final Reporting",
+      "description": "Compile final progress report, update PRD, and produce next-step recommendations.",
+      "wave_id": 4,
+      "priority": "P3",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "TASK-05-1",
+          "title": "Completion Report",
+          "description": "Aggregate progress from ledger and registries",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.4310362,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-05-2",
+          "title": "PRD Revision",
+          "description": "Update PRD with implementation amendments",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.4310372,
+          "completed_at": null
+        },
+        {
+          "id": "TASK-05-3",
+          "title": "Improvement Recommendations",
+          "description": "Document known gaps and suggested next work",
+          "status": "pending",
+          "assigned_worker_id": null,
+          "input_artifacts": [],
+          "output_artifacts": [],
+          "error_message": null,
+          "estimated_turns": 1,
+          "created_at": 1786007186.4310381,
+          "completed_at": null
+        }
+      ],
+      "dependencies": [
+        "EPIC-04"
+      ],
+      "acceptance_criteria": [
+        "Final report complete",
+        "Next-steps documented"
+      ],
+      "spec_gaps": [],
+      "created_at": 1786007186.4310396,
+      "updated_at": 1786007186.4310396
     }
   ],
-  "spec_gaps": [],
-  "total_estimated_turns": 0,
-  "parsed_at": 1785538081.9582222
+  "spec_gaps": [
+    {
+      "id": "GAP-01",
+      "epic_id": "EPIC-01",
+      "missing_requirement": "Proxy server support for Anthropic streaming response format",
+      "affected_files": [
+        "proxy/claude_proxy_server.py"
+      ],
+      "suggested_fix": "Add SSE streaming translation for live proxy turns.",
+      "resolved": false,
+      "resolution_note": null
+    },
+    {
+      "id": "GAP-02",
+      "epic_id": "EPIC-00",
+      "missing_requirement": "Task Master Python service format differs from real task-master CLI format",
+      "affected_files": [
+        "services/task_master_service.py",
+        ".taskmaster/tasks/tasks.json"
+      ],
+      "suggested_fix": "Delegate to task-master CLI via subprocess, or normalize formats.",
+      "resolved": false,
+      "resolution_note": null
+    }
+  ],
+  "total_estimated_turns": 24,
+  "parsed_at": 1786007186.431137,
+  "fabric_response_preview": [
+    {
+      "type": "text",
+      "text": "As Task Master AI, I have analyzed and parsed the PRD \"Agentic Codebase Optimization for Spotify AI Analytics\". Below is the structured decomposition into epics, subtasks, wave gates, and identified spec gaps, organized by the requested wave structure.\n\n---\n\n## PRD Decomposition: Agentic Codebase Optimization for Spotify AI Analytics\n\n**Target Architecture Overview:** Multi-layered agentic swarm integrating Task Master spine, 40-worker OpenCode pools, key-pool proxy, durable agent factory, multi-backend model fabric, knowledge-box \u2192 spawn chain, wave gates, and progress ledger.\n\n**Target Codebase:** `/home/ubuntu/spotify-ai` \u2014 Spotify AI Analytics v0.6.0, FastAPI + PostgreSQL + pgvector.\n\n---\n\n### Wave 0: Mapping & Spec\n\n**Objective:** Establish foundational control plane, understand the existing codebase, and define the initial task structure.\n\n**Epic: `W0-E01: System Initialization & Codebase Mapping`** (Derived from EPIC-00)\n\n*   **Subtasks:**\n    *   Initialize core system components (e.g., verify proxy, bootstrap key pool).\n    *   Parse the current PRD to generate and structure the task spine.\n    *   Perform a comprehensive mapping of the `/home/ubuntu/spotify-ai` codebase.\n    *   Identify and document initial spec gaps based on codebase analysis and architecture review.\n\n**Wave Gate 0 \u2192 1:**\n*   Initial system components (proxy, key pool) are operational.\n*   PRD has been fully parsed and converted into a preliminary task structure.\n*   Target codebase has been mapped, and a preliminary list of architecture-to-codebase spec gaps is documented and reviewed.\n\n---\n\n### Wave 1: Core Foundations\n\n**Objective:** Implement the core LLM provider integration fabric and establish robust contract tests for external AI services.\n\n**Epic: `W1-E01: LLM Provider Fabric & Contract Tests`** (Derived from EPIC-01)\n\n*   **Subtasks:**\n    *   Integrate AWS Bedrock LLM provider.\n    *   Integrate Oracle OCI GenAI LLM provider.\n    *   Integrate Azure OpenAI LLM provider.\n    *   Integrate GCP Vertex AI LLM provider.\n    *   Integrate Alibaba Tongyi LLM provider.\n    *   Develop contract tests for each provider's factory creation.\n    *   Develop contract tests for each provider's configuration validation.\n    *   Develop contract tests for each provider's error handling mechanisms.\n    *   Achieve 25+ new tests in `tests/test_ai_abstract.py` covering provider integrations.\n\n**Wave Gate 1 \u2192 2:**\n*   All 5 specified cloud LLM providers are integrated into the multi-backend model fabric.\n*   The LLM provider fabric passes all required contract tests (factory, config, error handling).\n*   Minimum 25 new tests added to `tests/test_ai_abstract.py`.\n\n---\n\n### Wave 2: Features\n\n**Objective:** Enhance the core analytics service with comprehensive testing and security fixes, alongside critical code quality improvements and bug resolutions.\n\n**Epic: `W2-E01: Analytics Service Hardening & Security Fixes`** (Derived from EPIC-02)\n\n*   **Subtasks:**\n    *   Develop 30+ new dedicated tests for `analytics/service.py` (612 lines, 25 public methods).\n    *   Wire `telemetry.record_*` calls into LLM interaction code.\n    *   Wire `telemetry.record_*` calls into Database interaction code.\n    *   Wire `telemetry.record_*` calls into SSE consumer code.\n    *   Fix missing migration files for orphaned models.\n    *   Replace in-memory PKCE state store with a durable DB-backed solution.\n\n**Epic: `W2-E02: Core Code Quality & Bug Resolution`** (Derived from EPIC-03)\n\n*   **Subtasks:**\n    *   Fix Quiz 5D/4D archetype dimension mismatch logic.\n    *   Replace hardcoded sample data with real DB queries for the quiz feature.\n    *   Replace hardcoded sample data with real DB queries for the compatibility feature.\n    *   Replace hardcoded sample data with real DB queries for the visualizer feature.\n    *   Identify and fix CSS duplication issues.\n    *   Implement and add a light mode theme to the UI.\n    *   Resolve 5 identified E2E test failures.\n    *   Deduplicate `_safe_float` and `_safe_str` utility functions.\n\n**Wave Gate 2 \u2192 3:**\n*   Core `analytics/service.py` has 30+ new tests, passing successfully.\n*   Telemetry calls are integrated into specified code paths.\n*   Critical security fixes (PKCE, migrations) are implemented and verified.\n*   All identified code quality issues and bugs (Quiz, sample data, CSS, E2E failures, deduplication) are resolved.\n\n---\n\n### Wave 3: Integration & Verification\n\n**Objective:** Achieve production readiness through comprehensive testing of real-time features, PWA support, API hardening, and final system-wide verification and reporting.\n\n**Epic: `W3-E01: Production Readiness & Hardening`** (Derived from EPIC-04)\n\n*   **Subtasks:**\n    *   Implement comprehensive tests for SSE stream functionality (critical real-time feature).\n    *   Add PWA support (develop service worker).\n    *   Add PWA support (create and integrate manifest file).\n    *   Fix Spotify API rate limiting issues in batch calls.\n\n**Epic: `W3-E02: System Synthesis & Final Reporting`** (Derived from EPIC-05)\n\n*   **Subtasks:**\n    *   Execute and verify the full test suite across the entire application.\n    *   Update all relevant project documentation (e.g., API docs, architecture, user guides).\n    *   Generate a detailed execution summary report.\n    *   Auto-compact system registries.\n    *   Persist final system state for future reference/recovery.\n\n**Wave Gate 3 \u2192 Release:**\n*   SSE stream tests are implemented and pass.\n*   PWA support is fully integrated and functional.\n*   Spotify API rate limiting issues are resolved.\n*   Full test suite passes verification.\n*   All documentation is updated and accurate.\n*   Execution summary is generated, and final system state is persisted.\n\n---\n\n### Identified Spec Gaps\n\nThe PRD provides a good overview but lacks specific details in several critical areas, particularly concerning the novel agentic architecture.\n\n1.  **Agentic Swarm Design & Implementation (Major Gap):**\n    *   **Missing Task:** The \"Target Architecture\" heavily emphasizes a \"multi-layered agentic swarm,\" \"Task Master spine,\" \"40-worker OpenCode pools,\" \"key-pool proxy,\" \"durable agent factory,\" \"knowledge-box \u2192 spawn chain,\" and \"progress ledger.\" However, there are **no explicit work items** or epics dedicated to the design, implementation, or testing of these core agentic components beyond \"create task spine\" in Wave 0. This is the most significant gap.\n    *   **Details Needed:** How will these components be designed? What are their interfaces? How will they interact? What technologies will be used (beyond general FastAPI/PostgreSQL)? What are the success criteria for the agentic swarm itself?\n\n2.  **Wave Gate Implementation:**\n    *   **Missing Task:** The \"Target Architecture\" mentions \"wave gates,\" but there is no explicit task to implement or integrate these wave gates into the development process or CI/CD pipeline, nor how they relate to the \"progress ledger.\"\n\n3.  **LLM Model Specificity:**\n    *   **Details Needed:** While 5 providers are listed, the PRD doesn't specify *which* LLM models from each provider are targeted (e.g., specific GPT-4 versions, Claude, Llama 2 variants, etc.) or their specific API versions/endpoints.\n\n4.  **Telemetry Details:**\n    *   **Details Needed:** \"Wire telemetry record_* calls\" is broad. What specific events, metrics, and data points are expected to be recorded for LLM, DB, and SSE consumers? What is the target telemetry system/backend?\n\n5.  **Security Scope Beyond PKCE:**\n    *   **Missing Requirement:** The PRD mentions fixing the PKCE state store but doesn't outline a broader security assessment, penetration testing, or adherence to"
+    }
+  ]
 }
