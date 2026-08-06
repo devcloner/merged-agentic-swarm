@@ -1,6 +1,6 @@
 """
 Merged Agentic Swarm — CLI Entry Point
-Provides run, status, promote, config, providers, and report subcommands.
+Provides run, status, promote, config, providers, report, and swarm subcommands.
 """
 
 import argparse
@@ -305,6 +305,56 @@ def cmd_report(args):
     return saved
 
 
+def cmd_swarm(args):
+    """List named swarm profiles or resolve one into a runnable orchestrator plan."""
+    from merged_agentic_swarm.services import (
+        list_profiles,
+        resolve_model_alias_for_profile,
+        resolve_profile,
+    )
+
+    if getattr(args, "list_profiles", False):
+        print("=" * 60)
+        print("SWARM PROFILES")
+        print("=" * 60)
+        for entry in list_profiles():
+            alias = resolve_model_alias_for_profile(entry["name"])
+            print(f"  {entry['name']:10s} {entry['description']}  (model: {alias})")
+        print()
+        return None
+
+    name = getattr(args, "profile", None)
+    if not name:
+        print("ERROR: specify --profile <name> (or use --list to see available profiles)")
+        sys.exit(1)
+    try:
+        profile = resolve_profile(name)
+    except (KeyError, ValueError) as e:
+        print(f"ERROR: {e}")
+        sys.exit(1)
+
+    alias = resolve_model_alias_for_profile(name)
+    waves = profile.get("waves", [])
+    print("=" * 60)
+    print(f"SWARM PROFILE: {name}")
+    print("=" * 60)
+    print(f"  Description:   {profile.get('description', '?')}")
+    print(f"  Wave ramp:     {waves}")
+    print(f"  Default tier:  {profile.get('default_tier', '?')}")
+    print(f"  Model alias:   {alias}")
+    print(f"  Gates:         {bool(profile.get('gates', True))}")
+    print(f"  Worker roles:  {', '.join(profile.get('worker_roles', []))}")
+    if waves:
+        print(
+            f"  Planned run:   agentic-cli run (MultiLayeredAgenticOrchestrator, "
+            f"waves={len(waves)}, peak={max(waves)} workers)"
+        )
+    else:
+        print("  Planned run:   cold-path maintenance only — no worker waves (use `agentic-cli promote`)")
+    print()
+    return profile
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Merged Agentic Swarm CLI",
@@ -318,6 +368,8 @@ def main():
   agentic-cli providers
   agentic-cli report
   agentic-cli report --out /tmp/reports
+  agentic-cli swarm --list
+  agentic-cli swarm --profile build
         """,
     )
     sub = parser.add_subparsers(dest="command")
@@ -346,6 +398,11 @@ def main():
     p_report.add_argument("--ledger", help="Path to progress ledger JSON (default: live ledger)")
     p_report.add_argument("--out", help="Output directory for the report (default: <repo>/reports)")
     p_report.set_defaults(func=cmd_report)
+
+    p_swarm = sub.add_parser("swarm", help="List or resolve named swarm profiles")
+    p_swarm.add_argument("--list", dest="list_profiles", action="store_true", help="List all profiles")
+    p_swarm.add_argument("--profile", help="Resolve a named swarm profile into an orchestrator plan")
+    p_swarm.set_defaults(func=cmd_swarm)
 
     args = parser.parse_args()
     if args.command is None:

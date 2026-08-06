@@ -479,3 +479,65 @@ class TestCmdRunAutoSave:
         agentic_cli.cmd_run(_args(prd=str(prd)))
         out = capsys.readouterr().out
         assert "Report:" not in out
+
+
+class TestCmdSwarm:
+    """Coverage for the swarm subcommand: --list, --profile, and error paths."""
+
+    def setup_method(self):
+        from merged_agentic_swarm.services import swarm_profiles
+
+        swarm_profiles._profiles_cache = None
+
+    def _swarm_args(self, profile=None, list_profiles=False):
+        class Args:
+            pass
+
+        a = Args()
+        a.profile = profile
+        a.list_profiles = list_profiles
+        return a
+
+    def test_swarm_list_through_main(self, capsys):
+        _main_with_args(["swarm", "--list"])
+        out = capsys.readouterr().out
+        assert "SWARM PROFILES" in out
+        assert "build" in out
+        assert "learning" in out
+        assert "gemini-batch" in out  # deep-tier default alias for build
+        assert "fast-flash" in out  # fast-tier default alias for review/patch
+
+    def test_swarm_profile_through_main(self, capsys):
+        _main_with_args(["swarm", "--profile", "build"])
+        out = capsys.readouterr().out
+        assert "SWARM PROFILE: build" in out
+        assert "[4, 8, 16, 24, 40]" in out
+        assert "gemini-batch" in out
+        assert "agentic-cli run" in out
+
+    def test_swarm_learning_profile_reports_no_runnable_waves(self, capsys):
+        _main_with_args(["swarm", "--profile", "learning"])
+        out = capsys.readouterr().out
+        assert "SWARM PROFILE: learning" in out
+        assert "no worker waves" in out
+
+    def test_swarm_unknown_profile_errors_clearly(self, capsys):
+        with pytest.raises(SystemExit) as exc:
+            _main_with_args(["swarm", "--profile", "no-such-profile"])
+        assert exc.value.code == 1
+        assert "Unknown swarm profile" in capsys.readouterr().out
+
+    def test_swarm_without_args_errors(self, capsys):
+        with pytest.raises(SystemExit) as exc:
+            _main_with_args(["swarm"])
+        assert exc.value.code == 1
+        assert "specify --profile" in capsys.readouterr().out
+
+    def test_swarm_handler_returns_resolved_profile(self, capsys):
+        profile = agentic_cli.cmd_swarm(self._swarm_args(profile="patch"))
+        out = capsys.readouterr().out
+        assert profile["waves"] == [4]
+        assert profile["default_tier"] == "fast"
+        assert "Quick targeted patch" in out
+        assert "fast-flash" in out
+        assert "Gates:         False" in out

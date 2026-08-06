@@ -48,3 +48,7 @@ Thumbs.db
 *.swo
 *.tmp
 .GitHubBoard/
+
+# ── Generated run reports ──
+reports/*.json
+reports/*.md

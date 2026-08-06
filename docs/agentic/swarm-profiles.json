@@ -1,0 +1,55 @@
+{
+  "build": {
+    "description": "Full multi-wave build across the whole codebase",
+    "waves": [4, 8, 16, 24, 40],
+    "default_tier": "deep",
+    "gates": true,
+    "worker_roles": [
+      "master_architect",
+      "codebase_mapper",
+      "spec_gap_closer",
+      "core_engineer",
+      "refactor_specialist",
+      "unit_tester",
+      "security_verifier"
+    ]
+  },
+  "review": {
+    "description": "Code review pass with security and refactor verifiers",
+    "waves": [4, 8],
+    "default_tier": "fast",
+    "gates": true,
+    "worker_roles": ["security_verifier", "refactor_specialist", "unit_tester"]
+  },
+  "ultra": {
+    "description": "Maximum concurrency using every tier and worker role",
+    "waves": [8, 16, 24, 40],
+    "default_tier": "deep",
+    "gates": true,
+    "worker_roles": [
+      "master_architect",
+      "codebase_mapper",
+      "spec_gap_closer",
+      "core_engineer",
+      "refactor_specialist",
+      "unit_tester",
+      "security_verifier",
+      "hot_micro_specialist",
+      "cold_durable"
+    ]
+  },
+  "patch": {
+    "description": "Quick targeted patch with a minimal focused swarm",
+    "waves": [4],
+    "default_tier": "fast",
+    "gates": false,
+    "worker_roles": ["core_engineer", "unit_tester"]
+  },
+  "learning": {
+    "description": "Cold-path promotion and registry compact only (no worker waves)",
+    "waves": [],
+    "default_tier": "deep",
+    "gates": false,
+    "worker_roles": ["cold_durable"]
+  }
+}

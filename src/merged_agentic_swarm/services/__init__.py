@@ -19,6 +19,12 @@ from merged_agentic_swarm.services.progress_ledger_service import (
     ProgressLedgerService,
     default_progress_ledger,
 )
+from merged_agentic_swarm.services.swarm_profiles import (
+    list_profiles,
+    load_profiles,
+    resolve_model_alias_for_profile,
+    resolve_profile,
+)
 from merged_agentic_swarm.services.task_master_service import TaskMasterService, default_task_master
 from merged_agentic_swarm.services.wave_gate_service import WaveGateController, default_wave_controller
 
@@ -39,6 +45,10 @@ __all__ = [
     "default_swarm_manager",
     "default_task_master",
     "default_wave_controller",
+    "list_profiles",
     "litellm_model_for_fabric_route",
+    "load_profiles",
     "resolve_litellm_model_for_role",
+    "resolve_model_alias_for_profile",
+    "resolve_profile",
 ]
