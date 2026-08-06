@@ -62,7 +62,7 @@ class ChainRegistry:
         parent_entry_id: str | None = None,
     ) -> SpawnChainEntry:
         entry = SpawnChainEntry(
-            entry_id=f"CHAIN-{len(self.entries) + 1:04d}",
+            entry_id=self._next_entry_id(),
             source_learning_id=source_learning_id,
             spawned_agent_id=spawned_agent_id,
             agent_type=agent_type,
@@ -74,10 +74,28 @@ class ChainRegistry:
         logger.info(f"Registered spawn chain entry {entry.entry_id}: {agent_type.value} agent {spawned_agent_id}")
         return entry
 
+    def _next_entry_id(self) -> str:
+        """Generate a collision-proof spawn-chain entry_id (sequence + timestamp suffix).
+
+        The sequence continues from the highest CHAIN-XXXX index already present,
+        and the nanosecond timestamp suffix guarantees uniqueness even when two
+        registry instances register spawns against the same file in the same
+        millisecond (e.g. a manual ``promote`` racing a full run) — so entry_ids
+        can never collide within a batch or across batches.
+        """
+        max_seq = 0
+        for e in self.entries:
+            try:
+                max_seq = max(max_seq, int(e.entry_id.split("-")[1]))
+            except ValueError, IndexError:
+                continue
+        return f"CHAIN-{max_seq + 1:04d}-{time.time_ns()}"
+
 
 class DurableAgentFactory:
-    def __init__(self, chain_registry: ChainRegistry | None = None):
+    def __init__(self, chain_registry: ChainRegistry | None = None, agents_registry_file: str | None = None):
         self.chain_registry = chain_registry or ChainRegistry()
+        self.agents_registry_file = agents_registry_file
         self.active_hot_specialists: dict[str, AgentSpec] = {}
         self.active_cold_agents: dict[str, AgentSpec] = {}
         self._load_cold_agents_from_registry()
@@ -92,19 +110,29 @@ class DurableAgentFactory:
                 logger.info(f"Purged expired HOT agent {aid} (lived {now - expired.created_at:.1f}s)")
         return len(expired_ids)
 
+    def _agents_registry_path(self) -> str:
+        """Resolve the durable cold-path agents registry (agents.jsonl).
+
+        Prefers an explicitly injected path, then the user config path, then the
+        repo registry. Load and persist share this resolution so agents written
+        by ``spawn_from_learning`` are discoverable on restart.
+        """
+        if self.agents_registry_file:
+            return self.agents_registry_file
+        agents_registry = os.path.expanduser("~/.config/merged-agentic-swarm/agents.jsonl")
+        if not os.path.exists(agents_registry):
+            # Fallback to repo-relative path (file is at src/merged_agentic_swarm/services/)
+            repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+            agents_registry = os.path.join(repo_root, "docs", "agentic", "registry", "agents.jsonl")
+        return agents_registry
+
     def _load_cold_agents_from_registry(self):
         """Load durable agents from the cold-path agents.jsonl registry.
 
         Called once at init so a fresh process discovers agents promoted by
         previous runs — this is the key restart-survival path.
         """
-        import json
-
-        agents_registry = os.path.expanduser("~/.config/merged-agentic-swarm/agents.jsonl")
-        if not os.path.exists(agents_registry):
-            # Fallback to repo-relative path (file is at src/merged_agentic_swarm/services/)
-            repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-            agents_registry = os.path.join(repo_root, "docs", "agentic", "registry", "agents.jsonl")
+        agents_registry = self._agents_registry_path()
         if not os.path.exists(agents_registry):
             logger.debug("No agents.jsonl found; no durable agents to load.")
             return
@@ -136,6 +164,33 @@ class DurableAgentFactory:
             logger.info(f"Loaded {len(self.active_cold_agents)} durable agents from {agents_registry}")
         except Exception as e:
             logger.warning(f"Failed to load durable agents from {agents_registry}: {e}")
+
+    def _persist_cold_agent(self, agent_record: dict[str, Any]) -> str | None:
+        """Append a COLD_DURABLE agent record to the durable agents.jsonl registry.
+
+        Idempotent: an agent with the same id is never written twice. Returns the
+        registry path written, or None if the agent was already present.
+        """
+        registry_path = self._agents_registry_path()
+        agent_id = agent_record.get("id", "")
+        if agent_id and os.path.exists(registry_path):
+            existing_ids: set[str] = set()
+            with open(registry_path) as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    try:
+                        existing_ids.add(json.loads(line).get("id"))
+                    except json.JSONDecodeError, AttributeError:
+                        continue
+            if agent_id in existing_ids:
+                logger.info(f"Durable agent {agent_id} already in {registry_path}; skipping")
+                return None
+        os.makedirs(os.path.dirname(registry_path), exist_ok=True)
+        with open(registry_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(agent_record, default=str) + "\n")
+        logger.info(f"Persisted durable agent {agent_id} → {registry_path}")
+        return registry_path
 
     def _write_agent_spec_file(self, agent_spec: dict[str, Any]) -> str | None:
         """Write an agent spec .md file from a JSONL entry.
@@ -274,6 +329,23 @@ Directives:
             self.active_hot_specialists[agent_id] = spec
         else:
             self.active_cold_agents[agent_id] = spec
+            # Persist COLD_DURABLE agents to the durable agents.jsonl registry and
+            # write their spec file, so Wave-2 specialists actually materialize as
+            # durable agents across restarts (issue #17).
+            agent_record = {
+                "id": agent_id,
+                "name": spec.name,
+                "role": role.value if isinstance(role, WorkerRole) else role,
+                "type": agent_type.value,
+                "agent_type": agent_type.value,
+                "category": (learning.get("category") if learning else None) or "general",
+                "derived_from_learnings": spec.validated_learnings_applied,
+                "system_prompt": spec.system_prompt,
+                "promoted_at": spec.created_at,
+                "ttl_sec": None,
+            }
+            self._persist_cold_agent(agent_record)
+            self._write_agent_spec_file(agent_record)
 
         # Register in Spawn Chain
         self.chain_registry.register_spawn(

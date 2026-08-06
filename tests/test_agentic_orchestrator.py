@@ -137,6 +137,29 @@ class TestRunFullAgenticWorkflow:
         result = orch.run_full_agentic_workflow("# PRD")
         assert result["status"] == "success"
 
+    def test_workflow_threads_wave_level_into_swarm(self, monkeypatch, tmp_path):
+        """Each wave threads its wave number as wave_gate_level so the swarm
+        executes at ramp[wave] concurrency instead of the 4-worker default (#5)."""
+        orch = self._stub_workflow(monkeypatch, tmp_path)
+        seen: dict[int, int] = {}
+
+        def recording(subtasks, role=None, wave_gate_level=0):
+            seen[wave_gate_level] = seen.get(wave_gate_level, 0) + 1
+            return [
+                {
+                    "status": "completed",
+                    "worker_id": "w1",
+                    "files_written": [],
+                    "commands_run": [],
+                    "final_text": "done",
+                }
+            ]
+
+        monkeypatch.setattr(orch_mod.default_swarm_manager, "execute_subtask_batch_parallel", recording)
+        result = orch.run_full_agentic_workflow("# PRD")
+        assert result["status"] == "success"
+        assert sorted(seen) == [1, 2, 3, 4]
+
 
 class TestRunSyntaxVerificationPaths:
     def _make_core_files(self, root, bad=None):
@@ -268,6 +291,42 @@ class TestPromoteColdPathAgentFileExists:
         orch.promoted_ids_file = str(tmp_path / "p.json")
         result = orch._promote_cold_path("test")
         assert result["promoted_agents"] == 1
+        # cleanup
+        default_knowledge_cache.learnings = {}
+
+
+class TestPromoteColdPathChainEntryIds:
+    def test_chain_entry_ids_unique_within_batch(self, tmp_path, monkeypatch):
+        """Two categories promoted in one batch must produce distinct chain entry_ids (#18)."""
+        import json
+
+        from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
+
+        registry = tmp_path / "registry"
+        registry.mkdir(parents=True, exist_ok=True)
+        for name in ("knowledge.jsonl", "agents.jsonl", "chain.jsonl"):
+            (registry / name).write_text("", encoding="utf-8")
+        monkeypatch.setattr(orch_mod, "_REGISTRY_DIR", registry)
+        monkeypatch.setattr(default_knowledge_cache, "learnings", {})
+        monkeypatch.setattr(orch_mod.default_agent_factory, "_write_agent_spec_file", lambda *a, **k: None)
+
+        for i in range(3):
+            default_knowledge_cache.add_learning(f"A{i}", "cat_a", f"SolA{i}")
+        for i in range(3):
+            default_knowledge_cache.add_learning(f"B{i}", "cat_b", f"SolB{i}")
+
+        orch = MultiLayeredAgenticOrchestrator()
+        orch.promoted_learning_ids = set()
+        orch.promoted_ids_file = str(tmp_path / "p.json")
+        result = orch._promote_cold_path("test")
+        assert result["promoted_agents"] == 2
+
+        entry_ids = []
+        for line in (registry / "chain.jsonl").read_text().splitlines():
+            if line.strip():
+                entry_ids.append(json.loads(line)["entry_id"])
+        assert len(entry_ids) == 2
+        assert len(set(entry_ids)) == len(entry_ids)
         # cleanup
         default_knowledge_cache.learnings = {}
 

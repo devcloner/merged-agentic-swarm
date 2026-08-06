@@ -183,13 +183,9 @@ class KeyPoolManager:
                 available_keys.append(k)
 
         if not available_keys:
-            # Fallback to key with earliest cooldown expiry
-            cooldown_keys = [k for k in keys if k.status == KeyStatus.COOLDOWN]
-            if cooldown_keys:
-                cooldown_keys.sort(key=lambda x: x.cooldown_until)
-                best_k = cooldown_keys[0]
-                best_k.status = KeyStatus.ACTIVE  # force recover
-                return best_k
+            # Do NOT force-recover a still-cooling key: reusing a throttled key
+            # just re-triggers its 429 and resets the cooldown, so the pool never
+            # recovers and the fabric cascade never advances to a healthy provider.
             return None
 
         # Sort by total requests then last used time

@@ -83,9 +83,10 @@ class MultiLayeredAgenticOrchestrator:
                 return {
                     "exit_code": result.returncode,
                     "output_summary": f"CI script: {summary} ({len(result.stdout)} chars)",
+                    "tests_ran": True,  # ci.sh executes the pytest suite
                 }
             except Exception as e:
-                return {"exit_code": 1, "output_summary": f"CI script failed: {e}"}
+                return {"exit_code": 1, "output_summary": f"CI script failed: {e}", "tests_ran": False}
 
         # Fallback: inline syntax check on core files
         # Paths are relative to the package root (src/merged_agentic_swarm/)
@@ -114,8 +115,16 @@ class MultiLayeredAgenticOrchestrator:
             except SyntaxError as e:
                 errors.append(f"{rel_path}:{e.lineno}: {e.msg}")
         if errors:
-            return {"exit_code": 1, "output_summary": f"Syntax check FAILED: {'; '.join(errors)}"}
-        return {"exit_code": 0, "output_summary": f"Syntax check PASSED ({len(core_files)} files)"}
+            return {
+                "exit_code": 1,
+                "output_summary": f"Syntax check FAILED: {'; '.join(errors)}",
+                "tests_ran": False,
+            }
+        return {
+            "exit_code": 0,
+            "output_summary": f"Syntax check PASSED ({len(core_files)} files)",
+            "tests_ran": False,  # inline fallback does not execute the test suite
+        }
 
     # ── Registry compaction (FIX-14: auto-compact at end of run) ──
 
@@ -310,6 +319,7 @@ class MultiLayeredAgenticOrchestrator:
 
         promoted_knowledge = 0
         promoted_agents = 0
+        chain_seq = 0  # per-batch sequence so chain entry_ids stay unique
         promoted_categories_this_run: set = set()  # track which categories already got agents this batch
 
         for learning in unpromoted:
@@ -349,8 +359,9 @@ class MultiLayeredAgenticOrchestrator:
                 self._append_jsonl(agents_registry, agent_spec)
 
                 # 3. Chain log entry
+                chain_seq += 1
                 chain_entry = {
-                    "entry_id": f"CHAIN-COLD-{int(now * 1000)}",
+                    "entry_id": f"CHAIN-COLD-{int(now * 1000)}-{chain_seq}",
                     "source_learning_id": lid,
                     "spawned_agent_id": agent_spec["id"],
                     "agent_type": "cold_durable",
@@ -445,7 +456,7 @@ class MultiLayeredAgenticOrchestrator:
         for epic in wave_1_epics:
             try:
                 results = default_swarm_manager.execute_subtask_batch_parallel(
-                    epic.subtasks, role=WorkerRole.CORE_ENGINEER
+                    epic.subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=1
                 )
             except Exception as e:
                 logger.error(f"Wave 1 batch failed: {e}")
@@ -502,7 +513,7 @@ class MultiLayeredAgenticOrchestrator:
         for epic in wave_2_epics:
             try:
                 results = default_swarm_manager.execute_subtask_batch_parallel(
-                    epic.subtasks, role=WorkerRole.CORE_ENGINEER
+                    epic.subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=2
                 )
             except Exception as e:
                 logger.error(f"Wave 2 batch failed: {e}")
@@ -606,10 +617,13 @@ class MultiLayeredAgenticOrchestrator:
         # Step 5: Wave 3 - Integration & Verification Gate
         logger.info("--- Step 5: Wave 3 Execution (Integration, Verifiers & Obstacle Playbooks) ---")
         wave_3_epics = default_task_master.get_tasks_for_wave(3)
+        # Run the syntax/test check once — it feeds both the per-epic ledger
+        # markers and the Wave-3 Zero-Defect gate (issue #13).
+        ver_result = self._run_syntax_verification()
         for epic in wave_3_epics:
             try:
                 results = default_swarm_manager.execute_subtask_batch_parallel(
-                    epic.subtasks, role=WorkerRole.SECURITY_VERIFIER
+                    epic.subtasks, role=WorkerRole.SECURITY_VERIFIER, wave_gate_level=3
                 )
             except Exception as e:
                 logger.error(f"Wave 3 batch failed: {e}")
@@ -641,7 +655,6 @@ class MultiLayeredAgenticOrchestrator:
                     )
                 else:
                     logger.warning(f"Wave 3 epic {epic.id}: {len(failed)}/{len(results)} subtasks failed")
-            ver_result = self._run_syntax_verification()
             default_progress_ledger.record_success_marker(
                 task_id=epic.id,
                 verifier_name="SystemIntegrationVerifier",
@@ -658,6 +671,9 @@ class MultiLayeredAgenticOrchestrator:
                 tags=["verification", "wave-gate", "integration"],
             )
 
+        # The Wave-3 "Zero Defect" gate evaluates the verification result —
+        # syntax and test outcomes — not just epic statuses (issue #13).
+        default_wave_controller.record_verification_results(ver_result)
         passed_w3, reason_w3 = default_wave_controller.advance_wave()
         logger.info(f"Wave 3 Gate Status: {passed_w3} ({reason_w3})")
         if not passed_w3:
@@ -670,7 +686,7 @@ class MultiLayeredAgenticOrchestrator:
         for epic in wave_4_epics:
             try:
                 results = default_swarm_manager.execute_subtask_batch_parallel(
-                    epic.subtasks, role=WorkerRole.CORE_ENGINEER
+                    epic.subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=4
                 )
             except Exception as e:
                 logger.error(f"Wave 4 batch failed: {e}")

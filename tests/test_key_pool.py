@@ -104,7 +104,9 @@ class TestKeyPoolManager:
         assert result is not None
         assert result.status == KeyStatus.ACTIVE
 
-    def test_get_key_returns_forced_recovered(self):
+    def test_get_key_all_cooldown_returns_none(self):
+        """When every key is still cooling down, get_key returns None so the
+        fabric cascade advances instead of force-recovering a throttled key."""
         pool = KeyPoolManager(env_file_path="/dev/null")
         pool.keys_by_provider = {}
         pool.add_key("test", "key-1", "t-1")
@@ -112,8 +114,32 @@ class TestKeyPoolManager:
         key.status = KeyStatus.COOLDOWN
         key.cooldown_until = time.time() + 300  # still cooling down
         result = pool.get_key("test")
-        # Should force-recover the cooldown key since no active key
+        assert result is None
+        # The throttled key must NOT have been reactivated
+        assert key.status == KeyStatus.COOLDOWN
+
+    def test_get_key_all_cooldown_multi_key_returns_none(self):
+        """Even with many keys, none may be reused while every one is cooling down."""
+        pool = KeyPoolManager(env_file_path="/dev/null")
+        pool.keys_by_provider = {}
+        pool.add_key("test", "key-1", "t-1")
+        pool.add_key("test", "key-2", "t-2")
+        for key in pool.keys_by_provider["test"]:
+            key.status = KeyStatus.COOLDOWN
+            key.cooldown_until = time.time() + 300
+        assert pool.get_key("test") is None
+
+    def test_get_key_returns_active_key_when_one_in_cooldown(self):
+        """A key still cooling down must not be picked while another is active."""
+        pool = KeyPoolManager(env_file_path="/dev/null")
+        pool.keys_by_provider = {}
+        pool.add_key("test", "key-1", "t-1")
+        pool.add_key("test", "key-2", "t-2")
+        pool.keys_by_provider["test"][0].status = KeyStatus.COOLDOWN
+        pool.keys_by_provider["test"][0].cooldown_until = time.time() + 300
+        result = pool.get_key("test")
         assert result is not None
+        assert result.key_id == "t-2"  # the active key, not the throttled one
 
     def test_mark_success(self):
         pool = KeyPoolManager(env_file_path="/dev/null")

@@ -368,3 +368,45 @@ class TestDispatchRequest:
         result = fabric.dispatch_request("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
         _permanently_dead.clear()
         assert result["simulation_fallback"] is True
+
+    @patch("merged_agentic_swarm.providers.multi_provider_fabric.pool_dispatch")
+    def test_consecutive_429s_trip_circuit_breaker(self, mock_dispatch):
+        """Consecutive 429 responses must count as a provider circuit-breaker
+        event (not just a per-key cooldown), so a throttled provider eventually
+        opens and stops being retried at the front of the cascade."""
+        import httpx
+
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
+        from merged_agentic_swarm.providers.key_pool import KeyPoolManager
+
+        def side_effect(url, req_data, headers, timeout):
+            mock_response = MagicMock()
+            mock_response.status_code = 429
+            mock_response.text = '{"error":"rate limited"}'
+            mock_response.request = MagicMock()
+            raise httpx.HTTPStatusError("Rate limited", request=mock_response.request, response=mock_response)
+
+        mock_dispatch.side_effect = side_effect
+
+        # Fresh, isolated key pool so cooldowns left by other tests can't skew
+        # the cascade. gemini needs >=9 keys so the 3-key retry loop still finds
+        # a key on the 3rd consecutive request (2 gemini routes per dispatch).
+        pool = KeyPoolManager(env_file_path="/dev/null")
+        pool.keys_by_provider = {}
+        for i in range(9):
+            pool.add_key("gemini", f"sk-g{i}", f"g-{i}")
+
+        mpf._permanently_dead.clear()
+        mpf._circuit_breaker.clear()
+        mpf._circuit_open_until.clear()
+        mpf._last_successful_provider.clear()
+        fabric = MultiProviderFabric(key_pool=pool)
+
+        for _ in range(3):
+            result = fabric.dispatch_request("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
+            assert result.get("simulation_fallback") is True
+
+        # gemini throttled every key attempt across consecutive requests →
+        # breaker trips and the provider is skipped at the front of the cascade.
+        assert mpf._circuit_breaker["gemini"] >= mpf.CIRCUIT_BREAKER_THRESHOLD
+        assert "gemini" in mpf._circuit_open_until

@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import time
+from typing import Any
 
 from merged_agentic_swarm.models.prd_models import SubTask
 from merged_agentic_swarm.models.wave_models import WaveExecutionState, WaveGateCriteria, WaveStatus
@@ -50,6 +51,7 @@ class WaveGateController:
         }
         self._max_wave = 4
         self.current_wave: int = 0
+        self._verification_results: dict[str, Any] | None = None
         self.waves[0].status = WaveStatus.IN_PROGRESS
         self.waves[0].started_at = time.time()
 
@@ -114,6 +116,25 @@ class WaveGateController:
 
         return violations
 
+    def record_verification_results(self, results: dict[str, Any] | None) -> None:
+        """Record the Wave-3 verification outcome for the Zero-Defect gate.
+
+        Accepts the orchestrator's verification dict (``exit_code``,
+        ``output_summary``, and ``tests_ran``). Passing None clears the record
+        so an unverified wave can never pass the gate.
+        """
+        if results is None:
+            self._verification_results = None
+            return
+        syntax_ok = results.get("exit_code", 1) == 0
+        tests_ran = bool(results.get("tests_ran", False))
+        self._verification_results = {
+            "syntax_ok": syntax_ok,
+            "tests_ran": tests_ran,
+            "tests_ok": tests_ran and syntax_ok,
+            "summary": results.get("output_summary", ""),
+        }
+
     def evaluate_gate_criteria(self, wave_id: int) -> tuple[bool, list[str]]:
         """Evaluates whether all criteria for a wave gate are met."""
         state = self.waves.get(wave_id)
@@ -150,8 +171,37 @@ class WaveGateController:
                 violations = self._check_ownership(subtasks, pool_id)
                 reasons.extend(violations)
 
+            # Wave 3 "Zero Defect" gate evaluates verification results (syntax
+            # + tests), not just task statuses (issue #13).
+            if wave_id == 3:
+                self._evaluate_verification_criteria(state, reasons)
+
         passed = len(reasons) == 0
         return passed, reasons
+
+    def _evaluate_verification_criteria(self, state: WaveExecutionState, reasons: list[str]) -> None:
+        """Evaluate Wave 3's Zero-Defect verification criteria.
+
+        Uses the results recorded via record_verification_results. The gate
+        fails if verification never ran, if the syntax check failed, or if the
+        test suite did not pass (or was never executed).
+        """
+        criteria = state.gate_criteria
+        if not criteria.zero_syntax_errors and not criteria.tests_passing:
+            return
+        results = self._verification_results
+        if results is None:
+            reasons.append(
+                "Wave 3 verification not run — syntax/test checks are required before the Zero-Defect gate can pass."
+            )
+            return
+        if criteria.zero_syntax_errors and not results["syntax_ok"]:
+            reasons.append(f"Syntax check failed: {results['summary']}")
+        if criteria.tests_passing and not results["tests_ok"]:
+            if not results["tests_ran"]:
+                reasons.append("Tests not verified — the syntax check did not execute the test suite.")
+            else:
+                reasons.append(f"Tests failed: {results['summary']}")
 
     def advance_wave(self) -> tuple[bool, str]:
         """Attempts to pass the current wave gate and advance to the next wave."""

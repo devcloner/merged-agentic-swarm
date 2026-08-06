@@ -144,6 +144,41 @@ class TestOpenCodeSwarmManager:
         )
         assert len(results) == 3
 
+    def test_batch_parallel_uses_ramp_concurrency(self, monkeypatch, make_subtask):
+        """Wave N batch executes at ramp[N] concurrency, not the 4-worker default."""
+        import concurrent.futures as cf
+
+        manager = OpenCodeSwarmManager()
+        monkeypatch.setattr(
+            manager,
+            "execute_subtask_with_worker",
+            lambda st, role: {"status": "completed", "subtask_id": st.id, "worker_id": "w"},
+        )
+        captured: dict[str, int] = {}
+
+        class FakeExecutor:
+            def __init__(self, max_workers):
+                captured["max_workers"] = max_workers
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def submit(self, fn, *args, **kwargs):
+                fut = cf.Future()
+                fut.set_result(fn(*args, **kwargs))
+                return fut
+
+        monkeypatch.setattr(mod, "ThreadPoolExecutor", FakeExecutor)
+        ramp = [4, 8, 16, 24, 40]
+        for wave, expected in enumerate(ramp):
+            captured.clear()
+            subtasks = [make_subtask(task_id=f"T-{wave}-{i}") for i in range(1)]
+            manager.execute_subtask_batch_parallel(subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=wave)
+            assert captured["max_workers"] == expected
+
 
 def _router(agents_jsonl_content="", agents_dir=None):
     """Build a real DurableAgentRouter over tmp JSONL + agent dir."""

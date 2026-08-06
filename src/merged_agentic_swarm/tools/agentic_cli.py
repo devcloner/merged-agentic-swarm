@@ -61,10 +61,74 @@ def cmd_run(args):
         sys.exit(1)
 
 
+def _progress_ledger_path() -> str:
+    """Resolve the live progress ledger path (default source for ``cmd_status``)."""
+    from merged_agentic_swarm.services.progress_ledger_service import default_progress_ledger
+
+    return default_progress_ledger.ledger_file
+
+
+def _render_ledger_status(progress: dict) -> None:
+    """Render a live progress-ledger snapshot (logs + success markers + task-master snapshot)."""
+    logs = progress.get("logs", [])
+    markers = progress.get("success_markers", [])
+    snapshot = progress.get("task_master_snapshot", {})
+    status_counts: dict[str, int] = {}
+    for log in logs:
+        st = log.get("status", "unknown")
+        status_counts[st] = status_counts.get(st, 0) + 1
+    completed = status_counts.get("completed", 0)
+    total_logged = len(logs)
+    pct = int(completed / total_logged * 100) if total_logged else 0
+
+    print(f"  Ledger:            {total_logged} log entries, {len(markers)} success markers")
+    print(
+        f"  Log status:        completed={completed}, "
+        f"failed={status_counts.get('failed', 0)}, other={total_logged - completed - status_counts.get('failed', 0)}"
+    )
+    waves = sorted({log.get("wave_id") for log in logs if log.get("wave_id") is not None})
+    print(f"  Waves covered:     {', '.join(str(w) for w in waves) or 'none'}")
+    if snapshot:
+        title = snapshot.get("title") or ""
+        if title:
+            print(f"  PRD:               {title}")
+        epics = snapshot.get("epics")
+        if isinstance(epics, list):
+            done = sum(
+                1 for e in epics if isinstance(e, dict) and str(e.get("status", "")).lower() in ("completed", "done")
+            )
+            print(f"  Epics:             {done}/{len(epics)} completed")
+    print(f"  Completion:        ~{pct}% of logged actions completed")
+    if logs:
+        print("  Latest activity:")
+        for log in logs[-5:]:
+            print(
+                f"    • [{log.get('entry_id', '?')}] wave {log.get('wave_id', '?')} "
+                f"{log.get('action', '?')} on {log.get('task_id', '?')} — {log.get('status', '?')}"
+            )
+
+
+def _render_legacy_snapshot(progress: dict) -> None:
+    """Render an older progress.json snapshot (kept so ``--progress`` still works on them)."""
+    print(f"  Overall completion: {progress.get('overall_completion_pct', '?')}%")
+    for phase, status in progress.get("phase_status", {}).items():
+        print(
+            f"  {phase}: {status.get('completion_pct', '?')}% "
+            f"[{status.get('color', '?')}] — {status.get('status', '?')}"
+        )
+    print(f"  Blockers: {len(progress.get('blockers', []))}")
+    for i, b in enumerate(progress.get("blockers", []), 1):
+        print(f"    {i}. {b[:110]}...")
+    milestones = progress.get("milestone_history", [])
+    print(f"  Milestones ({len(milestones)}):")
+    for m in milestones:
+        print(f"    • {m.get('milestone', '?')} — {m.get('status', '?')}")
+
+
 def cmd_status(args):
-    """Show current system status."""
+    """Show current system status from the live progress ledger."""
     reg_dir = _REPO_ROOT / "docs" / "agentic" / "registry"
-    progress_path = args.progress or str(reg_dir / "progress.json")
+    progress_path = args.progress or _progress_ledger_path()
     if os.path.exists(progress_path):
         try:
             with open(progress_path) as f:
@@ -72,23 +136,14 @@ def cmd_status(args):
             print("=" * 60)
             print("SYSTEM STATUS")
             print("=" * 60)
-            print(f"  Overall completion: {progress.get('overall_completion_pct', '?')}%")
-            for phase, status in progress.get("phase_status", {}).items():
-                print(
-                    f"  {phase}: {status.get('completion_pct', '?')}% "
-                    f"[{status.get('color', '?')}] — {status.get('status', '?')}"
-                )
-            print(f"  Blockers: {len(progress.get('blockers', []))}")
-            for i, b in enumerate(progress.get("blockers", []), 1):
-                print(f"    {i}. {b[:110]}...")
-            milestones = progress.get("milestone_history", [])
-            print(f"  Milestones ({len(milestones)}):")
-            for m in milestones:
-                print(f"    • {m.get('milestone', '?')} — {m.get('status', '?')}")
+            if isinstance(progress, dict) and ("logs" in progress or "success_markers" in progress):
+                _render_ledger_status(progress)
+            else:
+                _render_legacy_snapshot(progress)
         except Exception as e:
-            print(f"ERROR reading progress.json: {e}")
+            print(f"ERROR reading progress ledger: {e}")
     else:
-        print("No progress.json found. Run the orchestrator first.")
+        print("No progress ledger found. Run the orchestrator first.")
 
     for reg in ["knowledge.jsonl", "agents.jsonl", "chain.jsonl"]:
         path = reg_dir / reg

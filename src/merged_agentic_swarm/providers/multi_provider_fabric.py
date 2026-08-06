@@ -673,9 +673,11 @@ class MultiProviderFabric:
             # Try this route with up to KEY_RETRY_LIMIT distinct keys from the pool.
             # A 429/503 is a per-key throttle — with N keys rotating, the next key is
             # usually fine, so rotate within the route before cascading providers.
-            # Only non-throttle failures (401, 5xx, timeout) trip the provider-level
-            # circuit breaker, so one slow key can't take the whole provider down.
+            # But if every key attempt throttles, the provider itself is degraded:
+            # record that as a circuit-breaker event so a consecutive-429 provider is
+            # skipped at the front of the cascade instead of being retried each request.
             key_retry_limit = 3
+            throttled = False
             for _ in range(key_retry_limit):
                 key_info = self.key_pool.get_key(provider)
                 if not key_info:
@@ -767,6 +769,7 @@ class MultiProviderFabric:
                         # Key-level throttle — cool this key down, rotate to another.
                         self.key_pool.mark_rate_limited(key_info, cooldown_seconds=60.0)
                         last_error = f"HTTP {status_code}: {err_text}"
+                        throttled = True
                         continue
                     # Other HTTP errors — provider-level failure, trip breaker.
                     last_error = f"HTTP {status_code}: {err_text}"
@@ -782,6 +785,12 @@ class MultiProviderFabric:
                     last_error = str(e)
                     _record_failure(provider)
                     break
+
+            if throttled:
+                # Every key attempt for this route hit the throttle — the whole
+                # provider is degraded, not just one key. Trip the breaker so a
+                # consecutive-429 provider is skipped instead of re-pinned/retried.
+                _record_failure(provider, http_code=429)
 
         # Fallback offline simulation
         logger.warning(

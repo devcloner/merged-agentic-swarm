@@ -8,7 +8,15 @@ Coverage: ChainRegistry (load, save, register_spawn), DurableAgentFactory
 import os
 import time
 
+import pytest
+
 from merged_agentic_swarm.models.agent_models import AgentSpec, AgentType, WorkerRole
+
+
+@pytest.fixture
+def isolated_agents_registry(temp_dir):
+    """Return a temp path for the durable cold-path agents.jsonl registry."""
+    return os.path.join(temp_dir, "agents.jsonl")
 
 
 class TestChainRegistry:
@@ -66,6 +74,32 @@ class TestChainRegistry:
             f.write("not valid json")
         reg = ChainRegistry(registry_file=reg_file)
         assert reg.entries == []  # graceful fallback
+
+    def test_register_spawn_entry_ids_unique_within_batch(self, temp_dir):
+        """#18: entry_ids in one promotion batch must never collide."""
+        from merged_agentic_swarm.services.agent_factory_service import ChainRegistry
+
+        reg_file = os.path.join(temp_dir, "chain.json")
+        reg = ChainRegistry(registry_file=reg_file)
+        ids = [
+            reg.register_spawn(f"L-{i:03d}", f"a-{i:03d}", AgentType.COLD_DURABLE, f"batch {i}").entry_id
+            for i in range(5)
+        ]
+        assert len(ids) == len(set(ids)), f"duplicate entry_ids in one batch: {ids}"
+        assert all(reg.entries[i].entry_id == ids[i] for i in range(5))
+
+    def test_register_spawn_entry_ids_unique_across_instances(self, temp_dir):
+        """#18: separate registry instances sharing a file must not reuse entry_ids."""
+        from merged_agentic_swarm.services.agent_factory_service import ChainRegistry
+
+        reg_file = os.path.join(temp_dir, "chain.json")
+        reg1 = ChainRegistry(registry_file=reg_file)
+        reg2 = ChainRegistry(registry_file=reg_file)
+        id1 = reg1.register_spawn("L-1", "a-1", AgentType.COLD_DURABLE, "proc 1").entry_id
+        id2 = reg2.register_spawn("L-2", "a-2", AgentType.COLD_DURABLE, "proc 2").entry_id
+        assert id1 != id2
+        assert id1.startswith("CHAIN-")
+        assert id2.startswith("CHAIN-")
 
 
 class TestDurableAgentFactory:
@@ -165,6 +199,107 @@ class TestDurableAgentFactory:
             lid = isolated_knowledge_cache.add_learning("Chain test", "general", "Solution")
             factory.spawn_from_learning(lid, trigger_reason="Chain check")
             assert len(isolated_chain_registry.entries) == 1
+        finally:
+            afs_mod.default_knowledge_cache = orig_cache
+
+    def test_spawn_cold_persists_to_agents_registry(
+        self, isolated_knowledge_cache, isolated_chain_registry, isolated_agents_registry
+    ):
+        """#17: COLD_DURABLE spawns must be written to the durable agents.jsonl registry."""
+        import json
+
+        import merged_agentic_swarm.services.agent_factory_service as afs_mod
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
+
+        orig_cache = afs_mod.default_knowledge_cache
+        afs_mod.default_knowledge_cache = isolated_knowledge_cache
+        try:
+            factory = DurableAgentFactory(
+                chain_registry=isolated_chain_registry, agents_registry_file=isolated_agents_registry
+            )
+            lid = isolated_knowledge_cache.add_learning("Durable pattern", "swarm_concurrency", "40 workers")
+            spec = factory.spawn_from_learning(lid, trigger_reason="Durable state persistence")
+            assert spec.agent_type == AgentType.COLD_DURABLE
+
+            assert os.path.exists(isolated_agents_registry)
+            with open(isolated_agents_registry) as f:
+                lines = [json.loads(l) for l in f if l.strip()]
+            assert len(lines) == 1
+            record = lines[0]
+            assert record["id"] == spec.id
+            assert record["ttl_sec"] is None  # durable
+            assert record["role"] == "cold_durable"
+            assert record["agent_type"] == "cold_durable"
+            assert record["category"] == "swarm_concurrency"
+            assert lid in record["derived_from_learnings"]
+        finally:
+            afs_mod.default_knowledge_cache = orig_cache
+
+    def test_spawn_hot_not_persisted_to_agents_registry(
+        self, isolated_knowledge_cache, isolated_chain_registry, isolated_agents_registry
+    ):
+        """#17: HOT micro-specialists are transient and must NOT hit agents.jsonl."""
+        import merged_agentic_swarm.services.agent_factory_service as afs_mod
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
+
+        orig_cache = afs_mod.default_knowledge_cache
+        afs_mod.default_knowledge_cache = isolated_knowledge_cache
+        try:
+            factory = DurableAgentFactory(
+                chain_registry=isolated_chain_registry, agents_registry_file=isolated_agents_registry
+            )
+            lid = isolated_knowledge_cache.add_learning("Hot fix", "error_fix", "Quick patch")
+            spec = factory.spawn_from_learning(lid, trigger_reason="Error recovery")
+            assert spec.agent_type == AgentType.HOT_MICRO_SPECIALIST
+            assert not os.path.exists(isolated_agents_registry) or os.path.getsize(isolated_agents_registry) == 0
+        finally:
+            afs_mod.default_knowledge_cache = orig_cache
+
+    def test_cold_persist_is_idempotent(self, isolated_chain_registry, isolated_agents_registry):
+        """#17: persisting an already-registered agent id must not duplicate the line."""
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
+
+        factory = DurableAgentFactory(
+            chain_registry=isolated_chain_registry, agents_registry_file=isolated_agents_registry
+        )
+        record = {
+            "id": "agent-cold_durable-999",
+            "name": "Durable 999",
+            "role": "cold_durable",
+            "type": "cold_durable",
+            "category": "general",
+            "derived_from_learnings": ["LEARN-001"],
+            "system_prompt": "prompt",
+            "promoted_at": time.time(),
+            "ttl_sec": None,
+        }
+        assert factory._persist_cold_agent(record) is not None
+        assert factory._persist_cold_agent(record) is None  # skipped
+        with open(isolated_agents_registry) as f:
+            assert sum(1 for l in f if l.strip()) == 1
+
+    def test_cold_agents_loaded_from_registry_on_restart(
+        self, isolated_knowledge_cache, isolated_chain_registry, isolated_agents_registry
+    ):
+        """#17: a fresh factory discovers persisted COLD_DURABLE agents (restart survival)."""
+        import merged_agentic_swarm.services.agent_factory_service as afs_mod
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
+
+        orig_cache = afs_mod.default_knowledge_cache
+        afs_mod.default_knowledge_cache = isolated_knowledge_cache
+        try:
+            factory1 = DurableAgentFactory(
+                chain_registry=isolated_chain_registry, agents_registry_file=isolated_agents_registry
+            )
+            lid = isolated_knowledge_cache.add_learning("Restart pattern", "wave_gating", "Gate everything")
+            spec = factory1.spawn_from_learning(lid, trigger_reason="Durable")
+
+            factory2 = DurableAgentFactory(
+                chain_registry=isolated_chain_registry, agents_registry_file=isolated_agents_registry
+            )
+            assert spec.id in factory2.active_cold_agents
+            assert factory2.active_cold_agents[spec.id].agent_type == AgentType.COLD_DURABLE
+            assert factory2.active_cold_agents[spec.id].ttl_sec is None
         finally:
             afs_mod.default_knowledge_cache = orig_cache
 

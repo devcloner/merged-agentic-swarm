@@ -78,17 +78,24 @@ class TestWaveGateController:
             wgs.default_codebase_mapper = original_mapper
 
     def test_advance_wave_beyond_all(self, temp_dir, isolated_codebase_mapper, owner_map_file):
-        """advance_wave should complete after wave 3."""
+        """advance_wave should complete after wave 3 (with verification recorded)."""
         from merged_agentic_swarm.services import wave_gate_service as wgs
 
         original_mapper = wgs.default_codebase_mapper
         wgs.default_codebase_mapper = isolated_codebase_mapper
 
         try:
-            for _ in range(4):
+            # Waves 0-2 advance on statuses alone
+            for _ in range(3):
                 success, _ = self.controller.advance_wave()
-            success, message = self.controller.advance_wave()
-            assert success is True
+                assert success is True
+            # Wave 3 requires recorded verification results (issue #13)
+            self.controller.record_verification_results(
+                {"exit_code": 0, "tests_ran": True, "output_summary": "=== CI PASSED ==="}
+            )
+            for _ in range(2):
+                success, message = self.controller.advance_wave()
+                assert success is True
             assert "All Wave Gates successfully passed" in message
         finally:
             wgs.default_codebase_mapper = original_mapper
@@ -190,6 +197,39 @@ class TestWaveGatesWithRealState:
                 )
             )
         wgs.default_task_master.current_analysis = PRDAnalysisResult(title="T", summary="S", epics=epics)
+
+    def _with_wave3_epics(self, tmp_path, wgs, statuses):
+        """Attach real wave-3 epics whose subtasks output src/ artifacts."""
+        epics = []
+        for i, (epic_status, subtask_statuses) in enumerate(statuses):
+            subtasks = [
+                SubTask(
+                    id=f"ST3-{i}-{j}",
+                    title=f"Subtask {i}-{j}",
+                    description=f"d {i}-{j}",
+                    status=ss,
+                    output_artifacts=[f"src/module{i}/file{j}.py"],
+                )
+                for j, ss in enumerate(subtask_statuses)
+            ]
+            epics.append(
+                EpicTask(
+                    id=f"EPIC-W3-{i}",
+                    title=f"Epic {i}",
+                    description="desc",
+                    wave_id=3,
+                    priority=TaskPriority.P1_HIGH,
+                    status=epic_status,
+                    subtasks=subtasks,
+                )
+            )
+        wgs.default_task_master.current_analysis = PRDAnalysisResult(title="T", summary="S", epics=epics)
+
+    def _wave3_ownership(self, tmp_path):
+        _ownership_map(
+            str(tmp_path),
+            [{"pool_id": "security-a11y-auditors", "owned_paths": ["src/*"], "forbidden_paths": []}],
+        )
 
     def test_wave1_fails_on_incomplete_epics(self, tmp_path):
         controller, wgs = self._controller(tmp_path)
@@ -307,5 +347,57 @@ class TestWaveGatesWithRealState:
             assert success is False
             assert controller.waves[1].status.value == "failed"
             assert controller.waves[1].failure_reason
+        finally:
+            wgs.default_task_master.current_analysis = None
+
+    def test_wave3_gate_fails_without_verification(self, tmp_path):
+        """Wave 3 must not pass on statuses alone — verification must have run."""
+        controller, wgs = self._controller(tmp_path)
+        self._with_wave3_epics(tmp_path, wgs, [(TaskStatus.COMPLETED, [TaskStatus.COMPLETED])])
+        self._wave3_ownership(tmp_path)
+        try:
+            passed, reasons = controller.evaluate_gate_criteria(3)
+            assert passed is False
+            assert any("verification not run" in r for r in reasons)
+        finally:
+            wgs.default_task_master.current_analysis = None
+
+    def test_wave3_gate_passes_with_clean_verification(self, tmp_path):
+        controller, wgs = self._controller(tmp_path)
+        self._with_wave3_epics(tmp_path, wgs, [(TaskStatus.COMPLETED, [TaskStatus.COMPLETED])])
+        self._wave3_ownership(tmp_path)
+        controller.record_verification_results(
+            {"exit_code": 0, "tests_ran": True, "output_summary": "=== CI PASSED ==="}
+        )
+        try:
+            passed, reasons = controller.evaluate_gate_criteria(3)
+            assert passed is True, reasons
+        finally:
+            wgs.default_task_master.current_analysis = None
+
+    def test_wave3_gate_fails_on_syntax_errors(self, tmp_path):
+        controller, wgs = self._controller(tmp_path)
+        self._with_wave3_epics(tmp_path, wgs, [(TaskStatus.COMPLETED, [TaskStatus.COMPLETED])])
+        self._wave3_ownership(tmp_path)
+        controller.record_verification_results(
+            {"exit_code": 1, "tests_ran": True, "output_summary": "Syntax check FAILED"}
+        )
+        try:
+            passed, reasons = controller.evaluate_gate_criteria(3)
+            assert passed is False
+            assert any("Syntax check failed" in r for r in reasons)
+        finally:
+            wgs.default_task_master.current_analysis = None
+
+    def test_wave3_gate_fails_when_tests_not_run(self, tmp_path):
+        """Inline syntax fallback (no tests_ran) must not satisfy tests_passing."""
+        controller, wgs = self._controller(tmp_path)
+        self._with_wave3_epics(tmp_path, wgs, [(TaskStatus.COMPLETED, [TaskStatus.COMPLETED])])
+        self._wave3_ownership(tmp_path)
+        controller.record_verification_results({"exit_code": 0, "output_summary": "Syntax check PASSED"})
+        try:
+            passed, reasons = controller.evaluate_gate_criteria(3)
+            assert passed is False
+            assert any("Tests not verified" in r for r in reasons)
         finally:
             wgs.default_task_master.current_analysis = None

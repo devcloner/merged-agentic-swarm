@@ -88,7 +88,7 @@ class TestCLIStringFunctions:
         assert callable(cmd_promote)
 
     def test_cmd_status_no_progress_file(self, capsys, temp_dir):
-        """cmd_status should handle missing progress.json gracefully."""
+        """cmd_status should handle a missing progress ledger gracefully."""
         from merged_agentic_swarm.tools.agentic_cli import cmd_status
 
         # Create a mock args object
@@ -97,7 +97,7 @@ class TestCLIStringFunctions:
 
         cmd_status(Args())
         captured = capsys.readouterr()
-        assert "No progress.json found" in captured.out
+        assert "No progress ledger found" in captured.out
 
 
 class TestCmdRun:
@@ -170,17 +170,82 @@ class TestCmdStatus:
         reg.mkdir(parents=True, exist_ok=True)
         return reg
 
+    def _ledger(self, n_logs=3, n_markers=2, wave_ids=(1, 2, 4)):
+        logs = [
+            {
+                "entry_id": f"LOG-{i + 1:05d}",
+                "task_id": f"EPIC-{i}",
+                "subtask_id": None,
+                "worker_id": f"orchestrator-wave-{i % 4}",
+                "wave_id": wave_ids[i] if i < len(wave_ids) else 0,
+                "action": "synthesis_completed" if i % 2 else "testing",
+                "status": "completed",
+                "timestamp": 1700000000 + i,
+            }
+            for i in range(n_logs)
+        ]
+        markers = [
+            {
+                "id": f"MARKER-{i + 1:04d}",
+                "task_id": "TASK-01",
+                "verifier_name": "V",
+                "command_executed": "cmd",
+                "exit_code": 0,
+                "output_summary": "ok",
+                "timestamp": 1700000000 + i,
+            }
+            for i in range(n_markers)
+        ]
+        return {"logs": logs, "success_markers": markers, "task_master_snapshot": {"title": "Test PRD"}}
+
     def test_status_no_progress(self, tmp_path, capsys, monkeypatch):
         monkeypatch.setattr(agentic_cli, "_REPO_ROOT", tmp_path)
+        monkeypatch.setattr(agentic_cli, "_progress_ledger_path", lambda: str(tmp_path / "none.json"))
         agentic_cli.cmd_status(_args())
         out = capsys.readouterr().out
-        assert "No progress.json found" in out
+        assert "No progress ledger found" in out
 
-    def test_status_with_progress_and_registries(self, tmp_path, capsys, monkeypatch):
+    def test_status_with_ledger_and_registries(self, tmp_path, capsys, monkeypatch):
         reg = self._registry(tmp_path)
-        _write(
+        ledger_path = _write(tmp_path, "ledger.json", json.dumps(self._ledger()))
+        (reg / "knowledge.jsonl").write_text("a\nb\n", encoding="utf-8")
+        (reg / "agents.jsonl").write_text("x\n", encoding="utf-8")
+        (reg / "chain.jsonl").write_text("", encoding="utf-8")
+        _write(tmp_path, ".taskmaster/tasks/spawn_chain_registry.json", json.dumps([1, 2]))
+        monkeypatch.setattr(agentic_cli, "_REPO_ROOT", tmp_path)
+        monkeypatch.setattr(agentic_cli, "_progress_ledger_path", lambda: str(ledger_path))
+        agentic_cli.cmd_status(_args())
+        out = capsys.readouterr().out
+        assert "3 log entries, 2 success markers" in out
+        assert "completed=3, failed=0" in out
+        assert "Test PRD" in out
+        assert "knowledge.jsonl: 2 entries" in out
+        assert "agents.jsonl: 1 entries" in out
+        assert "chain.jsonl: 0 entries" in out
+        assert "spawn_chain_registry: 2 entries" in out
+
+    def test_status_corrupt_ledger(self, tmp_path, capsys, monkeypatch):
+        self._registry(tmp_path)
+        bad = _write(tmp_path, "ledger.json", "{not json")
+        monkeypatch.setattr(agentic_cli, "_REPO_ROOT", tmp_path)
+        monkeypatch.setattr(agentic_cli, "_progress_ledger_path", lambda: str(bad))
+        agentic_cli.cmd_status(_args())
+        out = capsys.readouterr().out
+        assert "ERROR reading progress ledger" in out
+
+    def test_status_custom_progress_path(self, tmp_path, capsys, monkeypatch):
+        p = _write(tmp_path, "alt.json", json.dumps(self._ledger(n_logs=1, n_markers=1, wave_ids=(3,))))
+        monkeypatch.setattr(agentic_cli, "_REPO_ROOT", tmp_path)
+        agentic_cli.cmd_status(_args(progress=str(p)))
+        out = capsys.readouterr().out
+        assert "1 log entries, 1 success markers" in out
+        assert "Waves covered:     3" in out
+
+    def test_status_legacy_snapshot_still_renders(self, tmp_path, capsys, monkeypatch):
+        """Old progress.json snapshots passed via --progress keep working."""
+        p = _write(
             tmp_path,
-            "docs/agentic/registry/progress.json",
+            "legacy.json",
             json.dumps(
                 {
                     "overall_completion_pct": 63,
@@ -190,33 +255,19 @@ class TestCmdStatus:
                 }
             ),
         )
-        (reg / "knowledge.jsonl").write_text("a\nb\n", encoding="utf-8")
-        (reg / "agents.jsonl").write_text("x\n", encoding="utf-8")
-        (reg / "chain.jsonl").write_text("", encoding="utf-8")
-        _write(tmp_path, ".taskmaster/tasks/spawn_chain_registry.json", json.dumps([1, 2]))
         monkeypatch.setattr(agentic_cli, "_REPO_ROOT", tmp_path)
-        agentic_cli.cmd_status(_args())
+        agentic_cli.cmd_status(_args(progress=str(p)))
         out = capsys.readouterr().out
         assert "Overall completion: 63%" in out
         assert "W1: 100%" in out
-        assert "knowledge.jsonl: 2 entries" in out
-        assert "agents.jsonl: 1 entries" in out
-        assert "chain.jsonl: 0 entries" in out
-        assert "spawn_chain_registry: 2 entries" in out
+        assert "Milestones (1):" in out
 
-    def test_status_corrupt_progress(self, tmp_path, capsys, monkeypatch):
-        self._registry(tmp_path)
-        _write(tmp_path, "docs/agentic/registry/progress.json", "{not json")
-        monkeypatch.setattr(agentic_cli, "_REPO_ROOT", tmp_path)
-        agentic_cli.cmd_status(_args())
-        out = capsys.readouterr().out
-        assert "ERROR reading progress.json" in out
+    def test_status_defaults_to_real_ledger(self):
+        """#19: cmd_status must point at the live ProgressLedgerService ledger."""
+        from merged_agentic_swarm.services.progress_ledger_service import default_progress_ledger
 
-    def test_status_custom_progress_path(self, tmp_path, capsys, monkeypatch):
-        p = _write(tmp_path, "alt.json", json.dumps({"overall_completion_pct": 42}))
-        monkeypatch.setattr(agentic_cli, "_REPO_ROOT", tmp_path)
-        agentic_cli.cmd_status(_args(progress=str(p)))
-        assert "Overall completion: 42%" in capsys.readouterr().out
+        assert agentic_cli._progress_ledger_path() == default_progress_ledger.ledger_file
+        assert agentic_cli._progress_ledger_path().endswith("progress_ledger.json")
 
 
 class TestCmdPromote:

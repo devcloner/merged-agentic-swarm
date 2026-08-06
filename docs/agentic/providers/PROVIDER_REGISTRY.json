@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Provider registry for the merged agentic swarm — mirrors routes defined in providers/multi_provider_fabric.py",
+  "description": "Provider registry for the merged agentic swarm — mirrors routes defined in providers/multi_provider_fabric.py. litellm on localhost:4000 is the primary backend.",
   "tiers": {
     "deep": [
       "opencode_go/deepseek-v4-flash",
@@ -30,7 +30,8 @@
       "domain-module-worker": "main",
       "type-hardening-worker": "fast",
       "test-engineer": "main",
-      "sec-a11y-auditor": "deep"
+      "sec-a11y-auditor": "deep",
+      "codebase-ast-mapper": "main"
     },
     "fallback_order": ["main", "fast", "deep"],
     "degrade_on_rate_limit": true,
@@ -41,13 +42,16 @@
       "type": "openai_compatible",
       "base_url": "http://localhost:4000/v1/chat/completions",
       "auth_env": "LITELLM_PROXY_KEY",
-      "status": "available"
+      "status": "available",
+      "primary": true,
+      "notes": "Fronts a 42-key rotating Gemini pool as virtual models (gemini-2.5-flash, gemini-3.6-flash, gemini-batch, ...)"
     },
     "opencode": {
       "type": "openai_compatible",
       "base_url": "https://api.opencode.ai/v1/chat/completions",
       "auth_env": "OPENCODE_API_KEY",
-      "status": "unavailable"
+      "status": "unavailable",
+      "notes": "Status derived from OPENCODE_API_KEY presence in os.environ — currently unset"
     },
     "gemini": {
       "type": "openai_compatible",
@@ -91,12 +95,56 @@
       "auth_env": "AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY",
       "auth_method": "sigv4",
       "status": "misconfigured"
+    },
+    "nvidia_nim": {
+      "type": "openai_compatible",
+      "base_url": "https://integrate.api.nvidia.com/v1/chat/completions",
+      "auth_env": "NVIDIA_NIM_API_KEY",
+      "status": "available"
+    },
+    "fcc-proxy": {
+      "type": "anthropic_compatible",
+      "base_url": "http://127.0.0.1:8080/v1/messages",
+      "auth_env": "ANTHROPIC_AUTH_TOKEN",
+      "status": "available",
+      "notes": "Anthropic Messages API shape; key_pool falls back to 'freecc' when ANTHROPIC_AUTH_TOKEN is unset"
+    },
+    "routatic-proxy": {
+      "type": "anthropic_compatible",
+      "base_url": "http://127.0.0.1:3456/v1/messages",
+      "auth_env": "ANTHROPIC_AUTH_TOKEN",
+      "status": "available",
+      "notes": "Anthropic-wire only — OpenAI /v1/chat/completions returns 404"
+    },
+    "cloudcli": {
+      "type": "remote_agent",
+      "base_url": "https://cloneclove.com/api/agent",
+      "auth_env": "CLOUDCLI_API_KEY",
+      "status": "available",
+      "notes": "Agent-triggering API (POST /api/agent, X-API-Key header), not a chat-completions endpoint"
+    },
+    "bluesminds": {
+      "type": "openai_compatible",
+      "base_url": "https://api.bluesminds.com/v1",
+      "auth_env": "BLUESMINDS_API_KEY",
+      "status": "available",
+      "notes": "Bypasses the litellm gateway (direct api.bluesminds.com); key embedded inline in ~/opencode.json"
+    },
+    "bluesminds-k1": {
+      "type": "openai_compatible",
+      "base_url": "https://api.bluesminds.com/v1",
+      "auth_env": "BLUESMINDS_K1_API_KEY",
+      "status": "available",
+      "notes": "K1/claude-* models on a separate K1 key; also bypasses the gateway"
     }
   },
   "notes": [
+    "litellm on http://localhost:4000 is the PRIMARY backend — a local gateway that fronts a 42-key rotating Gemini pool as virtual models",
     "Real routing table defined in providers/multi_provider_fabric.py MODEL_FABRIC_ROUTES",
     "fcc-server on port 8080 handles ANTHROPIC_BASE_URL traffic via settings.local.json",
     "Python proxy on port 8085 provides Anthropic + OpenAI compatible endpoints with key-pool rotation",
+    "bluesminds and bluesminds-k1 point directly at https://api.bluesminds.com/v1, bypassing the litellm gateway entirely — no rate-limit/K1 routing, K1 spend untracked by the gateway",
+    "routatic-proxy on port 3456 is Anthropic-wire only; OpenAI /v1/chat/completions 404s there",
     "Multi-provider fabric falls back to offline simulation payload when all keys are exhausted"
   ]
 }
