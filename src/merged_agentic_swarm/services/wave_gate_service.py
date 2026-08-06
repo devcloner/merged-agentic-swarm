@@ -2,6 +2,7 @@
 Wave Gates Controller Service
 Enforces gated phase boundaries (Wave 0 to Wave 3) with pre-condition and post-condition verification.
 """
+
 import fnmatch
 import json
 import logging
@@ -15,33 +16,36 @@ from merged_agentic_swarm.services.task_master_service import default_task_maste
 
 logger = logging.getLogger("wave_gate")
 
+
 class WaveGateController:
     def __init__(self):
         self.waves: dict[int, WaveExecutionState] = {
             0: WaveExecutionState(
                 wave_id=0,
                 name="Wave 0: Codebase Mapping & Spec Gap Gate",
-                gate_criteria=WaveGateCriteria(0, "Codebase Mapped & Gaps Closed", spec_gaps_closed=True)
+                gate_criteria=WaveGateCriteria(0, "Codebase Mapped & Gaps Closed", spec_gaps_closed=True),
             ),
             1: WaveExecutionState(
                 wave_id=1,
                 name="Wave 1: Key Pool Proxy & Fabric Gate",
-                gate_criteria=WaveGateCriteria(1, "Proxy & Fabric Operational", required_tasks_completed=True)
+                gate_criteria=WaveGateCriteria(1, "Proxy & Fabric Operational", required_tasks_completed=True),
             ),
             2: WaveExecutionState(
                 wave_id=2,
                 name="Wave 2: Swarm & Agent Factory Feature Gate",
-                gate_criteria=WaveGateCriteria(2, "Swarm Work Completed", required_tasks_completed=True)
+                gate_criteria=WaveGateCriteria(2, "Swarm Work Completed", required_tasks_completed=True),
             ),
             3: WaveExecutionState(
                 wave_id=3,
                 name="Wave 3: Integration & Verification Gate",
-                gate_criteria=WaveGateCriteria(3, "Full Verification & Zero Defect", zero_syntax_errors=True, tests_passing=True)
+                gate_criteria=WaveGateCriteria(
+                    3, "Full Verification & Zero Defect", zero_syntax_errors=True, tests_passing=True
+                ),
             ),
             4: WaveExecutionState(
                 wave_id=4,
                 name="Wave 4: Synthesis & Final Reporting Gate",
-                gate_criteria=WaveGateCriteria(4, "Synthesis & Reporting Complete", required_tasks_completed=True)
+                gate_criteria=WaveGateCriteria(4, "Synthesis & Reporting Complete", required_tasks_completed=True),
             ),
         }
         self._max_wave = 4
@@ -103,12 +107,9 @@ class WaveGateController:
                         )
 
                 # Check that output falls within owned paths (if pool has any defined)
-                if owned_paths and not any(
-                    fnmatch.fnmatch(output_path, p) for p in owned_paths
-                ):
+                if owned_paths and not any(fnmatch.fnmatch(output_path, p) for p in owned_paths):
                     violations.append(
-                        f"Subtask '{subtask.id}' output '{output_path}' is outside "
-                        f"owned paths for pool '{pool_id}'"
+                        f"Subtask '{subtask.id}' output '{output_path}' is outside owned paths for pool '{pool_id}'"
                     )
 
         return violations
@@ -178,6 +179,7 @@ class WaveGateController:
             return True, f"Advanced to Wave {self.current_wave}"
         else:
             return True, "All Wave Gates successfully passed!"
+
 
 # Global Singleton
 default_wave_controller = WaveGateController()

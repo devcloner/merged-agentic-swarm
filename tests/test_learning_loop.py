@@ -9,11 +9,13 @@ Covers:
   - Valid JSONL syntax throughout
   - Required frontmatter in agent .md files
 """
+
 import json
 import os
 import time
 
 # ── Test Helpers ──────────────────────────────────────────────────────────────
+
 
 def _make_learning_entry(title, category, solution, tags=None):
     """Create a learning entry dict matching the knowledge_cache schema."""
@@ -124,11 +126,10 @@ def _evaluate_promotion_criteria(learning_entry, cold_knowledge_path):
         all_pass = False
 
     # 5. no_duplicate: content-hash check against cold knowledge
-    content_key = f"{title}|{learning_entry.get('category','')}|{solution}"
+    content_key = f"{title}|{learning_entry.get('category', '')}|{solution}"
     existing = _read_jsonl(cold_knowledge_path)
     is_dup = any(
-        f"{e.get('title','')}|{e.get('category','')}|{e.get('solution','')}" == content_key
-        for e in existing
+        f"{e.get('title', '')}|{e.get('category', '')}|{e.get('solution', '')}" == content_key for e in existing
     )
     criteria["no_duplicate"] = not is_dup
     if not criteria["no_duplicate"]:
@@ -153,8 +154,7 @@ def _promote_learning(learning_entry, learning_id, temp_dir, timestamp=None):
     agent_name = f"Durable {category} Specialist"
     chain_entry_id = f"CHAIN-COLD-{int(ts * 1000)}"
     system_prompt = (
-        f"You are a durable specialist for {category} tasks, created from validated learning records. "
-        f"Pattern: {title}."
+        f"You are a durable specialist for {category} tasks, created from validated learning records. Pattern: {title}."
     )
 
     # Set up temp directory structure
@@ -167,21 +167,42 @@ def _promote_learning(learning_entry, learning_id, temp_dir, timestamp=None):
     progress_path = os.path.join(registry_dir, "progress.json")
 
     # 4a. knowledge.jsonl
-    _append_jsonl(knowledge_path, _make_knowledge_jsonl_entry(
-        learning_id, title, category, solution, tags, ts,
-    ))
+    _append_jsonl(
+        knowledge_path,
+        _make_knowledge_jsonl_entry(
+            learning_id,
+            title,
+            category,
+            solution,
+            tags,
+            ts,
+        ),
+    )
 
     # 4b. agents.jsonl
-    _append_jsonl(agents_path, _make_agent_jsonl_entry(
-        agent_id, agent_name, category, [learning_id], system_prompt, ts,
-    ))
+    _append_jsonl(
+        agents_path,
+        _make_agent_jsonl_entry(
+            agent_id,
+            agent_name,
+            category,
+            [learning_id],
+            system_prompt,
+            ts,
+        ),
+    )
 
     # 4c. chain.jsonl
-    _append_jsonl(chain_path, _make_chain_jsonl_entry(
-        chain_entry_id, learning_id, agent_id,
-        f"Repeated {category} pattern triggered cold-path promotion",
-        ts,
-    ))
+    _append_jsonl(
+        chain_path,
+        _make_chain_jsonl_entry(
+            chain_entry_id,
+            learning_id,
+            agent_id,
+            f"Repeated {category} pattern triggered cold-path promotion",
+            ts,
+        ),
+    )
 
     # 4d. agent .md file
     os.makedirs(agents_dir, exist_ok=True)
@@ -216,12 +237,14 @@ None (null = permanent / no expiry)
             except (OSError, json.JSONDecodeError):
                 pass
     milestones = progress.get("milestone_history", [])
-    milestones.append({
-        "milestone": "Learning Loop E2E Test",
-        "completed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(ts)),
-        "status": "completed",
-        "notes": f"Agent {agent_id} promoted. 5 artifacts written.",
-    })
+    milestones.append(
+        {
+            "milestone": "Learning Loop E2E Test",
+            "completed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(ts)),
+            "status": "completed",
+            "notes": f"Agent {agent_id} promoted. 5 artifacts written.",
+        }
+    )
     progress["milestone_history"] = milestones
     progress["_last_agent_id"] = agent_id
     with open(progress_path, "w") as f:
@@ -298,14 +321,16 @@ def _load_agents_from_registry(temp_dir):
         agent_id = entry.get("id", "")
         md_path = os.path.join(agents_dir, f"{agent_id}.md")
         has_md = os.path.exists(md_path)
-        agents.append({
-            "id": agent_id,
-            "name": entry.get("name", ""),
-            "category": entry.get("category", ""),
-            "system_prompt": entry.get("system_prompt", ""),
-            "has_md_file": has_md,
-            "md_path": md_path,
-        })
+        agents.append(
+            {
+                "id": agent_id,
+                "name": entry.get("name", ""),
+                "category": entry.get("category", ""),
+                "system_prompt": entry.get("system_prompt", ""),
+                "has_md_file": has_md,
+                "md_path": md_path,
+            }
+        )
     return agents
 
 
@@ -322,6 +347,7 @@ def _simulate_reuse(agent, task_description):
 
 
 # ── Tests: Step-by-Step ───────────────────────────────────────────────────────
+
 
 class TestCaptureStep:
     """Step 1: CAPTURE — Create a controlled learning scenario."""
@@ -441,11 +467,16 @@ class TestEvaluateStep:
         )
         cold_path = os.path.join(temp_dir, "knowledge.jsonl")
         # Pre-populate cold knowledge with same entry
-        _append_jsonl(cold_path, _make_knowledge_jsonl_entry(
-            "LEARN-0099", "Circuit Breaker Pattern", "resilience",
-            "Skip failed providers after 3 consecutive failures.",
-            ["circuit-breaker"],
-        ))
+        _append_jsonl(
+            cold_path,
+            _make_knowledge_jsonl_entry(
+                "LEARN-0099",
+                "Circuit Breaker Pattern",
+                "resilience",
+                "Skip failed providers after 3 consecutive failures.",
+                ["circuit-breaker"],
+            ),
+        )
 
         passed, criteria = _evaluate_promotion_criteria(entry, cold_path)
         assert passed is False
@@ -738,6 +769,7 @@ class TestFullLifecycle:
         # Step 2: Record (hot cache)
         cache_file = os.path.join(temp_dir, "hot_cache.json")
         from merged_agentic_swarm.tools.knowledge_cache import KnowledgeCache
+
         cache = KnowledgeCache(cache_file=cache_file, max_learnings=10)
         learning_id = cache.add_learning(
             title=entry["title"],

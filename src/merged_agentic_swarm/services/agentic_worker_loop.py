@@ -10,6 +10,7 @@ they can never be recorded as completed work.
 
 This replaces the old single-shot worker dispatch that produced no artifacts.
 """
+
 from __future__ import annotations
 
 import logging
@@ -64,7 +65,10 @@ LIST_DIR_TOOL: dict[str, Any] = {
         "parameters": {
             "type": "object",
             "properties": {
-                "path": {"type": "string", "description": "Repository-relative directory path; use '' for the repo root"},
+                "path": {
+                    "type": "string",
+                    "description": "Repository-relative directory path; use '' for the repo root",
+                },
             },
             "required": ["path"],
         },
@@ -221,10 +225,7 @@ class AgenticWorkerLoop:
 
             if response.get("simulation_fallback"):
                 # A simulated response is a hard failure — never a completion.
-                logger.error(
-                    "Worker received simulation_fallback (all live providers down); "
-                    "marking subtask failed."
-                )
+                logger.error("Worker received simulation_fallback (all live providers down); marking subtask failed.")
                 return {
                     "status": "failed",
                     "reason": "simulation_fallback",
@@ -247,11 +248,13 @@ class AgenticWorkerLoop:
                 }
 
             # Append the assistant tool-call message, then execute each call for real.
-            messages.append({
-                "role": "assistant",
-                "content": _extract_text(response),
-                "tool_calls": tool_calls,
-            })
+            messages.append(
+                {
+                    "role": "assistant",
+                    "content": _extract_text(response),
+                    "tool_calls": tool_calls,
+                }
+            )
             for tool_call in tool_calls:
                 name = tool_call.get("name", "")
                 args = tool_call.get("input", {}) or {}
@@ -263,11 +266,13 @@ class AgenticWorkerLoop:
                         files_written.append(args.get("path", ""))
                     elif name == "run_command":
                         commands_run.append(args.get("command", ""))
-                messages.append({
-                    "role": "tool",
-                    "tool_call_id": tool_call.get("id", ""),
-                    "content": result_text,
-                })
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tool_call.get("id", ""),
+                        "content": result_text,
+                    }
+                )
 
         # Iteration bound hit — real partial work is kept and reported honestly.
         return {

@@ -25,7 +25,7 @@
     "start_command": "/home/linuxbrew/.linuxbrew/Cellar/routatic-proxy/0.6.2/bin/routatic-proxy serve -c /home/ubuntu/.config/routatic-proxy/config.json -p 3456 -b",
     "env_vars": {
       "ROUTATIC_PROXY_API": "freecc",
-      "OC_GO_CC_API_KEY": "sk-REDACTED"
+      "OC_GO_CC_API_KEY": "${OC_GO_CC_API_KEY}"
     },
     "health_endpoint": "http://127.0.0.1:3456/health",
     "models_endpoint": "http://127.0.0.1:3456/v1/models",

@@ -3,6 +3,7 @@ Claude API Key Pool Proxy Server
 Exposes Anthropic-compatible, OpenAI-compatible API endpoints, and audio transcription
 backed by multi-provider key pools / NVIDIA NIM Whisper.
 """
+
 import json
 import logging
 import os
@@ -33,6 +34,7 @@ MIME_MAP = {
     "aac": "audio/aac",
 }
 
+
 def _parse_multipart(body: bytes, content_type: str) -> tuple[bytes | None, str | None, str | None]:
     """Return (file_bytes, file_name, model_name) from a multipart body."""
     m = re.search(r'boundary=(?:"([^"]+)"|([^;]+))', content_type)
@@ -50,7 +52,7 @@ def _parse_multipart(body: bytes, content_type: str) -> tuple[bytes | None, str 
         if hdr_end == -1:
             continue
         headers_raw = part[:hdr_end].decode("utf-8", errors="replace")
-        body_data = part[hdr_end + 4:]
+        body_data = part[hdr_end + 4 :]
         # Strip trailing boundary markers and CRLF
         if body_data.endswith(b"\r\n"):
             body_data = body_data[:-2]
@@ -104,9 +106,12 @@ def _forward_transcription(
         return resp.json()
     return resp.status_code, {"error": f"NIM transcription failed: {resp.text}"}
 
+
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Threaded HTTP server to handle concurrent requests."""
+
     daemon_threads = True
+
 
 class ClaudeProxyHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
@@ -133,7 +138,9 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/health":
-            self.send_json_response(200, {"status": "ok", "service": "Claude-Shaped Key Pool Proxy", "timestamp": time.time()})
+            self.send_json_response(
+                200, {"status": "ok", "service": "Claude-Shaped Key Pool Proxy", "timestamp": time.time()}
+            )
         elif self.path == "/status":
             summary = default_key_pool.get_summary()
             self.send_json_response(200, {"status": "active", "key_pools": summary, "timestamp": time.time()})
@@ -168,7 +175,7 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
                 messages=messages,
                 system_prompt=system_prompt,
                 max_tokens=max_tokens,
-                temperature=temperature
+                temperature=temperature,
             )
             self.send_json_response(200, response_data)
 
@@ -179,10 +186,7 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
             temperature = req_data.get("temperature", 0.7)
 
             anthropic_resp = default_fabric.dispatch_request(
-                model_alias=model,
-                messages=messages,
-                max_tokens=max_tokens,
-                temperature=temperature
+                model_alias=model, messages=messages, max_tokens=max_tokens, temperature=temperature
             )
 
             # Convert back to OpenAI format for chat completions endpoint callers
@@ -196,13 +200,9 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
                 "created": int(time.time()),
                 "model": model,
                 "choices": [
-                    {
-                        "index": 0,
-                        "message": {"role": "assistant", "content": text_content},
-                        "finish_reason": "stop"
-                    }
+                    {"index": 0, "message": {"role": "assistant", "content": text_content}, "finish_reason": "stop"}
                 ],
-                "usage": anthropic_resp.get("usage", {})
+                "usage": anthropic_resp.get("usage", {}),
             }
             self.send_json_response(200, openai_resp)
         else:
@@ -224,6 +224,7 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
             self.send_json_response(code, body)
         else:
             self.send_json_response(200, result)
+
 
 class ProxyServerDaemon:
     def __init__(self, host: str = "0.0.0.0", port: int = 8085):
@@ -256,6 +257,7 @@ class ProxyServerDaemon:
             self.server.server_close()
             self.server = None
             logger.info("Proxy server stopped.")
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

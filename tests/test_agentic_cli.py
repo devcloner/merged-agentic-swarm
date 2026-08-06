@@ -10,6 +10,7 @@ patched at the method level — the CLI's own logic (arg handling, file I/O,
 formatting, exit codes) is real. The orchestrator itself is covered by its own
 real-behavior tests and the live agentic run.
 """
+
 import json
 import os
 import sys
@@ -68,6 +69,7 @@ class TestCmdConfig:
         import sys
 
         from merged_agentic_swarm.tools.agentic_cli import main
+
         # Test that unknown commands exit
         with pytest.raises(SystemExit):
             sys.argv = ["agentic_cli.py", "unknown"]
@@ -80,6 +82,7 @@ class TestCLIStringFunctions:
     def test_cmd_promote_without_orchestrator_state(self):
         """cmd_promote should not crash when called directly (uses fresh orchestrator)."""
         from merged_agentic_swarm.tools.agentic_cli import cmd_promote
+
         # We can't easily test this without mocking because it writes to real registry
         # Just verify it imports correctly
         assert callable(cmd_promote)
@@ -87,9 +90,11 @@ class TestCLIStringFunctions:
     def test_cmd_status_no_progress_file(self, capsys, temp_dir):
         """cmd_status should handle missing progress.json gracefully."""
         from merged_agentic_swarm.tools.agentic_cli import cmd_status
+
         # Create a mock args object
         class Args:
             progress = os.path.join(temp_dir, "nonexistent.json")
+
         cmd_status(Args())
         captured = capsys.readouterr()
         assert "No progress.json found" in captured.out
@@ -173,12 +178,18 @@ class TestCmdStatus:
 
     def test_status_with_progress_and_registries(self, tmp_path, capsys, monkeypatch):
         reg = self._registry(tmp_path)
-        _write(tmp_path, "docs/agentic/registry/progress.json", json.dumps({
-            "overall_completion_pct": 63,
-            "phase_status": {"W1": {"completion_pct": 100, "color": "green", "status": "done"}},
-            "blockers": ["a long blocker message that should be truncated"],
-            "milestone_history": [{"milestone": "M1", "status": "achieved"}],
-        }))
+        _write(
+            tmp_path,
+            "docs/agentic/registry/progress.json",
+            json.dumps(
+                {
+                    "overall_completion_pct": 63,
+                    "phase_status": {"W1": {"completion_pct": 100, "color": "green", "status": "done"}},
+                    "blockers": ["a long blocker message that should be truncated"],
+                    "milestone_history": [{"milestone": "M1", "status": "achieved"}],
+                }
+            ),
+        )
         (reg / "knowledge.jsonl").write_text("a\nb\n", encoding="utf-8")
         (reg / "agents.jsonl").write_text("x\n", encoding="utf-8")
         (reg / "chain.jsonl").write_text("", encoding="utf-8")

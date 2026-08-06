@@ -1,6 +1,7 @@
 """
 pytest fixtures and shared test utilities for Merged Agentic Swarm.
 """
+
 import json
 import os
 import tempfile
@@ -12,6 +13,7 @@ import pytest
 
 
 # ── Fixtures: temp directories ──
+
 
 @pytest.fixture
 def temp_dir():
@@ -32,10 +34,12 @@ def temp_env_file(temp_dir):
 
 # ── Fixtures: isolated singletons ──
 
+
 @pytest.fixture
 def isolated_key_pool(temp_env_file):
     """Return a KeyPoolManager pointed at a temp env file."""
     from merged_agentic_swarm.providers.key_pool import KeyPoolManager
+
     pool = KeyPoolManager(env_file_path=temp_env_file)
     return pool
 
@@ -44,6 +48,7 @@ def isolated_key_pool(temp_env_file):
 def isolated_fabric(isolated_key_pool):
     """Return a MultiProviderFabric backed by the isolated key pool."""
     from merged_agentic_swarm.providers.multi_provider_fabric import MultiProviderFabric
+
     fabric = MultiProviderFabric(key_pool=isolated_key_pool)
     return fabric
 
@@ -52,6 +57,7 @@ def isolated_fabric(isolated_key_pool):
 def isolated_knowledge_cache(temp_dir):
     """Return a KnowledgeCache that writes to a temp file."""
     from merged_agentic_swarm.tools.knowledge_cache import KnowledgeCache
+
     cache_file = os.path.join(temp_dir, "knowledge_cache.json")
     cache = KnowledgeCache(cache_file=cache_file, max_learnings=10)
     return cache
@@ -61,6 +67,7 @@ def isolated_knowledge_cache(temp_dir):
 def isolated_chain_registry(temp_dir):
     """Return a ChainRegistry that writes to a temp file."""
     from merged_agentic_swarm.services.agent_factory_service import ChainRegistry
+
     reg_file = os.path.join(temp_dir, "spawn_chain_registry.json")
     reg = ChainRegistry(registry_file=reg_file)
     return reg
@@ -70,6 +77,7 @@ def isolated_chain_registry(temp_dir):
 def isolated_agent_factory(isolated_chain_registry):
     """Return a DurableAgentFactory with an isolated chain registry."""
     from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
+
     factory = DurableAgentFactory(chain_registry=isolated_chain_registry)
     return factory
 
@@ -78,6 +86,7 @@ def isolated_agent_factory(isolated_chain_registry):
 def isolated_progress_ledger(temp_dir):
     """Return a ProgressLedgerService that writes to a temp file."""
     from merged_agentic_swarm.services.progress_ledger_service import ProgressLedgerService
+
     ledger_file = os.path.join(temp_dir, "progress_ledger.json")
     ledger = ProgressLedgerService(ledger_file=ledger_file)
     return ledger
@@ -87,6 +96,7 @@ def isolated_progress_ledger(temp_dir):
 def isolated_task_master(temp_dir):
     """Return a TaskMasterService that writes to a temp file."""
     from merged_agentic_swarm.services.task_master_service import TaskMasterService
+
     state_file = os.path.join(temp_dir, "tasks.json")
     tm = TaskMasterService(state_file_path=state_file)
     return tm
@@ -96,6 +106,7 @@ def isolated_task_master(temp_dir):
 def isolated_wave_controller():
     """Return a fresh WaveGateController (no persistent state to worry about)."""
     from merged_agentic_swarm.services.wave_gate_service import WaveGateController
+
     return WaveGateController()
 
 
@@ -103,6 +114,7 @@ def isolated_wave_controller():
 def isolated_swarm_manager():
     """Return a fresh OpenCodeSwarmManager."""
     from merged_agentic_swarm.services.opencode_swarm_service import OpenCodeSwarmManager
+
     return OpenCodeSwarmManager()
 
 
@@ -110,6 +122,7 @@ def isolated_swarm_manager():
 def isolated_codebase_mapper(temp_dir):
     """Return a CodebaseMapService pointed at an isolated repo root."""
     from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
     mapper = CodebaseMapService(repo_root=temp_dir)
     mapper.spec_gaps = []
     mapper.symbol_cache = {}
@@ -148,12 +161,14 @@ def owner_map_file(temp_dir):
 
 # ── Helper factories ──
 
+
 @pytest.fixture
 def make_subtask():
     """Factory fixture that returns a function to create SubTask instances."""
 
     def _make(title="Test Task", desc="Test description", task_id=None):
         from merged_agentic_swarm.models.prd_models import SubTask
+
         return SubTask(
             id=task_id or f"TASK-{int(time.time() * 1000) % 10000:04d}",
             title=title,
@@ -169,6 +184,7 @@ def make_epic(make_subtask):
 
     def _make(title="Test Epic", epic_id=None, wave_id=0, subtask_count=1):
         from merged_agentic_swarm.models.prd_models import EpicTask, TaskPriority
+
         subtasks = [make_subtask(title=f"ST-{i}", task_id=f"ST-{epic_id}-{i}") for i in range(subtask_count)]
         return EpicTask(
             id=epic_id or f"EPIC-{int(time.time() * 1000) % 100:02d}",

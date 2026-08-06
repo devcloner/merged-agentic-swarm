@@ -39,6 +39,7 @@ VALID_STATUSES = {"pending", "in_progress", "completed", "failed", "blocked"}
 # Schema
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class TaskRecord:
     id: str
@@ -101,6 +102,7 @@ class TaskRecord:
 # Persistence (thread-safe + atomic)
 # ---------------------------------------------------------------------------
 
+
 class TaskSpineStore:
     """Manages the local task spine JSON file with fcntl locking."""
 
@@ -161,8 +163,7 @@ class TaskSpineStore:
                 self._write_atomic({"tasks": {}, "updated_at": datetime.now(UTC).isoformat()})
             return {"ok": True, "state_path": self.state_path, "exists": True}
 
-    def create(self, title: str, description: str, priority: str = "P2",
-               task_id: str | None = None) -> dict[str, Any]:
+    def create(self, title: str, description: str, priority: str = "P2", task_id: str | None = None) -> dict[str, Any]:
         """Create a new task.  Idempotent on task_id."""
         with self._locked():
             data = self._read_raw()
@@ -185,7 +186,9 @@ class TaskSpineStore:
             if task.status not in ("pending", "failed", "blocked"):
                 return {"ok": False, "error": f"Task '{task_id}' is '{task.status}', not claimable"}
             if task.status == "blocked" and task.blocked_by:
-                unresolved = [b for b in task.blocked_by if b in data["tasks"] and data["tasks"][b].get("status") != "completed"]
+                unresolved = [
+                    b for b in task.blocked_by if b in data["tasks"] and data["tasks"][b].get("status") != "completed"
+                ]
                 if unresolved:
                     return {"ok": False, "error": f"Task '{task_id}' is blocked by unresovled tasks: {unresolved}"}
             task.status = "in_progress"
@@ -323,6 +326,7 @@ class TaskSpineStore:
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def _make_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Local Task Spine Fallback Adapter", prog="task_spine_adapter")
     p.add_argument("--state-path", default=DEFAULT_STATE_PATH, help="Path to task_spine.json")
@@ -422,7 +426,10 @@ def main() -> None:
                     sys.exit(1)
                 result = store.attach_evidence(task_id=args.task_id, evidence=evidence)
         else:
-            result = {"ok": False, "error": "No command specified. Use --init, --create, --claim, --complete, --fail, --block, --list, --inspect, or --attach-evidence."}
+            result = {
+                "ok": False,
+                "error": "No command specified. Use --init, --create, --claim, --complete, --fail, --block, --list, --inspect, or --attach-evidence.",
+            }
 
     except Exception as exc:
         result = {"ok": False, "error": str(exc)}

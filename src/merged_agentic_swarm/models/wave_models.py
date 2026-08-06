@@ -1,6 +1,7 @@
 """
 Wave Gates Data Models
 """
+
 from dataclasses import asdict, dataclass, field
 from enum import Enum
 from typing import Any
@@ -12,11 +13,13 @@ class WavePhase(int, Enum):
     WAVE_2_CORE_FEATURES = 2
     WAVE_3_INTEGRATION_VERIFICATION = 3
 
+
 class WaveStatus(str, Enum):
     LOCKED = "locked"
     IN_PROGRESS = "in_progress"
     PASSED = "passed"
     FAILED = "failed"
+
 
 @dataclass
 class WaveGateCriteria:
@@ -32,6 +35,7 @@ class WaveGateCriteria:
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
+
 @dataclass
 class WaveExecutionState:
     wave_id: int
@@ -46,6 +50,8 @@ class WaveExecutionState:
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
-        d['status'] = self.status.value if isinstance(self.status, Enum) else self.status
-        d['gate_criteria'] = self.gate_criteria.to_dict() if hasattr(self.gate_criteria, 'to_dict') else self.gate_criteria
+        d["status"] = self.status.value if isinstance(self.status, Enum) else self.status
+        d["gate_criteria"] = (
+            self.gate_criteria.to_dict() if hasattr(self.gate_criteria, "to_dict") else self.gate_criteria
+        )
         return d

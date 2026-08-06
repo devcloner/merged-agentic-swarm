@@ -2,6 +2,7 @@
 Codebase Mapper & Spec Gap Closer Service
 Maps repository structure, AST symbols, and closes spec gaps before mass edits.
 """
+
 import ast
 import json
 import logging
@@ -11,6 +12,7 @@ from typing import Any
 from merged_agentic_swarm.models.prd_models import SpecGap
 
 logger = logging.getLogger("codebase_map_service")
+
 
 class CodebaseMapService:
     def __init__(self, repo_root: str | None = None):
@@ -28,10 +30,31 @@ class CodebaseMapService:
         symbol_index = {}
 
         ignore_dirs = {
-            ".git", "node_modules", ".cache", ".cargo", ".rustup", "__pycache__", ".npm",
-            ".gemini", ".local", "snap", ".atomic", ".aws", ".cloudcli", ".codex", ".config",
-            ".cursor", ".docker", ".fcc", ".fcc-tmp", ".omo", ".pi", ".remember", ".serena",
-            "claudecodeui", "Spotify-project-main"
+            ".git",
+            "node_modules",
+            ".cache",
+            ".cargo",
+            ".rustup",
+            "__pycache__",
+            ".npm",
+            ".gemini",
+            ".local",
+            "snap",
+            ".atomic",
+            ".aws",
+            ".cloudcli",
+            ".codex",
+            ".config",
+            ".cursor",
+            ".docker",
+            ".fcc",
+            ".fcc-tmp",
+            ".omo",
+            ".pi",
+            ".remember",
+            ".serena",
+            "claudecodeui",
+            "Spotify-project-main",
         }
 
         for root, dirs, files in os.walk(self.repo_root):
@@ -57,7 +80,7 @@ class CodebaseMapService:
             "total_files": len(file_tree),
             "python_files": len(symbol_index),
             "file_list": file_tree[:FILE_LIST_MAX],
-            "symbols": symbol_index
+            "symbols": symbol_index,
         }
         self._save_state()
         logger.info(f"Codebase map completed: {len(file_tree)} total files, {len(symbol_index)} python modules parsed.")
@@ -79,11 +102,7 @@ class CodebaseMapService:
                 elif isinstance(node, ast.ImportFrom) and node.module:
                     imports.append(node.module)
 
-            return {
-                "classes": classes,
-                "functions": functions,
-                "imports": list(set(imports))
-            }
+            return {"classes": classes, "functions": functions, "imports": list(set(imports))}
         except Exception as e:
             return {"error": str(e)}
 
@@ -105,19 +124,22 @@ class CodebaseMapService:
             file_path = os.path.join(self.repo_root, comp)
             # Check if any existing file path contains the component as a segment
             existing_files = self.symbol_cache.get("file_list", [])
-            path_in_filelist = any(
-                f"/{comp}/" in f or f.startswith(f"{comp}/") for f in existing_files
-            )
+            path_in_filelist = any(f"/{comp}/" in f or f.startswith(f"{comp}/") for f in existing_files)
 
-            if os.path.isdir(dir_path) or os.path.isdir(hidden_dir_path) or os.path.isfile(file_path) or path_in_filelist:
+            if (
+                os.path.isdir(dir_path)
+                or os.path.isdir(hidden_dir_path)
+                or os.path.isfile(file_path)
+                or path_in_filelist
+            ):
                 continue  # component exists — no gap
 
             gap = SpecGap(
-                id=f"GAP-{len(gaps)+1:02d}",
+                id=f"GAP-{len(gaps) + 1:02d}",
                 epic_id="EPIC-00",
                 missing_requirement=f"Component '{comp}' missing from mapped codebase",
                 affected_files=[f"{comp}/"],
-                suggested_fix=f"Bootstrap directory {comp}/ with standard service interface."
+                suggested_fix=f"Bootstrap directory {comp}/ with standard service interface.",
             )
             gaps.append(gap)
 
@@ -132,8 +154,10 @@ class CodebaseMapService:
                 with open(self._state_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
                 self.symbol_cache = data.get("symbol_cache", {})
-                logger.info(f"Loaded codebase map from cache: {self.symbol_cache.get('total_files', 0)} files, "
-                           f"{self.symbol_cache.get('python_files', 0)} modules")
+                logger.info(
+                    f"Loaded codebase map from cache: {self.symbol_cache.get('total_files', 0)} files, "
+                    f"{self.symbol_cache.get('python_files', 0)} modules"
+                )
             except Exception as e:
                 logger.warning(f"Could not load codebase map state: {e}")
 
@@ -156,6 +180,7 @@ class CodebaseMapService:
                 logger.info(f"Closed spec gap {gap_id}: {resolution_note}")
                 return True
         return False
+
 
 # Global Singleton
 default_codebase_mapper = CodebaseMapService()

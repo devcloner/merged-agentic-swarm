@@ -2,6 +2,7 @@
 Task Master AI Spine Service
 PRD optimization, task parsing, dependency resolution, and single source of truth sync.
 """
+
 import json
 import logging
 import os
@@ -20,6 +21,7 @@ from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric
 
 logger = logging.getLogger("task_master_service")
 
+
 class TaskMasterService:
     """Orchestrator wrapping the real Task Master AI spine.
 
@@ -31,6 +33,7 @@ class TaskMasterService:
         generator for this environment. It delegates to the model fabric instead.
       - See docs/agentic/STATE_PATH_NOTES.md for the full divergence analysis.
     """
+
     def __init__(self, state_file_path: str | None = None):
         if state_file_path is None:
             state_file_path = os.path.expanduser("~/.taskmaster/tasks/tasks.json")
@@ -60,7 +63,7 @@ class TaskMasterService:
                         epics=epics,
                         spec_gaps=gaps,
                         total_estimated_turns=data.get("total_estimated_turns", 0),
-                        parsed_at=data.get("parsed_at", time.time())
+                        parsed_at=data.get("parsed_at", time.time()),
                     )
                     logger.info(f"Loaded Task Master state with {len(epics)} epics from {self.state_file_path}")
             except Exception as e:
@@ -80,9 +83,19 @@ class TaskMasterService:
     def _estimate_turns(self, task_description: str) -> int:
         """Rough complexity analysis: estimate turns based on task scope."""
         complexity_indicators = [
-            "multi-provider", "concurrent", "40-worker", "40", "full",
-            "parallel", "distributed", "integration", "end-to-end",
-            "comprehensive", "all backends", "complete", "robust"
+            "multi-provider",
+            "concurrent",
+            "40-worker",
+            "40",
+            "full",
+            "parallel",
+            "distributed",
+            "integration",
+            "end-to-end",
+            "comprehensive",
+            "all backends",
+            "complete",
+            "robust",
         ]
         count = 1  # baseline
         for indicator in complexity_indicators:
@@ -90,7 +103,9 @@ class TaskMasterService:
                 count += 1
         return min(count, 5)
 
-    def optimize_and_parse_prd(self, prd_content: str, title: str = "Multi-Layered Agentic Workflow System") -> PRDAnalysisResult:
+    def optimize_and_parse_prd(
+        self, prd_content: str, title: str = "Multi-Layered Agentic Workflow System"
+    ) -> PRDAnalysisResult:
         """Parses and optimizes PRD via Task Master AI model fabric routing.
 
         Calls the model fabric for AI-driven analysis, then builds structured
@@ -111,7 +126,7 @@ Identify any missing requirements or spec gaps.
             response = default_fabric.dispatch_request(
                 model_alias="claude-3-7-sonnet",
                 messages=[{"role": "user", "content": prompt}],
-                system_prompt="You are Task Master AI, an expert software architect specializing in task decomposition, dependency resolution, and PRD optimization."
+                system_prompt="You are Task Master AI, an expert software architect specializing in task decomposition, dependency resolution, and PRD optimization.",
             )
             if response and isinstance(response, dict):
                 fabric_response_text = response.get("content", str(response))[:2000]
@@ -129,12 +144,24 @@ Identify any missing requirements or spec gaps.
                 wave_id=0,
                 priority=TaskPriority.P0_CRITICAL,
                 subtasks=[
-                    SubTask(id="TASK-00-1", title="AST Codebase Scan", description="Scan repository files and symbol exports"),
-                    SubTask(id="TASK-00-2", title="Spec Gap Analysis", description="Cross-reference PRD goals against repository state"),
-                    SubTask(id="TASK-00-3", title="Context Map Generation", description="Build dependency graph of all services and modules")
+                    SubTask(
+                        id="TASK-00-1",
+                        title="AST Codebase Scan",
+                        description="Scan repository files and symbol exports",
+                    ),
+                    SubTask(
+                        id="TASK-00-2",
+                        title="Spec Gap Analysis",
+                        description="Cross-reference PRD goals against repository state",
+                    ),
+                    SubTask(
+                        id="TASK-00-3",
+                        title="Context Map Generation",
+                        description="Build dependency graph of all services and modules",
+                    ),
                 ],
                 dependencies=[],
-                acceptance_criteria=["AST mapping complete", "Zero unhandled spec gaps in Wave 0"]
+                acceptance_criteria=["AST mapping complete", "Zero unhandled spec gaps in Wave 0"],
             ),
             EpicTask(
                 id="EPIC-01",
@@ -143,13 +170,32 @@ Identify any missing requirements or spec gaps.
                 wave_id=1,
                 priority=TaskPriority.P0_CRITICAL,
                 subtasks=[
-                    SubTask(id="TASK-01-1", title="Key Pool Rotation", description="Implement multi-provider key rotation & quota handling"),
-                    SubTask(id="TASK-01-2", title="Claude API Proxy", description="Deploy Anthropic & OpenAI compatible endpoint server"),
-                    SubTask(id="TASK-01-3", title="Fallback Cascade", description="Wire degrade policies across all 8 backends"),
-                    SubTask(id="TASK-01-4", title="Proxy Health Endpoint", description="Add /health and /status to Python proxy server")
+                    SubTask(
+                        id="TASK-01-1",
+                        title="Key Pool Rotation",
+                        description="Implement multi-provider key rotation & quota handling",
+                    ),
+                    SubTask(
+                        id="TASK-01-2",
+                        title="Claude API Proxy",
+                        description="Deploy Anthropic & OpenAI compatible endpoint server",
+                    ),
+                    SubTask(
+                        id="TASK-01-3",
+                        title="Fallback Cascade",
+                        description="Wire degrade policies across all 8 backends",
+                    ),
+                    SubTask(
+                        id="TASK-01-4",
+                        title="Proxy Health Endpoint",
+                        description="Add /health and /status to Python proxy server",
+                    ),
                 ],
                 dependencies=[],
-                acceptance_criteria=["Proxy server running on port 8085", "Multi-backend model fabric fallback operational"]
+                acceptance_criteria=[
+                    "Proxy server running on port 8085",
+                    "Multi-backend model fabric fallback operational",
+                ],
             ),
             EpicTask(
                 id="EPIC-02",
@@ -158,13 +204,29 @@ Identify any missing requirements or spec gaps.
                 wave_id=2,
                 priority=TaskPriority.P1_HIGH,
                 subtasks=[
-                    SubTask(id="TASK-02-1", title="Worker Pool Dispatcher", description="Manage 40 concurrent workers across 7 roles"),
-                    SubTask(id="TASK-02-2", title="Spawn Chain Registry", description="Link validated learnings to HOT and COLD agents"),
-                    SubTask(id="TASK-02-3", title="Concurrency Ramp Controller", description="Ramp workers [4→8→16→24→40] with gate checks"),
-                    SubTask(id="TASK-02-4", title="Role-based Worker Template", description="Define prompt templates per role")
+                    SubTask(
+                        id="TASK-02-1",
+                        title="Worker Pool Dispatcher",
+                        description="Manage 40 concurrent workers across 7 roles",
+                    ),
+                    SubTask(
+                        id="TASK-02-2",
+                        title="Spawn Chain Registry",
+                        description="Link validated learnings to HOT and COLD agents",
+                    ),
+                    SubTask(
+                        id="TASK-02-3",
+                        title="Concurrency Ramp Controller",
+                        description="Ramp workers [4→8→16→24→40] with gate checks",
+                    ),
+                    SubTask(
+                        id="TASK-02-4",
+                        title="Role-based Worker Template",
+                        description="Define prompt templates per role",
+                    ),
                 ],
                 dependencies=["EPIC-01"],
-                acceptance_criteria=["40-worker pools configured", "Hot & Cold agent spawning functional"]
+                acceptance_criteria=["40-worker pools configured", "Hot & Cold agent spawning functional"],
             ),
             EpicTask(
                 id="EPIC-03",
@@ -173,12 +235,24 @@ Identify any missing requirements or spec gaps.
                 wave_id=3,
                 priority=TaskPriority.P1_HIGH,
                 subtasks=[
-                    SubTask(id="TASK-03-1", title="Wave Gate Controller", description="Validate gate criteria before advancing waves"),
-                    SubTask(id="TASK-03-2", title="Self-Healing Playbooks", description="Auto-remediate runtime errors & log progress"),
-                    SubTask(id="TASK-03-3", title="Progress Report Generator", description="Emit live completion percentages per phase/pool")
+                    SubTask(
+                        id="TASK-03-1",
+                        title="Wave Gate Controller",
+                        description="Validate gate criteria before advancing waves",
+                    ),
+                    SubTask(
+                        id="TASK-03-2",
+                        title="Self-Healing Playbooks",
+                        description="Auto-remediate runtime errors & log progress",
+                    ),
+                    SubTask(
+                        id="TASK-03-3",
+                        title="Progress Report Generator",
+                        description="Emit live completion percentages per phase/pool",
+                    ),
                 ],
                 dependencies=["EPIC-02"],
-                acceptance_criteria=["Gated execution verified", "Continuous progress ledger synced to Task Master"]
+                acceptance_criteria=["Gated execution verified", "Continuous progress ledger synced to Task Master"],
             ),
             EpicTask(
                 id="EPIC-04",
@@ -187,12 +261,27 @@ Identify any missing requirements or spec gaps.
                 wave_id=3,
                 priority=TaskPriority.P2_MEDIUM,
                 subtasks=[
-                    SubTask(id="TASK-04-1", title="Anomaly Detection → Hot Cache", description="Log runtime anomalies to .opencode/knowledge_cache.json"),
-                    SubTask(id="TASK-04-2", title="Micro-Specialist Spawning", description="Spawn temporary agents for acute failures (5-min TTL)"),
-                    SubTask(id="TASK-04-3", title="Cold-Path Promotion Pipeline", description="Normalize hot-cache entries → knowledge.jsonl → agent spec")
+                    SubTask(
+                        id="TASK-04-1",
+                        title="Anomaly Detection → Hot Cache",
+                        description="Log runtime anomalies to .opencode/knowledge_cache.json",
+                    ),
+                    SubTask(
+                        id="TASK-04-2",
+                        title="Micro-Specialist Spawning",
+                        description="Spawn temporary agents for acute failures (5-min TTL)",
+                    ),
+                    SubTask(
+                        id="TASK-04-3",
+                        title="Cold-Path Promotion Pipeline",
+                        description="Normalize hot-cache entries → knowledge.jsonl → agent spec",
+                    ),
                 ],
                 dependencies=["EPIC-02", "EPIC-03"],
-                acceptance_criteria=["Anomaly → cache → specialist pipeline verified", "Cold-path registry promotion functional"]
+                acceptance_criteria=[
+                    "Anomaly → cache → specialist pipeline verified",
+                    "Cold-path registry promotion functional",
+                ],
             ),
             EpicTask(
                 id="EPIC-05",
@@ -201,13 +290,23 @@ Identify any missing requirements or spec gaps.
                 wave_id=4,
                 priority=TaskPriority.P3_LOW,
                 subtasks=[
-                    SubTask(id="TASK-05-1", title="Completion Report", description="Aggregate progress from ledger and registries"),
-                    SubTask(id="TASK-05-2", title="PRD Revision", description="Update PRD with implementation amendments"),
-                    SubTask(id="TASK-05-3", title="Improvement Recommendations", description="Document known gaps and suggested next work")
+                    SubTask(
+                        id="TASK-05-1",
+                        title="Completion Report",
+                        description="Aggregate progress from ledger and registries",
+                    ),
+                    SubTask(
+                        id="TASK-05-2", title="PRD Revision", description="Update PRD with implementation amendments"
+                    ),
+                    SubTask(
+                        id="TASK-05-3",
+                        title="Improvement Recommendations",
+                        description="Document known gaps and suggested next work",
+                    ),
                 ],
                 dependencies=["EPIC-04"],
-                acceptance_criteria=["Final report complete", "Next-steps documented"]
-            )
+                acceptance_criteria=["Final report complete", "Next-steps documented"],
+            ),
         ]
 
         # Assign estimated turns per subtask as complexity analysis
@@ -224,15 +323,15 @@ Identify any missing requirements or spec gaps.
                 epic_id="EPIC-01",
                 missing_requirement="Proxy server support for Anthropic streaming response format",
                 affected_files=["proxy/claude_proxy_server.py"],
-                suggested_fix="Add SSE streaming translation for live proxy turns."
+                suggested_fix="Add SSE streaming translation for live proxy turns.",
             ),
             SpecGap(
                 id="GAP-02",
                 epic_id="EPIC-00",
                 missing_requirement="Task Master Python service format differs from real task-master CLI format",
                 affected_files=["services/task_master_service.py", ".taskmaster/tasks/tasks.json"],
-                suggested_fix="Delegate to task-master CLI via subprocess, or normalize formats."
-            )
+                suggested_fix="Delegate to task-master CLI via subprocess, or normalize formats.",
+            ),
         ]
 
         # Build summary, including AI fabric preview if available
@@ -246,11 +345,11 @@ Identify any missing requirements or spec gaps.
         analysis = PRDAnalysisResult(
             title=title,
             summary=f"PRD parsed into {len(epics)} epics with {sum(len(e.subtasks) for e in epics)} subtasks, "
-                    f"{total_turns} estimated turns.{preview_snippet}",
+            f"{total_turns} estimated turns.{preview_snippet}",
             epics=epics,
             spec_gaps=spec_gaps,
             total_estimated_turns=total_turns,
-            parsed_at=time.time()
+            parsed_at=time.time(),
         )
         if fabric_response_text:
             analysis.fabric_response_preview = fabric_response_text
@@ -285,6 +384,7 @@ Identify any missing requirements or spec gaps.
         if not self.current_analysis:
             return []
         return [epic for epic in self.current_analysis.epics if epic.wave_id == wave_id]
+
 
 # Global Singleton
 default_task_master = TaskMasterService()

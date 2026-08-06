@@ -5,6 +5,7 @@ Real-behavior coverage: TaskSpineStore CRUD against a real JSON state file in
 tmp_path (real fcntl locking, real atomic renames), TaskRecord schema, and the
 CLI entry point via argparse. No mocks — files and locks are real.
 """
+
 import json
 import os
 
@@ -248,6 +249,7 @@ class TestCLI:
     def test_main_create_requires_title(self, tmp_path, capsys):
         state = str(tmp_path / "cli2.json")
         import sys
+
         old = sys.argv
         sys.argv = ["task_spine_adapter", "--create", "--state-path", state]
         try:
@@ -260,6 +262,7 @@ class TestCLI:
     def _run_cli(self, capsys, state, *extra):
         """Run main() with argv and return the parsed JSON of its output."""
         import sys
+
         argv = ["task_spine_adapter", "--state-path", state, *extra]
         old = sys.argv
         sys.argv = argv
@@ -311,6 +314,7 @@ class TestCLI:
     def test_main_invalid_evidence_exits(self, tmp_path, capsys):
         state = str(tmp_path / "cli7.json")
         import sys
+
         old = sys.argv
         try:
             sys.argv = ["task_spine_adapter", "--init", "--state-path", state]
@@ -318,7 +322,16 @@ class TestCLI:
             sys.argv = ["task_spine_adapter", "--create", "--state-path", state, "--title", "t", "--task-id", "E9"]
             main()
             capsys.readouterr()
-            sys.argv = ["task_spine_adapter", "--complete", "--state-path", state, "--task-id", "E9", "--evidence", "not-json"]
+            sys.argv = [
+                "task_spine_adapter",
+                "--complete",
+                "--state-path",
+                state,
+                "--task-id",
+                "E9",
+                "--evidence",
+                "not-json",
+            ]
             with pytest.raises(SystemExit):
                 main()
             out = capsys.readouterr().out
@@ -329,6 +342,7 @@ class TestCLI:
     def test_main_no_command(self, tmp_path, capsys):
         state = str(tmp_path / "cli8.json")
         import sys
+
         old = sys.argv
         try:
             sys.argv = ["task_spine_adapter", "--state-path", state]

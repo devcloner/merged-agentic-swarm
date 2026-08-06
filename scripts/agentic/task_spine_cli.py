@@ -16,6 +16,7 @@ Usage:
   uv run python scripts/agentic/task_spine_cli.py inspect <task-id>
   uv run python scripts/agentic/task_spine_cli.py restart-verify
 """
+
 from __future__ import annotations
 
 import argparse
@@ -35,7 +36,13 @@ def _load_state() -> dict:
     if STATE_FILE.exists():
         with open(STATE_FILE) as f:
             return json.load(f)
-    return {"title": "Task Spine Fallback", "epics": [], "spec_gaps": [], "total_estimated_turns": 0, "parsed_at": time.time()}
+    return {
+        "title": "Task Spine Fallback",
+        "epics": [],
+        "spec_gaps": [],
+        "total_estimated_turns": 0,
+        "parsed_at": time.time(),
+    }
 
 
 def _save_state(state: dict) -> None:
@@ -58,6 +65,7 @@ def _find_task(state: dict, task_id: str) -> dict | None:
 
 
 _id_counter = [0]  # mutable across calls within same second
+
 
 def cmd_create(args) -> None:
     state = _load_state()
@@ -192,8 +200,10 @@ def cmd_restart_verify(args) -> None:
     completed = sum(1 for e in epics if e.get("status") == "completed")
     blocked = sum(1 for e in epics if e.get("status") == "blocked")
     evidence_count = sum(len(e.get("evidence", [])) for e in epics)
-    print(f"  ✓ Restart verification PASSED:")
-    print(f"    Tasks: {task_count} | Claimed: {claimed} | Completed: {completed} | Blocked: {blocked} | Evidence: {evidence_count}")
+    print("  ✓ Restart verification PASSED:")
+    print(
+        f"    Tasks: {task_count} | Claimed: {claimed} | Completed: {completed} | Blocked: {blocked} | Evidence: {evidence_count}"
+    )
 
 
 def main() -> None:

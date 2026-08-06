@@ -11,12 +11,10 @@ services has its own real-behavior tests. The orchestrator's own logic (wave
 ordering, gate checks, epic status transitions, sim-failure logging, cold-path
 calls) runs for real against a tmp registry dir.
 """
+
 import logging
-import os
 from pathlib import Path
 from types import SimpleNamespace
-
-import pytest
 
 from merged_agentic_swarm.tools import agentic_orchestrator as orch_mod
 from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
@@ -24,21 +22,24 @@ from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticO
 
 def _epic(wave_id, subtask_count=1, epic_id=None):
     from merged_agentic_swarm.models.prd_models import EpicTask, SubTask, TaskPriority
-    subtasks = [
-        SubTask(id=f"ST-{wave_id}-{i}", title=f"ST {i}", description=f"d{i}")
-        for i in range(subtask_count)
-    ]
+
+    subtasks = [SubTask(id=f"ST-{wave_id}-{i}", title=f"ST {i}", description=f"d{i}") for i in range(subtask_count)]
     return EpicTask(
-        id=epic_id or f"EPIC-{wave_id}", title=f"Epic W{wave_id}",
-        description="d", wave_id=wave_id, priority=TaskPriority.P1_HIGH,
+        id=epic_id or f"EPIC-{wave_id}",
+        title=f"Epic W{wave_id}",
+        description="d",
+        wave_id=wave_id,
+        priority=TaskPriority.P1_HIGH,
         subtasks=subtasks,
     )
 
 
 def _analysis():
     from merged_agentic_swarm.models.prd_models import PRDAnalysisResult
+
     return PRDAnalysisResult(
-        title="T", summary="S",
+        title="T",
+        summary="S",
         epics=[_epic(1), _epic(2), _epic(3), _epic(4)],
     )
 
@@ -56,8 +57,10 @@ class TestRunFullAgenticWorkflow:
         orch.promoted_ids_file = str(tmp_path / "promoted_ids.json")
         monkeypatch.setattr(orch, "initialize_system", lambda: {"status": "ready"})
         monkeypatch.setattr(orch, "_run_syntax_verification", lambda: {"exit_code": 0, "output_summary": "ok"})
-        monkeypatch.setattr(orch, "_promote_cold_path", lambda phase_label="": {"promoted_knowledge": 0, "promoted_agents": 0})
-        monkeypatch.setattr(orch, "_compact_registries", lambda: {})
+        monkeypatch.setattr(
+            orch, "_promote_cold_path", lambda phase_label="": {"promoted_knowledge": 0, "promoted_agents": 0}
+        )
+        monkeypatch.setattr(orch, "_compact_registries", dict)
 
         analysis = _analysis()
         monkeypatch.setattr(orch_mod.default_task_master, "current_analysis", analysis)
@@ -69,23 +72,35 @@ class TestRunFullAgenticWorkflow:
         monkeypatch.setattr(orch_mod.default_codebase_mapper, "close_spec_gap", lambda *a, **k: None)
         monkeypatch.setattr(orch_mod.default_wave_controller, "advance_wave", lambda: advance)
         if batch_error is not None:
+
             def boom(subtasks, role=None, wave_gate_level=0):
                 raise batch_error
+
             monkeypatch.setattr(orch_mod.default_swarm_manager, "execute_subtask_batch_parallel", boom)
         else:
             result = batch_result or {
-                "status": "completed", "worker_id": "w1",
-                "files_written": [], "commands_run": [], "final_text": "done",
+                "status": "completed",
+                "worker_id": "w1",
+                "files_written": [],
+                "commands_run": [],
+                "final_text": "done",
             }
             monkeypatch.setattr(
-                orch_mod.default_swarm_manager, "execute_subtask_batch_parallel",
+                orch_mod.default_swarm_manager,
+                "execute_subtask_batch_parallel",
                 lambda subtasks, role=None, wave_gate_level=0: [result],
             )
         monkeypatch.setattr(orch_mod.default_progress_ledger, "log_progress", lambda **k: None)
         monkeypatch.setattr(orch_mod.default_progress_ledger, "record_success_marker", lambda **k: None)
-        monkeypatch.setattr(orch_mod.default_progress_ledger, "handle_task_failure", lambda *a, **k: {"remediated": True, "action": "retry"})
+        monkeypatch.setattr(
+            orch_mod.default_progress_ledger,
+            "handle_task_failure",
+            lambda *a, **k: {"remediated": True, "action": "retry"},
+        )
         monkeypatch.setattr(orch_mod.default_knowledge_cache, "add_learning", lambda *a, **k: "learning-1")
-        monkeypatch.setattr(orch_mod.default_agent_factory, "spawn_from_learning", lambda *a, **k: SimpleNamespace(id="agent-1"))
+        monkeypatch.setattr(
+            orch_mod.default_agent_factory, "spawn_from_learning", lambda *a, **k: SimpleNamespace(id="agent-1")
+        )
         monkeypatch.setattr(orch_mod.default_agent_factory, "purge_expired", lambda: 0)
         return orch
 
@@ -104,8 +119,12 @@ class TestRunFullAgenticWorkflow:
 
     def test_workflow_simulation_failure_logged_and_epic_failed(self, monkeypatch, tmp_path, caplog):
         sim_result = {
-            "status": "failed", "worker_id": "w1", "reason": "simulation_fallback",
-            "final_text": "fake", "files_written": [], "commands_run": [],
+            "status": "failed",
+            "worker_id": "w1",
+            "reason": "simulation_fallback",
+            "final_text": "fake",
+            "files_written": [],
+            "commands_run": [],
         }
         orch = self._stub_workflow(monkeypatch, tmp_path, batch_result=sim_result)
         with caplog.at_level(logging.ERROR, logger="agentic_orchestrator"):
@@ -175,20 +194,24 @@ class TestApplyWorkerOutputsPaths:
     def test_relative_path_resolves_and_write_failure_logged(self, tmp_path, caplog):
         """A relative # file: path that resolves to a directory triggers the
         write-failure branch (resolved abs path is an existing dir)."""
-        results = [{
-            "status": "completed",
-            "final_text": "```\n# file: tools\nnot-writable\n```",
-        }]
+        results = [
+            {
+                "status": "completed",
+                "final_text": "```\n# file: tools\nnot-writable\n```",
+            }
+        ]
         with caplog.at_level(logging.ERROR, logger="agentic_orchestrator"):
             count = self.orch._apply_worker_outputs(results, wave_label="W1")
         assert count == 0
         assert any("Failed to write" in r.message for r in caplog.records)
 
     def test_secondary_text_from_response_dict(self, tmp_path):
-        results = [{
-            "status": "completed",
-            "response": {"content": "no file annotations"},
-        }]
+        results = [
+            {
+                "status": "completed",
+                "response": {"content": "no file annotations"},
+            }
+        ]
         count = self.orch._apply_worker_outputs(results)
         assert count == 0
 
@@ -234,11 +257,12 @@ class TestPromoteColdPathAgentFileExists:
         """When _write_agent_spec_file returns None (already exists), the skip
         branch logs at debug — promotion count is still correct."""
         from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
+
         monkeypatch.setattr(default_knowledge_cache, "learnings", {})
         monkeypatch.setattr(orch_mod.default_agent_factory, "_write_agent_spec_file", lambda *a, **k: None)
         # 3 learnings in one category → agent promotion path runs
         for i in range(3):
-            lid = default_knowledge_cache.add_learning(f"L{i}", "skip_cat", f"Sol{i}")
+            default_knowledge_cache.add_learning(f"L{i}", "skip_cat", f"Sol{i}")
         orch = MultiLayeredAgenticOrchestrator()
         orch.promoted_learning_ids = set()
         orch.promoted_ids_file = str(tmp_path / "p.json")

@@ -43,17 +43,17 @@ echo ""
 
 # 2. CLI smoke test
 echo "--- CLI smoke test ---"
-python3 src/merged_agentic_swarm/tools/agentic_cli.py config 2>&1 | grep 'Key Pool\|Route:\|Swarm:'
+uv run python src/merged_agentic_swarm/tools/agentic_cli.py config 2>&1 | grep -E 'Key Pool|Route:|Swarm:'
 echo ""
 
 # 3. Pytest suite
 echo "--- Pytest suite ---"
-uv run pytest -v --tb=short --timeout=120 2>&1
+uv run pytest -v --tb=short --timeout=120 -m "not live" 2>&1
 echo ""
 
 # 4. Import chain test
 echo "--- Import chain test ---"
-python3 << 'PYEOF'
+uv run python << 'PYEOF'
 from merged_agentic_swarm.providers.key_pool import default_key_pool
 from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric, MODEL_FABRIC_ROUTES
 from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache

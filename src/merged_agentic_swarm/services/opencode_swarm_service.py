@@ -5,6 +5,7 @@ Allocates worker pools across roles, manages parallel execution, and coordinates
 Includes DurableAgentRouter — matches incoming tasks to promoted durable agents
 based on category and keyword overlap, then routes to the best-matching agent.
 """
+
 import json
 import logging
 import os
@@ -35,14 +36,12 @@ class DurableAgentRouter:
     # Minimum score for a match to be considered "routed"
     MIN_SCORE = 1.0
     # Weights for scoring components
-    W_CATEGORY = 2.0   # exact category match
-    W_KEYWORD = 1.0    # per keyword hit in title+description
+    W_CATEGORY = 2.0  # exact category match
+    W_KEYWORD = 1.0  # per keyword hit in title+description
 
     def __init__(self, agents_jsonl: str | None = None, agents_dir: str | None = None):
         self._repo_root = Path(__file__).resolve().parent.parent
-        self._agents_jsonl = agents_jsonl or str(
-            self._repo_root / "docs/agentic/registry/agents.jsonl"
-        )
+        self._agents_jsonl = agents_jsonl or str(self._repo_root / "docs/agentic/registry/agents.jsonl")
         self._agents_dir = agents_dir or str(self._repo_root / ".claude/agents")
         self._agents: list[dict[str, Any]] = []
         self._category_index: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -104,8 +103,9 @@ class DurableAgentRouter:
                     continue
 
         self._loaded = True
-        logger.info(f"DurableAgentRouter loaded {len(self._agents)} agents across "
-                     f"{len(self._category_index)} categories.")
+        logger.info(
+            f"DurableAgentRouter loaded {len(self._agents)} agents across {len(self._category_index)} categories."
+        )
         return len(self._agents)
 
     def _parse_frontmatter(self, path: Path) -> dict[str, Any] | None:
@@ -132,18 +132,61 @@ class DurableAgentRouter:
         end = text.find("---", 3)
         if end == -1:
             return text
-        return text[end + 3:].strip()
+        return text[end + 3 :].strip()
 
     # ── Keyword extraction ────────────────────────────────────────────────
 
     @staticmethod
     def _extract_keywords(text: str) -> set[str]:
         """Extract lowercase alphanumeric tokens, dropping very short/common words."""
-        STOP = {"the", "a", "an", "is", "of", "in", "to", "for", "and", "or",
-                "on", "at", "with", "by", "from", "be", "it", "we", "you", "not",
-                "this", "that", "are", "was", "has", "have", "do", "does", "will",
-                "can", "all", "as", "if", "no", "so", "but", "its", "just", "only",
-                "also", "then", "than", "when", "what", "which", "how"}
+        STOP = {
+            "the",
+            "a",
+            "an",
+            "is",
+            "of",
+            "in",
+            "to",
+            "for",
+            "and",
+            "or",
+            "on",
+            "at",
+            "with",
+            "by",
+            "from",
+            "be",
+            "it",
+            "we",
+            "you",
+            "not",
+            "this",
+            "that",
+            "are",
+            "was",
+            "has",
+            "have",
+            "do",
+            "does",
+            "will",
+            "can",
+            "all",
+            "as",
+            "if",
+            "no",
+            "so",
+            "but",
+            "its",
+            "just",
+            "only",
+            "also",
+            "then",
+            "than",
+            "when",
+            "what",
+            "which",
+            "how",
+        }
         tokens = set()
         for word in re.findall(r"[a-z0-9_]{3,}", text.lower()):
             if word not in STOP:
@@ -234,6 +277,7 @@ def get_durable_router() -> DurableAgentRouter:
         _durable_router.load()
     return _durable_router
 
+
 # Pool ID mapping from WorkerRole value to pool health key
 _POOL_ID_MAP: dict[str, str] = {
     WorkerRole.CORE_ENGINEER.value: "domain_module",
@@ -241,6 +285,7 @@ _POOL_ID_MAP: dict[str, str] = {
     WorkerRole.UNIT_TESTER.value: "test_engineering",
     WorkerRole.SECURITY_VERIFIER.value: "security_a11y",
 }
+
 
 class ConcurrencyRampController:
     """Controls worker concurrency ramp-up across wave gates."""
@@ -286,7 +331,7 @@ class OpenCodeSwarmManager:
                     name=f"Swarm Worker ({role_name})",
                     role=role_enum,
                     agent_type=AgentType.SWARM_WORKER,
-                    system_prompt=f"You are OpenCode Swarm Worker specializing as {role_name}. Deliver minimal, zero-defect code."
+                    system_prompt=f"You are OpenCode Swarm Worker specializing as {role_name}. Deliver minimal, zero-defect code.",
                 )
                 self.workers[wid] = spec
                 self.state.workers_by_role[role_name].append(wid)
@@ -349,7 +394,9 @@ class OpenCodeSwarmManager:
                     system_prompt = f"{system_prompt}\n\n---\n{body}"
                 logger.info(
                     "Routed subtask '%s' → durable agent %s (score=%.1f, %s)",
-                    subtask.title, routed_agent_id, routed_agent_score,
+                    subtask.title,
+                    routed_agent_id,
+                    routed_agent_score,
                     matched.get("_reason", "unknown"),
                 )
         except Exception:
@@ -422,9 +469,7 @@ class OpenCodeSwarmManager:
             subtask.error_message = reason or "worker failed"
             self.state.failed_tasks += 1
             self.state.record_pool_failure(pool_id)
-            logger.warning(
-                f"Worker {worker_id} ({role.value}) failed subtask: {subtask.title} — {reason}"
-            )
+            logger.warning(f"Worker {worker_id} ({role.value}) failed subtask: {subtask.title} — {reason}")
 
         result = {
             "status": status,
@@ -502,15 +547,14 @@ class OpenCodeSwarmManager:
             "commands_run": [],
         }
 
-    def execute_subtask_batch_parallel(self, subtasks: list[SubTask], role: WorkerRole = WorkerRole.CORE_ENGINEER, wave_gate_level: int = 0) -> list[dict[str, Any]]:
+    def execute_subtask_batch_parallel(
+        self, subtasks: list[SubTask], role: WorkerRole = WorkerRole.CORE_ENGINEER, wave_gate_level: int = 0
+    ) -> list[dict[str, Any]]:
         """Executes a batch of subtasks in parallel using ThreadPoolExecutor up to max pool capacity."""
         results = []
         max_workers = self.ramp_controller.get_current_max_workers(wave_gate_level)
         with ThreadPoolExecutor(max_workers=min(max_workers, self.config.max_total_workers)) as executor:
-            future_to_subtask = {
-                executor.submit(self.execute_subtask_with_worker, st, role): st
-                for st in subtasks
-            }
+            future_to_subtask = {executor.submit(self.execute_subtask_with_worker, st, role): st for st in subtasks}
             for future in as_completed(future_to_subtask):
                 try:
                     res = future.result()
@@ -523,6 +567,7 @@ class OpenCodeSwarmManager:
                     results.append({"status": "failed", "subtask_id": st.id, "error": str(e)})
 
         return results
+
 
 # Global Singleton
 default_swarm_manager = OpenCodeSwarmManager()

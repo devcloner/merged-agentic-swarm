@@ -7,7 +7,6 @@ and shutdown. The fabric (HTTP transport) is stubbed via monkeypatch — the
 user's rule allows mocking the HTTP transport layer; adapter logic itself is
 real (real subprocess management, real thread pool, real AgentSpec).
 """
-import threading
 
 import pytest
 
@@ -76,6 +75,7 @@ class TestLaunchWorker:
             return {"type": "message", "content": [{"type": "text", "text": "result text"}]}
 
         import merged_agentic_swarm.services.worker_runtime_adapter as mod
+
         monkeypatch.setattr(mod.default_fabric, "dispatch_request", fake_dispatch)
         adapter = WorkerRuntimeAdapter(mode="native_subagent")
         result = adapter.launch_worker(_spec(), "write hello")
@@ -89,10 +89,12 @@ class TestLaunchWorker:
     def test_native_launch_simulated_is_hard_failure(self, monkeypatch):
         """A simulated fabric response must fail, never complete or 'partial'.
         This is the invariant that keeps simulation out of the swarm gates."""
+
         def fake_dispatch(**kwargs):
             return {"type": "message", "simulation_fallback": True, "content": [{"type": "text", "text": "fake"}]}
 
         import merged_agentic_swarm.services.worker_runtime_adapter as mod
+
         monkeypatch.setattr(mod.default_fabric, "dispatch_request", fake_dispatch)
         adapter = WorkerRuntimeAdapter(mode="native_subagent")
         result = adapter.launch_worker(_spec(), "t")
@@ -104,6 +106,7 @@ class TestLaunchWorker:
             raise RuntimeError("all keys down")
 
         import merged_agentic_swarm.services.worker_runtime_adapter as mod
+
         monkeypatch.setattr(mod.default_fabric, "dispatch_request", boom)
         adapter = WorkerRuntimeAdapter(mode="native_subagent")
         result = adapter.launch_worker(_spec(), "t")
@@ -118,6 +121,7 @@ class TestLaunchWorker:
             return {"type": "message", "content": [{"type": "text", "text": "ok"}]}
 
         import merged_agentic_swarm.services.worker_runtime_adapter as mod
+
         monkeypatch.setattr(mod.default_fabric, "dispatch_request", fake_dispatch)
         adapter = WorkerRuntimeAdapter(mode="direct_fabric")
         result = adapter.launch_worker(_spec(), "t")
@@ -126,6 +130,7 @@ class TestLaunchWorker:
 
     def test_opencode_falls_back_to_native_when_no_bin(self, monkeypatch):
         import merged_agentic_swarm.services.worker_runtime_adapter as mod
+
         monkeypatch.setattr(mod, "_resolve_opencode_bin", lambda: None)
 
         def fake_dispatch(**kwargs):

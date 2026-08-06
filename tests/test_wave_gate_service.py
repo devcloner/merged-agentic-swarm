@@ -6,23 +6,23 @@ get_wave_state, _check_ownership. Wave 1-3 gates are exercised with a real
 TaskMasterService (real epics/subtasks on disk) and a real ownership-map.json,
 so incomplete-task and ownership violations are verified for real.
 """
+
 import json
 import os
 
-import pytest
-
 from merged_agentic_swarm.models.prd_models import (
+    EpicTask,
     PRDAnalysisResult,
     SubTask,
     TaskPriority,
     TaskStatus,
-    EpicTask,
 )
 
 
 class TestWaveGateController:
     def setup_method(self):
         from merged_agentic_swarm.services.wave_gate_service import WaveGateController
+
         self.controller = WaveGateController()
 
     def test_initial_state(self):
@@ -44,6 +44,7 @@ class TestWaveGateController:
         """Wave 0 should pass when there are no unresolved spec gaps."""
         # Replace the singleton with our isolated one
         from merged_agentic_swarm.services import wave_gate_service as wgs
+
         original_mapper = wgs.default_codebase_mapper
         wgs.default_codebase_mapper = isolated_codebase_mapper
 
@@ -63,6 +64,7 @@ class TestWaveGateController:
     def test_advance_wave_passes(self, temp_dir, isolated_codebase_mapper):
         """advance_wave should move from wave 0 to wave 1 if gate criteria pass."""
         from merged_agentic_swarm.services import wave_gate_service as wgs
+
         original_mapper = wgs.default_codebase_mapper
         wgs.default_codebase_mapper = isolated_codebase_mapper
 
@@ -78,6 +80,7 @@ class TestWaveGateController:
     def test_advance_wave_beyond_all(self, temp_dir, isolated_codebase_mapper, owner_map_file):
         """advance_wave should complete after wave 3."""
         from merged_agentic_swarm.services import wave_gate_service as wgs
+
         original_mapper = wgs.default_codebase_mapper
         wgs.default_codebase_mapper = isolated_codebase_mapper
 
@@ -95,12 +98,10 @@ class TestWaveGateController:
         # Override base dir so it finds our owner map
         # Monkey-patch _check_ownership's base path resolution
         import merged_agentic_swarm.services.wave_gate_service as wave_mod
+
         os.path.dirname(os.path.dirname(os.path.abspath(wave_mod.__file__)))
         # We can't easily mock os.path.dirname chain, so test the logic directly
-        subtasks = [
-            SubTask(id="ST-01", title="T", description="D",
-                    output_artifacts=["services/test_service.py"])
-        ]
+        subtasks = [SubTask(id="ST-01", title="T", description="D", output_artifacts=["services/test_service.py"])]
         # Check ownership for domain-module-workers pool
         violations = self.controller._check_ownership(subtasks, "domain-module-workers")
         # This will likely file not found since ownership-map.json is in temp_dir
@@ -131,6 +132,7 @@ class TestWaveGateController:
 
     def test_advance_wave_sets_timestamps(self, temp_dir, isolated_codebase_mapper):
         from merged_agentic_swarm.services import wave_gate_service as wgs
+
         original_mapper = wgs.default_codebase_mapper
         wgs.default_codebase_mapper = isolated_codebase_mapper
         try:
@@ -176,18 +178,18 @@ class TestWaveGatesWithRealState:
                 )
                 for j, ss in enumerate(subtask_statuses)
             ]
-            epics.append(EpicTask(
-                id=f"EPIC-W1-{i}",
-                title=f"Epic {i}",
-                description="desc",
-                wave_id=1,
-                priority=TaskPriority.P1_HIGH,
-                status=epic_status,
-                subtasks=subtasks,
-            ))
-        wgs.default_task_master.current_analysis = PRDAnalysisResult(
-            title="T", summary="S", epics=epics
-        )
+            epics.append(
+                EpicTask(
+                    id=f"EPIC-W1-{i}",
+                    title=f"Epic {i}",
+                    description="desc",
+                    wave_id=1,
+                    priority=TaskPriority.P1_HIGH,
+                    status=epic_status,
+                    subtasks=subtasks,
+                )
+            )
+        wgs.default_task_master.current_analysis = PRDAnalysisResult(title="T", summary="S", epics=epics)
 
     def test_wave1_fails_on_incomplete_epics(self, tmp_path):
         controller, wgs = self._controller(tmp_path)
@@ -202,11 +204,16 @@ class TestWaveGatesWithRealState:
     def test_wave1_passes_when_all_completed(self, tmp_path):
         controller, wgs = self._controller(tmp_path)
         self._with_epics(tmp_path, wgs, [(TaskStatus.COMPLETED, [TaskStatus.COMPLETED])])
-        _ownership_map(str(tmp_path), [{
-            "pool_id": "domain-module-workers",
-            "owned_paths": ["src/*"],
-            "forbidden_paths": [],
-        }])
+        _ownership_map(
+            str(tmp_path),
+            [
+                {
+                    "pool_id": "domain-module-workers",
+                    "owned_paths": ["src/*"],
+                    "forbidden_paths": [],
+                }
+            ],
+        )
         try:
             passed, reasons = controller.evaluate_gate_criteria(1)
             assert passed is True, reasons
@@ -217,11 +224,16 @@ class TestWaveGatesWithRealState:
     def test_ownership_forbidden_path_violation(self, tmp_path):
         controller, wgs = self._controller(tmp_path)
         self._with_epics(tmp_path, wgs, [(TaskStatus.COMPLETED, [TaskStatus.COMPLETED])])
-        _ownership_map(str(tmp_path), [{
-            "pool_id": "domain-module-workers",
-            "owned_paths": ["src/*"],
-            "forbidden_paths": ["src/secret/*"],
-        }])
+        _ownership_map(
+            str(tmp_path),
+            [
+                {
+                    "pool_id": "domain-module-workers",
+                    "owned_paths": ["src/*"],
+                    "forbidden_paths": ["src/secret/*"],
+                }
+            ],
+        )
         # Rewrite subtask output to hit the forbidden path
         wgs.default_task_master.current_analysis.epics[0].subtasks[0].output_artifacts = ["src/secret/x.py"]
         try:
@@ -234,11 +246,16 @@ class TestWaveGatesWithRealState:
     def test_ownership_outside_owned_paths(self, tmp_path):
         controller, wgs = self._controller(tmp_path)
         self._with_epics(tmp_path, wgs, [(TaskStatus.COMPLETED, [TaskStatus.COMPLETED])])
-        _ownership_map(str(tmp_path), [{
-            "pool_id": "domain-module-workers",
-            "owned_paths": ["services/*"],
-            "forbidden_paths": [],
-        }])
+        _ownership_map(
+            str(tmp_path),
+            [
+                {
+                    "pool_id": "domain-module-workers",
+                    "owned_paths": ["services/*"],
+                    "forbidden_paths": [],
+                }
+            ],
+        )
         try:
             passed, reasons = controller.evaluate_gate_criteria(1)
             assert passed is False
@@ -286,7 +303,7 @@ class TestWaveGatesWithRealState:
         controller.current_wave = 1
         self._with_epics(tmp_path, wgs, [(TaskStatus.PENDING, [TaskStatus.PENDING])])
         try:
-            success, message = controller.advance_wave()
+            success, _message = controller.advance_wave()
             assert success is False
             assert controller.waves[1].status.value == "failed"
             assert controller.waves[1].failure_reason

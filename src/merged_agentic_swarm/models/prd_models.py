@@ -1,6 +1,7 @@
 """
 PRD and Task Master Data Models
 """
+
 import time
 from dataclasses import asdict, dataclass, field
 from enum import Enum
@@ -16,11 +17,13 @@ class TaskStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
 
+
 class TaskPriority(str, Enum):
     P0_CRITICAL = "P0"
     P1_HIGH = "P1"
     P2_MEDIUM = "P2"
     P3_LOW = "P3"
+
 
 @dataclass
 class SubTask:
@@ -38,8 +41,9 @@ class SubTask:
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
-        d['status'] = self.status.value if isinstance(self.status, Enum) else self.status
+        d["status"] = self.status.value if isinstance(self.status, Enum) else self.status
         return d
+
 
 @dataclass
 class EpicTask:
@@ -50,7 +54,7 @@ class EpicTask:
     priority: TaskPriority = TaskPriority.P1_HIGH
     status: TaskStatus = TaskStatus.PENDING
     subtasks: list[SubTask] = field(default_factory=list)
-    dependencies: list[str] = field(default_factory=list) # IDs of prerequisite tasks
+    dependencies: list[str] = field(default_factory=list)  # IDs of prerequisite tasks
     acceptance_criteria: list[str] = field(default_factory=list)
     spec_gaps: list[str] = field(default_factory=list)
     created_at: float = field(default_factory=time.time)
@@ -58,10 +62,11 @@ class EpicTask:
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
-        d['status'] = self.status.value if isinstance(self.status, Enum) else self.status
-        d['priority'] = self.priority.value if isinstance(self.priority, Enum) else self.priority
-        d['subtasks'] = [st.to_dict() if hasattr(st, 'to_dict') else st for st in self.subtasks]
+        d["status"] = self.status.value if isinstance(self.status, Enum) else self.status
+        d["priority"] = self.priority.value if isinstance(self.priority, Enum) else self.priority
+        d["subtasks"] = [st.to_dict() if hasattr(st, "to_dict") else st for st in self.subtasks]
         return d
+
 
 @dataclass
 class SpecGap:
@@ -76,12 +81,14 @@ class SpecGap:
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
+
 @dataclass
 class PRDDocument:
     raw_text: str
     title: str = "Unassigned PRD"
     version: str = "1.0.0"
     created_at: float = field(default_factory=time.time)
+
 
 @dataclass
 class PRDAnalysisResult:
@@ -100,7 +107,7 @@ class PRDAnalysisResult:
             "epics": [epic.to_dict() for epic in self.epics],
             "spec_gaps": [gap.to_dict() for gap in self.spec_gaps],
             "total_estimated_turns": self.total_estimated_turns,
-            "parsed_at": self.parsed_at
+            "parsed_at": self.parsed_at,
         }
         if self.fabric_response_preview:
             d["fabric_response_preview"] = self.fabric_response_preview

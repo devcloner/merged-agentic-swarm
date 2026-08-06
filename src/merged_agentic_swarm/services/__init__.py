@@ -1,6 +1,7 @@
 """
 Services Package Initialization
 """
+
 from merged_agentic_swarm.services.agent_factory_service import (
     ChainRegistry,
     DurableAgentFactory,
@@ -17,18 +18,18 @@ from merged_agentic_swarm.services.task_master_service import TaskMasterService,
 from merged_agentic_swarm.services.wave_gate_service import WaveGateController, default_wave_controller
 
 __all__ = [
-    'ChainRegistry',
-    'CodebaseMapService',
-    'DurableAgentFactory',
-    'ObstaclePlaybookEngine',
-    'OpenCodeSwarmManager',
-    'ProgressLedgerService',
-    'TaskMasterService',
-    'WaveGateController',
-    'default_agent_factory',
-    'default_codebase_mapper',
-    'default_progress_ledger',
-    'default_swarm_manager',
-    'default_task_master',
-    'default_wave_controller'
+    "ChainRegistry",
+    "CodebaseMapService",
+    "DurableAgentFactory",
+    "ObstaclePlaybookEngine",
+    "OpenCodeSwarmManager",
+    "ProgressLedgerService",
+    "TaskMasterService",
+    "WaveGateController",
+    "default_agent_factory",
+    "default_codebase_mapper",
+    "default_progress_ledger",
+    "default_swarm_manager",
+    "default_task_master",
+    "default_wave_controller",
 ]

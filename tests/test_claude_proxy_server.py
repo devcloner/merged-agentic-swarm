@@ -5,6 +5,7 @@ Coverage: ClaudeProxyHandler (do_GET, do_POST), ProxyServerDaemon
 (start, stop), JSON response helpers, multipart audio parsing, and
 Whisper transcription forwarding (backend HTTP transport stubbed).
 """
+
 import json
 
 import pytest
@@ -31,37 +32,28 @@ def _multipart_body(include_file=True):
     parts = []
     if include_file:
         parts.append(
-            b'--boundary123\r\n'
+            b"--boundary123\r\n"
             b'Content-Disposition: form-data; name="file"; filename="test.wav"\r\n'
-            b'Content-Type: audio/wav\r\n'
-            b'\r\n'
-            b'WAVE-data-bytes\r\n'
+            b"Content-Type: audio/wav\r\n"
+            b"\r\n"
+            b"WAVE-data-bytes\r\n"
         )
-    parts.append(
-        b'--boundary123\r\n'
-        b'Content-Disposition: form-data; name="model"\r\n'
-        b'\r\n'
-        b'openai/whisper-large-v3\r\n'
-    )
-    parts.append(b'--boundary123--\r\n')
-    return b''.join(parts)
+    parts.append(b'--boundary123\r\nContent-Disposition: form-data; name="model"\r\n\r\nopenai/whisper-large-v3\r\n')
+    parts.append(b"--boundary123--\r\n")
+    return b"".join(parts)
 
 
 class TestParseMultipart:
     def test_parses_file_and_model(self):
         body = _multipart_body()
-        file_data, file_name, model_name = _parse_multipart(
-            body, "multipart/form-data; boundary=boundary123"
-        )
+        file_data, file_name, model_name = _parse_multipart(body, "multipart/form-data; boundary=boundary123")
         assert file_data == b"WAVE-data-bytes"
         assert file_name == "test.wav"
         assert model_name == "openai/whisper-large-v3"
 
     def test_no_file_field(self):
         body = _multipart_body(include_file=False)
-        file_data, file_name, model_name = _parse_multipart(
-            body, "multipart/form-data; boundary=boundary123"
-        )
+        file_data, _file_name, model_name = _parse_multipart(body, "multipart/form-data; boundary=boundary123")
         assert file_data is None
         assert model_name == "openai/whisper-large-v3"
 
@@ -71,11 +63,11 @@ class TestParseMultipart:
 
     def test_default_model_when_no_model_field(self):
         body = (
-            b'--boundary123\r\n'
+            b"--boundary123\r\n"
             b'Content-Disposition: form-data; name="file"; filename="a.mp3"\r\n'
-            b'\r\n'
-            b'MP3DATA\r\n'
-            b'--boundary123--\r\n'
+            b"\r\n"
+            b"MP3DATA\r\n"
+            b"--boundary123--\r\n"
         )
         _, file_name, model_name = _parse_multipart(body, "multipart/form-data; boundary=boundary123")
         assert file_name == "a.mp3"
@@ -85,7 +77,8 @@ class TestParseMultipart:
 class TestForwardTranscription:
     def test_success_returns_json(self, monkeypatch):
         monkeypatch.setattr(
-            claude_proxy_server.requests, "post",
+            claude_proxy_server.requests,
+            "post",
             lambda *a, **k: _FakeResp(200, {"text": "hello world"}),
         )
         result = _forward_transcription(b"WAVE", "a.wav", "openai/whisper-large-v3")
@@ -111,7 +104,8 @@ class TestForwardTranscription:
 
     def test_backend_error_returns_status(self, monkeypatch):
         monkeypatch.setattr(
-            claude_proxy_server.requests, "post",
+            claude_proxy_server.requests,
+            "post",
             lambda *a, **k: _FakeResp(502, text="upstream failed"),
         )
         code, body = _forward_transcription(b"WAVE", "a.wav", "model")
@@ -167,6 +161,7 @@ class TestClaudeProxyHandler:
 
     def test_health_endpoint(self):
         import urllib.request
+
         resp = urllib.request.urlopen(f"{self.base_url}/health", timeout=5)
         assert resp.status == 200
         data = json.loads(resp.read().decode("utf-8"))
@@ -175,6 +170,7 @@ class TestClaudeProxyHandler:
 
     def test_status_endpoint(self):
         import urllib.request
+
         resp = urllib.request.urlopen(f"{self.base_url}/status", timeout=5)
         assert resp.status == 200
         data = json.loads(resp.read().decode("utf-8"))
@@ -184,6 +180,7 @@ class TestClaudeProxyHandler:
     def test_get_unknown_endpoint_returns_404(self):
         import urllib.request
         from urllib.error import HTTPError
+
         with pytest.raises(HTTPError) as exc:
             urllib.request.urlopen(f"{self.base_url}/unknown", timeout=5)
         assert exc.value.code == 404
@@ -191,6 +188,7 @@ class TestClaudeProxyHandler:
     def test_post_chat_completions_with_invalid_json(self):
         import urllib.request
         from urllib.error import HTTPError
+
         req = urllib.request.Request(
             f"{self.base_url}/v1/chat/completions",
             data=b"not json",
@@ -204,10 +202,13 @@ class TestClaudeProxyHandler:
     def test_post_v1_messages(self):
         """POST /v1/messages should return a response (simulation fallback)."""
         import urllib.request
-        payload = json.dumps({
-            "model": "claude-3-7-sonnet",
-            "messages": [{"role": "user", "content": "Hi"}],
-        }).encode("utf-8")
+
+        payload = json.dumps(
+            {
+                "model": "claude-3-7-sonnet",
+                "messages": [{"role": "user", "content": "Hi"}],
+            }
+        ).encode("utf-8")
         req = urllib.request.Request(
             f"{self.base_url}/v1/messages",
             data=payload,
@@ -223,6 +224,7 @@ class TestClaudeProxyHandler:
     def test_options_request(self):
         """OPTIONS request should return CORS headers."""
         import urllib.request
+
         req = urllib.request.Request(
             f"{self.base_url}/health",
             method="OPTIONS",
@@ -234,6 +236,7 @@ class TestClaudeProxyHandler:
         """POST to unsupported path should return 404."""
         import urllib.request
         from urllib.error import HTTPError
+
         payload = json.dumps({"test": True}).encode("utf-8")
         req = urllib.request.Request(
             f"{self.base_url}/unsupported",
@@ -248,6 +251,7 @@ class TestClaudeProxyHandler:
     def test_empty_content_length(self):
         """POST with zero content-length should be handled."""
         import urllib.request
+
         req = urllib.request.Request(
             f"{self.base_url}/v1/messages",
             data=b"{}",
@@ -260,6 +264,7 @@ class TestClaudeProxyHandler:
     def test_post_chat_completions_openai_conversion(self, monkeypatch):
         """POST /v1/chat/completions converts an Anthropic response to OpenAI shape."""
         import urllib.request
+
         from merged_agentic_swarm.proxy import claude_proxy_server as mod
 
         def fake_dispatch(**kwargs):
@@ -271,10 +276,12 @@ class TestClaudeProxyHandler:
             }
 
         monkeypatch.setattr(mod.default_fabric, "dispatch_request", fake_dispatch)
-        payload = json.dumps({
-            "model": "claude-3-7-sonnet",
-            "messages": [{"role": "user", "content": "Hi"}],
-        }).encode("utf-8")
+        payload = json.dumps(
+            {
+                "model": "claude-3-7-sonnet",
+                "messages": [{"role": "user", "content": "Hi"}],
+            }
+        ).encode("utf-8")
         req = urllib.request.Request(
             f"{self.base_url}/v1/chat/completions",
             data=payload,
@@ -291,10 +298,12 @@ class TestClaudeProxyHandler:
     def test_post_audio_transcriptions_success(self, monkeypatch):
         """Multipart audio POST → forwarded to Whisper backend → JSON response."""
         import urllib.request
+
         from merged_agentic_swarm.proxy import claude_proxy_server as mod
 
         monkeypatch.setattr(
-            mod.requests, "post",
+            mod.requests,
+            "post",
             lambda *a, **k: _FakeResp(200, {"text": "transcribed"}),
         )
         req = urllib.request.Request(
@@ -312,10 +321,12 @@ class TestClaudeProxyHandler:
         """Multipart POST without a file field → 400."""
         import urllib.request
         from urllib.error import HTTPError
+
         from merged_agentic_swarm.proxy import claude_proxy_server as mod
 
         monkeypatch.setattr(
-            mod.requests, "post",
+            mod.requests,
+            "post",
             lambda *a, **k: _FakeResp(200, {"text": "unused"}),
         )
         req = urllib.request.Request(
@@ -332,6 +343,7 @@ class TestClaudeProxyHandler:
         """Backend connection failure → 503 with unavailable message."""
         import urllib.request
         from urllib.error import HTTPError
+
         from merged_agentic_swarm.proxy import claude_proxy_server as mod
 
         def boom(*a, **k):

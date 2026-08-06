@@ -7,15 +7,14 @@ knowledge-cache capture, cold-path promotion, and durable agent sync.
 import json
 import os
 import sys
-import time
 from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from merged_agentic_swarm.services.agent_factory_service import default_agent_factory
 from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
 from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
-from merged_agentic_swarm.services.agent_factory_service import default_agent_factory
 
 SPOTIFY_AI_ROOT = os.path.expanduser("/home/ubuntu/spotify-ai")
 OUTPUT_DIR = Path(SPOTIFY_AI_ROOT) / ".agentic-workflow"
@@ -33,11 +32,11 @@ print("\n── Phase 1: Project Inspection ──")
 # Git state
 import subprocess
 
+
 def run_git(cmd_parts, cwd=SPOTIFY_AI_ROOT):
-    result = subprocess.run(
-        ["git"] + cmd_parts, cwd=cwd, capture_output=True, text=True
-    )
+    result = subprocess.run(["git"] + cmd_parts, cwd=cwd, capture_output=True, text=True)
     return result.stdout.strip(), result.stderr.strip()
+
 
 last_commit, _ = run_git(["log", "-1", "--format=%h %s"])
 branch, _ = run_git(["rev-parse", "--abbrev-ref", "HEAD"])
@@ -55,6 +54,7 @@ print(f"  Test files: {test_files}")
 
 # Read project version
 import tomllib
+
 with open(Path(SPOTIFY_AI_ROOT) / "pyproject.toml", "rb") as f:
     pkg_data = tomllib.load(f)
 version = pkg_data["project"]["version"]
@@ -166,9 +166,20 @@ for name in ["knowledge.jsonl", "agents.jsonl", "chain.jsonl"]:
 print("\n── Phase 6: Test Verification (spotify-ai) ──")
 
 result = subprocess.run(
-    ["uv", "run", "pytest", "-q", "--tb=short", "--ignore=tests/e2e",
-     "-k", "not live and not screenshots and not oauth_playwright"],
-    cwd=SPOTIFY_AI_ROOT, capture_output=True, text=True, timeout=120
+    [
+        "uv",
+        "run",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "--ignore=tests/e2e",
+        "-k",
+        "not live and not screenshots and not oauth_playwright",
+    ],
+    cwd=SPOTIFY_AI_ROOT,
+    capture_output=True,
+    text=True,
+    timeout=120,
 )
 
 # Parse the summary line
@@ -231,7 +242,7 @@ print(f"  Summary written to: {summary_path}")
 md_path = OUTPUT_DIR / "SESSIONS_REPORT.md"
 md_content = f"""# Agentic Swarm Execution Report — spotify-ai v{version}
 
-**Generated:** {datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S UTC')}
+**Generated:** {datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")}
 **Orchestrator:** MultiLayeredAgenticOrchestrator
 **Project:** spotify-ai (AI-powered Spotify analytics platform)
 
@@ -241,13 +252,13 @@ md_content = f"""# Agentic Swarm Execution Report — spotify-ai v{version}
 
 | Metric | Value |
 |--------|-------|
-| Issues discovered | {summary['issues_discovered']} |
-| Issues fixed | {summary['issues_fixed']} |
-| Learnings captured | {summary['learnings_captured']} |
-| Durable agents promoted | {summary['agents_promoted']} |
-| Knowledge entries promoted | {summary['knowledge_promoted']} |
-| Active cold agents | {summary['durable_agents']} |
-| Active hot specialists | {summary['hot_specialists']} |
+| Issues discovered | {summary["issues_discovered"]} |
+| Issues fixed | {summary["issues_fixed"]} |
+| Learnings captured | {summary["learnings_captured"]} |
+| Durable agents promoted | {summary["agents_promoted"]} |
+| Knowledge entries promoted | {summary["knowledge_promoted"]} |
+| Active cold agents | {summary["durable_agents"]} |
+| Active hot specialists | {summary["hot_specialists"]} |
 | Tests before | 736 pass, 4 fail, 19 errors |
 | Tests after | 740 pass, 0 fail, 0 errors |
 
@@ -287,7 +298,7 @@ The following pattern solutions were promoted to the durable knowledge registry:
 
 ## Agent Factory State
 
-{summary['durable_agents']} durable agents loaded after restart. Agent .md spec files synced to `~/.claude/agents/`.
+{summary["durable_agents"]} durable agents loaded after restart. Agent .md spec files synced to `~/.claude/agents/`.
 
 ---
 

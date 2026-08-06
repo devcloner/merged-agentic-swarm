@@ -2,6 +2,7 @@
 Agentic Multi-Layered Workflow Master Orchestrator
 Integrates Task Master AI, Codebase Mapper, Wave Gates, OpenCode 40-Worker Swarm, Key Pool Proxy, Durable Agent Factory, and Progress Ledger.
 """
+
 import json
 import logging
 import os
@@ -28,6 +29,7 @@ from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
 
 logger = logging.getLogger("agentic_orchestrator")
 
+
 class MultiLayeredAgenticOrchestrator:
     def __init__(self, prd_title: str = "Multi-Layered Agentic Workflow System"):
         self.prd_title = prd_title
@@ -43,6 +45,7 @@ class MultiLayeredAgenticOrchestrator:
         if os.path.exists(self.promoted_ids_file):
             try:
                 import json
+
                 with open(self.promoted_ids_file) as f:
                     data = json.load(f)
                 self.promoted_learning_ids = set(data.get("ids", []))
@@ -54,6 +57,7 @@ class MultiLayeredAgenticOrchestrator:
         """Persist promoted learning IDs for the next run."""
         try:
             import json
+
             os.makedirs(os.path.dirname(self.promoted_ids_file), exist_ok=True)
             with open(self.promoted_ids_file, "w") as f:
                 json.dump({"ids": sorted(self.promoted_learning_ids), "updated_at": time.time()}, f)
@@ -74,14 +78,11 @@ class MultiLayeredAgenticOrchestrator:
         ci_script = str(_REPO_ROOT / "scripts" / "ci.sh")
         if os.path.exists(ci_script):
             try:
-                result = subprocess.run(
-                    ["bash", ci_script],
-                    capture_output=True, text=True, timeout=60
-                )
+                result = subprocess.run(["bash", ci_script], capture_output=True, text=True, timeout=60)
                 summary = result.stdout.strip().split("\n")[-1]  # Last line = pass/fail banner
                 return {
                     "exit_code": result.returncode,
-                    "output_summary": f"CI script: {summary} ({len(result.stdout)} chars)"
+                    "output_summary": f"CI script: {summary} ({len(result.stdout)} chars)",
                 }
             except Exception as e:
                 return {"exit_code": 1, "output_summary": f"CI script failed: {e}"}
@@ -113,14 +114,8 @@ class MultiLayeredAgenticOrchestrator:
             except SyntaxError as e:
                 errors.append(f"{rel_path}:{e.lineno}: {e.msg}")
         if errors:
-            return {
-                "exit_code": 1,
-                "output_summary": f"Syntax check FAILED: {'; '.join(errors)}"
-            }
-        return {
-            "exit_code": 0,
-            "output_summary": f"Syntax check PASSED ({len(core_files)} files)"
-        }
+            return {"exit_code": 1, "output_summary": f"Syntax check FAILED: {'; '.join(errors)}"}
+        return {"exit_code": 0, "output_summary": f"Syntax check PASSED ({len(core_files)} files)"}
 
     # ── Registry compaction (FIX-14: auto-compact at end of run) ──
 
@@ -147,7 +142,7 @@ class MultiLayeredAgenticOrchestrator:
             for line in kn_lines:
                 entry = json.loads(line)
                 key = hashlib.md5(
-                    f"{entry.get('title','')}|{entry.get('category','')}|{entry.get('solution','')}".encode()
+                    f"{entry.get('title', '')}|{entry.get('category', '')}|{entry.get('solution', '')}".encode()
                 ).hexdigest()
                 groups[key] = entry  # last occurrence wins
             filtered = [json.dumps(e) + "\n" for e in groups.values()]
@@ -169,7 +164,7 @@ class MultiLayeredAgenticOrchestrator:
                 # Dedup by name+category+system_prompt so distinct agents in the
                 # same category are preserved
                 key = hashlib.md5(
-                    f"{entry.get('name','')}|{entry.get('category','')}|{entry.get('system_prompt','')}".encode()
+                    f"{entry.get('name', '')}|{entry.get('category', '')}|{entry.get('system_prompt', '')}".encode()
                 ).hexdigest()
                 groups[key] = entry  # last occurrence per content-hash wins
             filtered = [json.dumps(e) + "\n" for e in groups.values()]
@@ -251,10 +246,7 @@ class MultiLayeredAgenticOrchestrator:
 
             # Match: ```lang\n# file: <path>\n<content>```
             # Also match: ```\n# file: <path>\n<content>```
-            for match in re.finditer(
-                r'```\w*\n#\s*file:\s*(.+?)\n(.*?)```',
-                content, re.DOTALL | re.IGNORECASE
-            ):
+            for match in re.finditer(r"```\w*\n#\s*file:\s*(.+?)\n(.*?)```", content, re.DOTALL | re.IGNORECASE):
                 raw_path = match.group(1).strip().strip('"').strip("'")
                 file_content = match.group(2).strip()
                 # Resolve relative paths against the repo root
@@ -267,8 +259,7 @@ class MultiLayeredAgenticOrchestrator:
                     with open(abs_path, "w") as f:
                         f.write(file_content)
                     logger.info(
-                        f"{wave_label} worker {result.get('worker_id', '?')} "
-                        f"wrote {len(file_content)}B → {raw_path}"
+                        f"{wave_label} worker {result.get('worker_id', '?')} wrote {len(file_content)}B → {raw_path}"
                     )
                     files_written += 1
                 except Exception as e:
@@ -283,6 +274,7 @@ class MultiLayeredAgenticOrchestrator:
     def _append_jsonl(self, path: str, record: dict):
         """Append a JSON line to a JSONL registry."""
         import json
+
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "a", encoding="utf-8") as f:
             f.write(json.dumps(record, default=str) + "\n")
@@ -332,7 +324,7 @@ class MultiLayeredAgenticOrchestrator:
                 "tags": learning.get("tags", []),
                 "promoted_at": now,
                 "source": "orchestrator_cold_path",
-                "phase": phase_label
+                "phase": phase_label,
             }
             self._append_jsonl(knowledge_registry, knowledge_record)
             self.promoted_learning_ids.add(lid)
@@ -347,13 +339,12 @@ class MultiLayeredAgenticOrchestrator:
                     "name": f"Durable {cat} Specialist",
                     "category": cat,
                     "derived_from_learnings": [
-                        l["id"] for l in default_knowledge_cache.learnings.values()
-                        if l.get("category") == cat
+                        l["id"] for l in default_knowledge_cache.learnings.values() if l.get("category") == cat
                     ],
                     "system_prompt": f"You are a durable specialist for {cat} tasks, "
-                                     f"created from {category_counts[cat]} validated learning records.",
+                    f"created from {category_counts[cat]} validated learning records.",
                     "promoted_at": now,
-                    "ttl_sec": None  # durable — no expiration
+                    "ttl_sec": None,  # durable — no expiration
                 }
                 self._append_jsonl(agents_registry, agent_spec)
 
@@ -365,7 +356,7 @@ class MultiLayeredAgenticOrchestrator:
                     "agent_type": "cold_durable",
                     "trigger_reason": f"Repeated {cat} pattern ({category_counts[cat]} instances) triggered cold-path promotion",
                     "timestamp": now,
-                    "promotion_phase": phase_label
+                    "promotion_phase": phase_label,
                 }
                 self._append_jsonl(chain_registry, chain_entry)
                 promoted_agents += 1
@@ -382,7 +373,7 @@ class MultiLayeredAgenticOrchestrator:
                     source_learning_id=lid,
                     spawned_agent_id=agent_spec["id"],
                     agent_type=AgentType.COLD_DURABLE,
-                    trigger_reason=chain_entry["trigger_reason"]
+                    trigger_reason=chain_entry["trigger_reason"],
                 )
 
                 # promoted_categories_this_run set above ensures only one agent
@@ -409,13 +400,13 @@ class MultiLayeredAgenticOrchestrator:
             "proxy_status": proxy_status,
             "task_master_ready": True,
             "swarm_workers": 40,
-            "timestamp": time.time()
+            "timestamp": time.time(),
         }
 
     def run_full_agentic_workflow(self, prd_content: str) -> dict[str, Any]:
         """Runs the complete self-healing 6-step agent-to-agent workflow."""
         logger.info("=== STARTING MULTI-LAYERED AGENTIC WORKFLOW ===")
-        
+
         # Step 0: System Init & Proxy Check
         self.initialize_system()
 
@@ -429,16 +420,18 @@ class MultiLayeredAgenticOrchestrator:
             wave_id=0,
             action="prd_parsed",
             status="completed",
-            details={"epics_count": len(prd_result.epics)}
+            details={"epics_count": len(prd_result.epics)},
         )
 
         # Step 2: Map Codebase & Close Spec Gaps
         logger.info("--- Step 2: Mapping Codebase and Closing Spec Gaps ---")
         default_codebase_mapper.scan_repository()
-        detected_gaps = default_codebase_mapper.detect_spec_gaps(required_components=["models", "providers", "proxy", "services", "tools"])
+        detected_gaps = default_codebase_mapper.detect_spec_gaps(
+            required_components=["models", "providers", "proxy", "services", "tools"]
+        )
         for gap in detected_gaps:
             default_codebase_mapper.close_spec_gap(gap.id, resolution_note="Bootstrapped required module architecture.")
-        
+
         # Validate Wave 0 Gate
         passed_w0, reason_w0 = default_wave_controller.advance_wave()
         logger.info(f"Wave 0 Gate Status: {passed_w0} ({reason_w0})")
@@ -451,7 +444,9 @@ class MultiLayeredAgenticOrchestrator:
         wave_1_epics = default_task_master.get_tasks_for_wave(1)
         for epic in wave_1_epics:
             try:
-                results = default_swarm_manager.execute_subtask_batch_parallel(epic.subtasks, role=WorkerRole.CORE_ENGINEER)
+                results = default_swarm_manager.execute_subtask_batch_parallel(
+                    epic.subtasks, role=WorkerRole.CORE_ENGINEER
+                )
             except Exception as e:
                 logger.error(f"Wave 1 batch failed: {e}")
                 try:
@@ -463,7 +458,7 @@ class MultiLayeredAgenticOrchestrator:
                     title=f"Anomaly: {epic.title}",
                     category="anomaly",
                     pattern_solution=f"Error: {str(e)[:200]}. Remediation: {remediation.get('action', 'none')}",
-                    tags=["anomaly", "recovery", "wave-1"]
+                    tags=["anomaly", "recovery", "wave-1"],
                 )
                 results = [{"status": "error", "error": str(e)}]
             files_written = self._apply_worker_outputs(results, wave_label="W1")
@@ -476,8 +471,9 @@ class MultiLayeredAgenticOrchestrator:
             else:
                 failed = [r for r in results if r.get("status") != "completed"]
                 sim_failures = [r for r in failed if "simulation" in str(r.get("reason", ""))]
-                default_task_master.update_task_status(epic.id, TaskStatus.FAILED,
-                    error_message=f"{len(failed)}/{len(results)} subtasks failed")
+                default_task_master.update_task_status(
+                    epic.id, TaskStatus.FAILED, error_message=f"{len(failed)}/{len(results)} subtasks failed"
+                )
                 if sim_failures:
                     # Simulated work must NEVER advance a gate — log it distinctly.
                     logger.error(
@@ -491,7 +487,7 @@ class MultiLayeredAgenticOrchestrator:
                 verifier_name="ProxyFabricVerifier",
                 command_executed="curl http://localhost:8085/health",
                 exit_code=0 if all_ok else 1,
-                output_summary=f"Proxy server and key pool rotation active. Applied {files_written} file(s)."
+                output_summary=f"Proxy server and key pool rotation active. Applied {files_written} file(s).",
             )
 
         passed_w1, reason_w1 = default_wave_controller.advance_wave()
@@ -505,7 +501,9 @@ class MultiLayeredAgenticOrchestrator:
         wave_2_epics = default_task_master.get_tasks_for_wave(2)
         for epic in wave_2_epics:
             try:
-                results = default_swarm_manager.execute_subtask_batch_parallel(epic.subtasks, role=WorkerRole.CORE_ENGINEER)
+                results = default_swarm_manager.execute_subtask_batch_parallel(
+                    epic.subtasks, role=WorkerRole.CORE_ENGINEER
+                )
             except Exception as e:
                 logger.error(f"Wave 2 batch failed: {e}")
                 remediation = default_progress_ledger.handle_task_failure(epic.id, str(e))
@@ -513,7 +511,7 @@ class MultiLayeredAgenticOrchestrator:
                     title=f"Anomaly: {epic.title}",
                     category="anomaly",
                     pattern_solution=f"Error: {str(e)[:200]}. Remediation: {remediation.get('action', 'none')}",
-                    tags=["anomaly", "recovery", "wave-2"]
+                    tags=["anomaly", "recovery", "wave-2"],
                 )
                 default_agent_factory.spawn_from_learning(learning_id, trigger_reason="Anomaly auto-recovery")
                 results = [{"status": "error", "error": str(e)}]
@@ -551,15 +549,19 @@ class MultiLayeredAgenticOrchestrator:
                 title=f"{learn_cat.replace('_', ' ').title()}: {epic.title}",
                 category=learn_cat,
                 pattern_solution=learn_sol,
-                tags=learn_tags
+                tags=learn_tags,
             )
             # Spawn HOT Micro-Specialist and COLD Durable Agent
             # FIX-09: Purge expired HOT agents before spawning new ones
             purged = default_agent_factory.purge_expired()
             if purged:
                 logger.info(f"Purged {purged} expired HOT agents before spawning")
-            hot_agent = default_agent_factory.spawn_from_learning(learning_id, trigger_reason="Acute concurrency optimization", force_type=AgentType.HOT_MICRO_SPECIALIST)
-            default_agent_factory.spawn_from_learning(learning_id, trigger_reason="Durable state persistence", force_type=AgentType.COLD_DURABLE)
+            hot_agent = default_agent_factory.spawn_from_learning(
+                learning_id, trigger_reason="Acute concurrency optimization", force_type=AgentType.HOT_MICRO_SPECIALIST
+            )
+            default_agent_factory.spawn_from_learning(
+                learning_id, trigger_reason="Durable state persistence", force_type=AgentType.COLD_DURABLE
+            )
 
             # FIX-05: Only mark epic COMPLETED if ALL subtasks succeeded.
             # Simulated (offline-fallback) results report status="failed", so they
@@ -570,8 +572,9 @@ class MultiLayeredAgenticOrchestrator:
             else:
                 failed = [r for r in results if r.get("status") != "completed"]
                 sim_failures = [r for r in failed if "simulation" in str(r.get("reason", ""))]
-                default_task_master.update_task_status(epic.id, TaskStatus.FAILED,
-                    error_message=f"{len(failed)}/{len(results)} subtasks failed")
+                default_task_master.update_task_status(
+                    epic.id, TaskStatus.FAILED, error_message=f"{len(failed)}/{len(results)} subtasks failed"
+                )
                 if sim_failures:
                     logger.error(
                         f"Wave 2 epic {epic.id}: {len(sim_failures)} subtask(s) returned "
@@ -588,7 +591,7 @@ class MultiLayeredAgenticOrchestrator:
                 action="agent_spawned",
                 status="completed",
                 learning_generated=learning_id,
-                details={"files_applied": files_written}
+                details={"files_applied": files_written},
             )
 
         passed_w2, reason_w2 = default_wave_controller.advance_wave()
@@ -605,7 +608,9 @@ class MultiLayeredAgenticOrchestrator:
         wave_3_epics = default_task_master.get_tasks_for_wave(3)
         for epic in wave_3_epics:
             try:
-                results = default_swarm_manager.execute_subtask_batch_parallel(epic.subtasks, role=WorkerRole.SECURITY_VERIFIER)
+                results = default_swarm_manager.execute_subtask_batch_parallel(
+                    epic.subtasks, role=WorkerRole.SECURITY_VERIFIER
+                )
             except Exception as e:
                 logger.error(f"Wave 3 batch failed: {e}")
                 remediation = default_progress_ledger.handle_task_failure(epic.id, str(e))
@@ -613,7 +618,7 @@ class MultiLayeredAgenticOrchestrator:
                     title=f"Anomaly: {epic.title}",
                     category="anomaly",
                     pattern_solution=f"Error: {str(e)[:200]}. Remediation: {remediation.get('action', 'none')}",
-                    tags=["anomaly", "recovery", "wave-3"]
+                    tags=["anomaly", "recovery", "wave-3"],
                 )
                 results = [{"status": "error", "error": str(e)}]
             files_written = self._apply_worker_outputs(results, wave_label="W3")
@@ -626,8 +631,9 @@ class MultiLayeredAgenticOrchestrator:
             else:
                 failed = [r for r in results if r.get("status") != "completed"]
                 sim_failures = [r for r in failed if "simulation" in str(r.get("reason", ""))]
-                default_task_master.update_task_status(epic.id, TaskStatus.FAILED,
-                    error_message=f"{len(failed)}/{len(results)} subtasks failed")
+                default_task_master.update_task_status(
+                    epic.id, TaskStatus.FAILED, error_message=f"{len(failed)}/{len(results)} subtasks failed"
+                )
                 if sim_failures:
                     logger.error(
                         f"Wave 3 epic {epic.id}: {len(sim_failures)} subtask(s) returned "
@@ -641,7 +647,7 @@ class MultiLayeredAgenticOrchestrator:
                 verifier_name="SystemIntegrationVerifier",
                 command_executed=ver_result.get("output_summary", "syntax-check")[:120],
                 exit_code=ver_result.get("exit_code", 1) if not all_ok else 0,
-                output_summary=f"Applied {files_written} file(s). {ver_result.get('output_summary', '')}"
+                output_summary=f"Applied {files_written} file(s). {ver_result.get('output_summary', '')}",
             )
 
             # Generate verification learning for cold-path diversity
@@ -649,7 +655,7 @@ class MultiLayeredAgenticOrchestrator:
                 title=f"Verification: {epic.title}",
                 category="verification",
                 pattern_solution=f"Wave verification {'passed' if all_ok else 'FAILED'} for {epic.title} — {len(epic.subtasks)} subtasks validated.",
-                tags=["verification", "wave-gate", "integration"]
+                tags=["verification", "wave-gate", "integration"],
             )
 
         passed_w3, reason_w3 = default_wave_controller.advance_wave()
@@ -663,7 +669,9 @@ class MultiLayeredAgenticOrchestrator:
         wave_4_epics = default_task_master.get_tasks_for_wave(4)
         for epic in wave_4_epics:
             try:
-                results = default_swarm_manager.execute_subtask_batch_parallel(epic.subtasks, role=WorkerRole.CORE_ENGINEER)
+                results = default_swarm_manager.execute_subtask_batch_parallel(
+                    epic.subtasks, role=WorkerRole.CORE_ENGINEER
+                )
             except Exception as e:
                 logger.error(f"Wave 4 batch failed: {e}")
                 try:
@@ -680,8 +688,9 @@ class MultiLayeredAgenticOrchestrator:
             else:
                 failed = [r for r in results if r.get("status") != "completed"]
                 sim_failures = [r for r in failed if "simulation" in str(r.get("reason", ""))]
-                default_task_master.update_task_status(epic.id, TaskStatus.FAILED,
-                    error_message=f"{len(failed)}/{len(results)} subtasks failed")
+                default_task_master.update_task_status(
+                    epic.id, TaskStatus.FAILED, error_message=f"{len(failed)}/{len(results)} subtasks failed"
+                )
                 if sim_failures:
                     logger.error(
                         f"Wave 4 epic {epic.id}: {len(sim_failures)} subtask(s) returned "
@@ -694,7 +703,7 @@ class MultiLayeredAgenticOrchestrator:
                 wave_id=4,
                 action="synthesis_completed",
                 status="completed" if all_ok else "failed",
-                details={"files_applied": files_written}
+                details={"files_applied": files_written},
             )
 
         passed_w4, reason_w4 = default_wave_controller.advance_wave()
@@ -725,7 +734,9 @@ class MultiLayeredAgenticOrchestrator:
             "status": "success",
             "prd_summary": prd_result.summary,
             "waves_completed": 4,
-            "epics_completed": len(default_task_master.current_analysis.epics) if default_task_master.current_analysis else 0,
+            "epics_completed": len(default_task_master.current_analysis.epics)
+            if default_task_master.current_analysis
+            else 0,
             "total_success_markers": len(default_progress_ledger.success_markers),
             "chain_registry_entries": len(default_agent_factory.chain_registry.entries),
             "cold_path": {
@@ -733,12 +744,13 @@ class MultiLayeredAgenticOrchestrator:
                 "agents_promoted": cold_2.get("promoted_agents", 0) + cold_3.get("promoted_agents", 0),
                 "total_knowledge_records": total_cold_knowledge,
                 "total_durable_agents": total_cold_agents,
-                "memo": "Cold path: hot cache → knowledge.jsonl → validated → agents.jsonl"
+                "memo": "Cold path: hot cache → knowledge.jsonl → validated → agents.jsonl",
             },
             "promoted_ids_persisted": len(self.promoted_learning_ids),
             "registry_compaction": compact_counts,
-            "timestamp": time.time()
+            "timestamp": time.time(),
         }
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

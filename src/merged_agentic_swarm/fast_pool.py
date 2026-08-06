@@ -21,6 +21,7 @@ Design
   get shorter connect timeouts; remote providers get longer ones. Per-route
   timeout overrides are passed through unchanged.
 """
+
 from __future__ import annotations
 
 import logging
@@ -143,22 +144,16 @@ class _CachedDNSBackend(SyncBackend):
         target_ip = _resolve_host(host)
         if target_ip == host:
             # Resolution was skipped/failed — connect the normal way.
-            return super().connect_tcp(
-                host, port, timeout, local_address, socket_options
-            )
+            return super().connect_tcp(host, port, timeout, local_address, socket_options)
         try:
-            return super().connect_tcp(
-                target_ip, port, timeout, local_address, socket_options
-            )
+            return super().connect_tcp(target_ip, port, timeout, local_address, socket_options)
         except ConnectError:
             # Stale cache entry — invalidate, re-resolve once, retry.
             _dns_cache.delete(host)
             fresh_ip = _resolve_host(host)
             if fresh_ip == host:
                 raise
-            return super().connect_tcp(
-                fresh_ip, port, timeout, local_address, socket_options
-            )
+            return super().connect_tcp(fresh_ip, port, timeout, local_address, socket_options)
 
 
 class _PooledTransport(httpx.HTTPTransport):
@@ -210,7 +205,7 @@ def _create_client(config: FastPoolConfig | None = None) -> httpx.Client:
         transport=transport,
         timeout=httpx.Timeout(
             connect=cfg.connect_timeout,
-            read=None,   # read timeout is per-request via route config
+            read=None,  # read timeout is per-request via route config
             write=None,
             pool=None,
         ),
@@ -349,9 +344,9 @@ _KNOWN_PROVIDER_HOSTS = [
     "integrate.api.nvidia.com",
     "api.mistral.ai",
     "openrouter.ai",
-    "http://localhost:4000",   # litellm
-    "http://localhost:8080",   # fcc-proxy
-    "http://localhost:3456",   # routatic-proxy
+    "http://localhost:4000",  # litellm
+    "http://localhost:8080",  # fcc-proxy
+    "http://localhost:3456",  # routatic-proxy
 ]
 
 

@@ -1,6 +1,7 @@
 """
 Agent, Worker Pool, and Spawn Chain Data Models
 """
+
 import time
 from dataclasses import asdict, dataclass, field
 from enum import Enum
@@ -18,10 +19,12 @@ class WorkerRole(str, Enum):
     HOT_MICRO_SPECIALIST = "hot_micro_specialist"
     COLD_DURABLE = "cold_durable"
 
+
 class AgentType(str, Enum):
     SWARM_WORKER = "swarm_worker"
     HOT_MICRO_SPECIALIST = "hot_micro_specialist"
     COLD_DURABLE = "cold_durable"
+
 
 @dataclass
 class AgentSpec:
@@ -47,23 +50,27 @@ class AgentSpec:
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
-        d['role'] = self.role.value if isinstance(self.role, Enum) else self.role
-        d['agent_type'] = self.agent_type.value if isinstance(self.agent_type, Enum) else self.agent_type
+        d["role"] = self.role.value if isinstance(self.role, Enum) else self.role
+        d["agent_type"] = self.agent_type.value if isinstance(self.agent_type, Enum) else self.agent_type
         return d
+
 
 @dataclass
 class WorkerPoolConfig:
     pool_name: str = "opencode-swarm-40"
     max_total_workers: int = 40
-    role_allocations: dict[str, int] = field(default_factory=lambda: {
-        WorkerRole.MASTER_ARCHITECT.value: 1,
-        WorkerRole.CODEBASE_MAPPER.value: 4,
-        WorkerRole.SPEC_GAP_CLOSER.value: 4,
-        WorkerRole.CORE_ENGINEER.value: 18,
-        WorkerRole.REFACTOR_SPECIALIST.value: 4,
-        WorkerRole.UNIT_TESTER.value: 5,
-        WorkerRole.SECURITY_VERIFIER.value: 4,
-    })
+    role_allocations: dict[str, int] = field(
+        default_factory=lambda: {
+            WorkerRole.MASTER_ARCHITECT.value: 1,
+            WorkerRole.CODEBASE_MAPPER.value: 4,
+            WorkerRole.SPEC_GAP_CLOSER.value: 4,
+            WorkerRole.CORE_ENGINEER.value: 18,
+            WorkerRole.REFACTOR_SPECIALIST.value: 4,
+            WorkerRole.UNIT_TESTER.value: 5,
+            WorkerRole.SECURITY_VERIFIER.value: 4,
+        }
+    )
+
 
 @dataclass
 class SpawnChainEntry:
@@ -77,8 +84,9 @@ class SpawnChainEntry:
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
-        d['agent_type'] = self.agent_type.value if isinstance(self.agent_type, Enum) else self.agent_type
+        d["agent_type"] = self.agent_type.value if isinstance(self.agent_type, Enum) else self.agent_type
         return d
+
 
 @dataclass
 class WorkerPoolState:

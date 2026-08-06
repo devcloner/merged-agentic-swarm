@@ -2,6 +2,7 @@
 API Key Pool Manager & Key Rotator
 Supports multi-provider key rotation, quota handling, cooldown tracking, and health checks.
 """
+
 import logging
 import os
 import threading
@@ -12,11 +13,13 @@ from typing import Any
 
 logger = logging.getLogger("key_pool")
 
+
 class KeyStatus(str, Enum):
     ACTIVE = "active"
     COOLDOWN = "cooldown"
     EXHAUSTED = "exhausted"
     DISABLED = "disabled"
+
 
 @dataclass
 class APIKeyInfo:
@@ -33,9 +36,12 @@ class APIKeyInfo:
 
     def __repr__(self):
         """Avoid leaking the secret value in logs/debug output."""
-        return (f"APIKeyInfo(key_id='{self.key_id}', provider='{self.provider}', "
-                f"status='{self.status.value}', failure_count={self.failure_count}, "
-                f"total_requests={self.total_requests})")
+        return (
+            f"APIKeyInfo(key_id='{self.key_id}', provider='{self.provider}', "
+            f"status='{self.status.value}', failure_count={self.failure_count}, "
+            f"total_requests={self.total_requests})"
+        )
+
 
 class KeyPoolManager:
     def __init__(self, env_file_path: str | None = None):
@@ -64,7 +70,7 @@ class KeyPoolManager:
             gemini_keys.extend([k.strip() for k in env_vars["GEMINI_API_KEYS"].split(",") if k.strip()])
         if env_vars.get("GEMINI_API_KEY") and env_vars["GEMINI_API_KEY"] not in gemini_keys:
             gemini_keys.append(env_vars["GEMINI_API_KEY"])
-        
+
         # Load from gemini-keys/working-keys.txt if available (also check misspelled legacy path)
         for candidate in (
             os.path.expanduser("~/gemini-keys/working-keys.txt"),
@@ -81,9 +87,9 @@ class KeyPoolManager:
                     k = line.strip()
                     if k and k not in gemini_keys:
                         gemini_keys.append(k)
-        
+
         for idx, key in enumerate(gemini_keys):
-            self.add_key("gemini", key, key_id=f"gemini-{idx+1}")
+            self.add_key("gemini", key, key_id=f"gemini-{idx + 1}")
 
         # 3. OpenCode Keys
         opencode_key = env_vars.get("OPENCODE_API_KEY") or os.environ.get("OPENCODE_API_KEY")
@@ -132,9 +138,7 @@ class KeyPoolManager:
             self.add_key("litellm", litellm_key, key_id="litellm-main")
 
         # 11. FCC Proxy (localhost:8080) — uses ANTHROPIC_AUTH_TOKEN or falls back to "freecc"
-        fcc_proxy_key = (env_vars.get("ANTHROPIC_AUTH_TOKEN")
-                         or os.environ.get("ANTHROPIC_AUTH_TOKEN")
-                         or "freecc")
+        fcc_proxy_key = env_vars.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("ANTHROPIC_AUTH_TOKEN") or "freecc"
         self.add_key("fcc-proxy", fcc_proxy_key, key_id="fcc-proxy-main")
 
         # 12. Routatic-proxy (localhost:3456) — standalone model router,
@@ -179,7 +183,7 @@ class KeyPoolManager:
             if cooldown_keys:
                 cooldown_keys.sort(key=lambda x: x.cooldown_until)
                 best_k = cooldown_keys[0]
-                best_k.status = KeyStatus.ACTIVE # force recover
+                best_k.status = KeyStatus.ACTIVE  # force recover
                 return best_k
             return None
 
@@ -205,7 +209,9 @@ class KeyPoolManager:
             key_info.status = KeyStatus.COOLDOWN
             key_info.cooldown_until = time.time() + cooldown_seconds
             key_info.failure_count += 1
-            logger.warning(f"Key {key_info.key_id} for provider {key_info.provider} rate-limited. Cooldown for {cooldown_seconds}s.")
+            logger.warning(
+                f"Key {key_info.key_id} for provider {key_info.provider} rate-limited. Cooldown for {cooldown_seconds}s."
+            )
 
     def get_summary(self) -> dict[str, Any]:
         with self._lock:
@@ -223,6 +229,7 @@ class KeyPoolManager:
                 "total_tokens": sum(k.total_tokens for k in keys),
             }
         return summary
+
 
 # Global Singleton
 default_key_pool = KeyPoolManager()

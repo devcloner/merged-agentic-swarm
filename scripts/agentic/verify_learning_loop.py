@@ -1,15 +1,14 @@
 """Phase 5: Durable Learning Loop End-to-End Verification"""
-import json
+
 import os
 import sys
-import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
 from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
 from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
-from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
 
 REG_DIR = Path("docs/agentic/registry")
 AGENTS_DIR = Path(os.path.expanduser("~/.claude/agents"))
@@ -23,18 +22,33 @@ print("\n── Step 1: Capture learnings in hot cache ──")
 orch = MultiLayeredAgenticOrchestrator(prd_title="Learning Loop E2E Test")
 
 learnings = [
-    ("Mistral 429 Rate-Limit Recovery Pattern", "provider-resilience",
-     "When Mistral returns HTTP 429, read Retry-After header. Wait that duration (default 5s). "
-     "Retry with exponential backoff: 1s, 2s, 4s. Max 3 retries. Log each attempt.",
-     ["mistral", "rate-limit", "429", "retry"]),
-    ("Mistral 5xx Circuit Breaker Strategy", "provider-resilience",
-     "After 3 consecutive 5xx errors from Mistral, open circuit breaker for 120s. "
-     "Route traffic to fallback provider. Log all breaker state transitions.",
-     ["mistral", "circuit-breaker", "5xx", "fallback"]),
-    ("Mistral Key Rotation Load Balancing", "provider-resilience",
-     "Use least-used key selection. Track tokens per key. Rotate when approaching rate limits. "
-     "Balance load across available keys with weighted round-robin.",
-     ["mistral", "key-rotation", "load-balancing"]),
+    (
+        "Mistral 429 Rate-Limit Recovery Pattern",
+        "provider-resilience",
+        (
+            "When Mistral returns HTTP 429, read Retry-After header. Wait that duration (default 5s). "
+            "Retry with exponential backoff: 1s, 2s, 4s. Max 3 retries. Log each attempt."
+        ),
+        ["mistral", "rate-limit", "429", "retry"],
+    ),
+    (
+        "Mistral 5xx Circuit Breaker Strategy",
+        "provider-resilience",
+        (
+            "After 3 consecutive 5xx errors from Mistral, open circuit breaker for 120s. "
+            "Route traffic to fallback provider. Log all breaker state transitions."
+        ),
+        ["mistral", "circuit-breaker", "5xx", "fallback"],
+    ),
+    (
+        "Mistral Key Rotation Load Balancing",
+        "provider-resilience",
+        (
+            "Use least-used key selection. Track tokens per key. Rotate when approaching rate limits. "
+            "Balance load across available keys with weighted round-robin."
+        ),
+        ["mistral", "key-rotation", "load-balancing"],
+    ),
 ]
 
 for title, cat, sol, tags in learnings:
@@ -80,7 +94,9 @@ for agent_id, spec in factory2.active_cold_agents.items():
 print("\n── Step 5: Summary ──")
 promoted = result.get("promoted_agents", 0)
 agent_files_count = len(agent_files)
-registry_entries = sum(1 for _ in (REG_DIR / "agents.jsonl").read_text().splitlines()) if (REG_DIR / "agents.jsonl").exists() else 0
+registry_entries = (
+    sum(1 for _ in (REG_DIR / "agents.jsonl").read_text().splitlines()) if (REG_DIR / "agents.jsonl").exists() else 0
+)
 cold_agents = len(factory2.active_cold_agents)
 
 checks = {

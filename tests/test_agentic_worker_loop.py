@@ -8,6 +8,7 @@ simulation failure, iteration bound), and the command safety denylist.
 The HTTP transport layer is mocked via a fake fabric; tool execution itself is
 REAL (files on disk, real subprocesses).
 """
+
 import os
 from unittest.mock import MagicMock
 
@@ -144,10 +145,12 @@ class TestLoopControlFlow:
 
     def test_executes_tool_call_then_completes(self, tmp_path):
         """Tool call is executed for real, result fed back, then completes."""
-        fabric = _FakeFabric([
-            _tool_response("write_file", path="greet.py", content="print('hello')\n"),
-            _text_response("wrote the file"),
-        ])
+        fabric = _FakeFabric(
+            [
+                _tool_response("write_file", path="greet.py", content="print('hello')\n"),
+                _text_response("wrote the file"),
+            ]
+        )
         loop = AgenticWorkerLoop(fabric=fabric, workdir=str(tmp_path))
         result = loop.execute({"title": "T", "description": "create greet.py"})
         assert result["status"] == "completed"
@@ -169,10 +172,12 @@ class TestLoopControlFlow:
 
     def test_iteration_bound_keeps_partial_work(self, tmp_path):
         """Hitting max_iterations completes with real partial work kept."""
-        fabric = _FakeFabric([
-            _tool_response("write_file", path="a.txt", content="1\n"),
-            _tool_response("write_file", path="b.txt", content="2\n"),
-        ])
+        fabric = _FakeFabric(
+            [
+                _tool_response("write_file", path="a.txt", content="1\n"),
+                _tool_response("write_file", path="b.txt", content="2\n"),
+            ]
+        )
         loop = AgenticWorkerLoop(fabric=fabric, workdir=str(tmp_path), max_iterations=2)
         result = loop.execute({"title": "T", "description": "D"})
         assert result["status"] == "completed"

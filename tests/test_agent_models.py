@@ -4,6 +4,7 @@ Tests for models/agent_models.py
 Coverage: AgentSpec, WorkerPoolConfig, SpawnChainEntry, WorkerPoolState,
 WorkerRole, AgentType enums.
 """
+
 import time
 
 from merged_agentic_swarm.models.agent_models import (
@@ -58,7 +59,8 @@ class TestAgentSpec:
 
     def test_durable_never_expires(self):
         spec = AgentSpec(
-            id="cold-001", name="Durable",
+            id="cold-001",
+            name="Durable",
             role=WorkerRole.COLD_DURABLE,
             agent_type=AgentType.COLD_DURABLE,
             system_prompt="Durable agent",
@@ -68,7 +70,8 @@ class TestAgentSpec:
 
     def test_hot_expires_after_ttl(self):
         spec = AgentSpec(
-            id="hot-001", name="Hot",
+            id="hot-001",
+            name="Hot",
             role=WorkerRole.HOT_MICRO_SPECIALIST,
             agent_type=AgentType.HOT_MICRO_SPECIALIST,
             system_prompt="Hot agent",
@@ -79,7 +82,8 @@ class TestAgentSpec:
 
     def test_hot_not_expired_within_ttl(self):
         spec = AgentSpec(
-            id="hot-002", name="Fresh",
+            id="hot-002",
+            name="Fresh",
             role=WorkerRole.HOT_MICRO_SPECIALIST,
             agent_type=AgentType.HOT_MICRO_SPECIALIST,
             system_prompt="Fresh hot agent",
@@ -89,7 +93,8 @@ class TestAgentSpec:
 
     def test_to_dict_serializes_enums(self):
         spec = AgentSpec(
-            id="d-001", name="Dict",
+            id="d-001",
+            name="Dict",
             role=WorkerRole.MASTER_ARCHITECT,
             agent_type=AgentType.COLD_DURABLE,
             system_prompt="test",
@@ -101,7 +106,8 @@ class TestAgentSpec:
 
     def test_custom_fields(self):
         spec = AgentSpec(
-            id="custom", name="Custom",
+            id="custom",
+            name="Custom",
             role=WorkerRole.UNIT_TESTER,
             agent_type=AgentType.SWARM_WORKER,
             system_prompt="test",

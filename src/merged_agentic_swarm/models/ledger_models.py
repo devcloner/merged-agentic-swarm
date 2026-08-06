@@ -1,6 +1,7 @@
 """
 Progress Ledger, Success Markers, and Obstacle Playbooks Models
 """
+
 import time
 from dataclasses import asdict, dataclass, field
 from typing import Any
@@ -19,6 +20,7 @@ class SuccessMarker:
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
+
 @dataclass
 class ObstaclePlaybookEntry:
     id: str
@@ -31,6 +33,7 @@ class ObstaclePlaybookEntry:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
 
 @dataclass
 class ProgressLogEntry:
@@ -48,6 +51,7 @@ class ProgressLogEntry:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
 
 @dataclass
 class TaskMasterStateSnapshot:

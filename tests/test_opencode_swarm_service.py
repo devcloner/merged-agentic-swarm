@@ -11,7 +11,10 @@ stubbed at the method level for the swarm manager's *decision* logic — status
 transitions, pool accounting, routing. The loop itself has its own real-behavior
 tests; the existing live test here still makes one real fabric call.
 """
+
 import json
+
+import pytest
 
 from merged_agentic_swarm.models.agent_models import WorkerRole
 from merged_agentic_swarm.models.prd_models import TaskStatus
@@ -26,6 +29,7 @@ from merged_agentic_swarm.services.opencode_swarm_service import (
 class TestConcurrencyRampController:
     def setup_method(self):
         from merged_agentic_swarm.services.opencode_swarm_service import ConcurrencyRampController
+
         self.ctrl = ConcurrencyRampController()
 
     def test_ramp_sequence_length(self):
@@ -58,6 +62,7 @@ class TestConcurrencyRampController:
 class TestOpenCodeSwarmManager:
     def setup_method(self):
         from merged_agentic_swarm.services.opencode_swarm_service import OpenCodeSwarmManager
+
         self.manager = OpenCodeSwarmManager()
 
     def test_initializes_40_workers(self):
@@ -94,6 +99,7 @@ class TestOpenCodeSwarmManager:
         # Create config without HOT_MICRO_SPECIALIST (not in defaults)
         from merged_agentic_swarm.models.agent_models import WorkerPoolConfig
         from merged_agentic_swarm.services.opencode_swarm_service import OpenCodeSwarmManager
+
         config = WorkerPoolConfig()
         manager = OpenCodeSwarmManager(config=config)
         # HOT_MICRO_SPECIALIST has no dedicated allocation
@@ -108,11 +114,16 @@ class TestOpenCodeSwarmManager:
         pid = self.manager._get_pool_id(WorkerRole.MASTER_ARCHITECT)
         assert pid == "general"
 
+    @pytest.mark.live
     def test_execute_subtask_with_worker_fabric(self, make_subtask):
         """A worker subtask goes through the agentic tool loop and reports honestly.
 
         A simulated (offline-fallback) response must be reported as ``failed``,
         never ``completed`` — simulation can never advance a gate.
+
+        ``live``: makes a real fabric call; excluded from CI because the live
+        gemini fleet can rate-limit mid-run. The simulation-honesty invariant
+        is covered deterministically by ``test_simulation_worker_fails``.
         """
         subtask = make_subtask(title="Test task", desc="Test description")
         result = self.manager.execute_subtask_with_worker(subtask, WorkerRole.CORE_ENGINEER)
@@ -125,6 +136,7 @@ class TestOpenCodeSwarmManager:
         else:
             assert "reason" in result
 
+    @pytest.mark.live
     def test_execute_subtask_batch_parallel(self, make_subtask):
         subtasks = [make_subtask(title=f"Batch {i}", desc="Parallel test") for i in range(3)]
         results = self.manager.execute_subtask_batch_parallel(
@@ -150,12 +162,17 @@ def _router(agents_jsonl_content="", agents_dir=None):
 
 class TestDurableAgentRouter:
     def test_load_from_jsonl(self):
-        content = json.dumps({
-            "id": "agent-1",
-            "name": "Agent One",
-            "category": "python",
-            "system_prompt": "You are a python expert.",
-        }) + "\n"
+        content = (
+            json.dumps(
+                {
+                    "id": "agent-1",
+                    "name": "Agent One",
+                    "category": "python",
+                    "system_prompt": "You are a python expert.",
+                }
+            )
+            + "\n"
+        )
         router = _router(content)
         assert router.get_stats()["total_agents"] == 1
         assert "python" in router.get_stats()["categories"]
@@ -185,8 +202,7 @@ class TestDurableAgentRouter:
     def test_dedupes_by_id(self, tmp_path):
         jsonl = tmp_path / "agents.jsonl"
         jsonl.write_text(
-            json.dumps({"id": "dup", "category": "a"}) + "\n"
-            + json.dumps({"id": "dup", "category": "b"}) + "\n",
+            json.dumps({"id": "dup", "category": "a"}) + "\n" + json.dumps({"id": "dup", "category": "b"}) + "\n",
             encoding="utf-8",
         )
         router = DurableAgentRouter(agents_jsonl=str(jsonl), agents_dir=str(tmp_path / "agents"))
@@ -218,14 +234,20 @@ class TestDurableAgentRouter:
         assert "building" in triggers or "python" in triggers
 
     def test_find_matching_agent_by_category_and_keywords(self):
-        content = json.dumps({
-            "id": "python-builder",
-            "name": "Python Builder",
-            "category": "python",
-            "system_prompt": "specialized in building and compiling python modules.",
-        }) + "\n"
+        content = (
+            json.dumps(
+                {
+                    "id": "python-builder",
+                    "name": "Python Builder",
+                    "category": "python",
+                    "system_prompt": "specialized in building and compiling python modules.",
+                }
+            )
+            + "\n"
+        )
         router = _router(content)
         from merged_agentic_swarm.models.prd_models import SubTask
+
         task = SubTask(id="T1", title="python builder", description="compile a python module")
         task.category = "python"
         matched = router.find_matching_agent(task)
@@ -234,14 +256,20 @@ class TestDurableAgentRouter:
         assert matched["_score"] >= 1.0
 
     def test_find_matching_agent_no_match_returns_none(self):
-        content = json.dumps({
-            "id": "rust-expert",
-            "name": "Rust Expert",
-            "category": "rust",
-            "system_prompt": "specialized in rust lifetimes.",
-        }) + "\n"
+        content = (
+            json.dumps(
+                {
+                    "id": "rust-expert",
+                    "name": "Rust Expert",
+                    "category": "rust",
+                    "system_prompt": "specialized in rust lifetimes.",
+                }
+            )
+            + "\n"
+        )
         router = _router(content)
         from merged_agentic_swarm.models.prd_models import SubTask
+
         task = SubTask(id="T1", title="javascript ui", description="build a react component")
         task.category = "frontend"
         assert router.find_matching_agent(task) is None
@@ -258,16 +286,22 @@ class TestExecuteSubtaskDecisionLogic:
         return OpenCodeSwarmManager()
 
     def test_routed_to_durable_agent(self, tmp_path, monkeypatch, make_subtask):
-        content = json.dumps({
-            "id": "router-agent",
-            "name": "Router Agent",
-            "category": "routing",
-            "system_prompt": "specialized in routing and building python code.",
-        }) + "\n"
+        content = (
+            json.dumps(
+                {
+                    "id": "router-agent",
+                    "name": "Router Agent",
+                    "category": "routing",
+                    "system_prompt": "specialized in routing and building python code.",
+                }
+            )
+            + "\n"
+        )
         router = _router(content)
         monkeypatch.setattr(mod, "get_durable_router", lambda: router)
         monkeypatch.setattr(
-            mod.default_agentic_worker_loop, "execute",
+            mod.default_agentic_worker_loop,
+            "execute",
             lambda **k: {"status": "completed", "final_text": "done", "files_written": [], "commands_run": []},
         )
         subtask = make_subtask(title="python routing", desc="build and fix python code")
@@ -288,8 +322,10 @@ class TestExecuteSubtaskDecisionLogic:
 
     def test_loop_exception_fails_subtask(self, monkeypatch, make_subtask):
         monkeypatch.setattr(mod, "get_durable_router", lambda: _router(""))
+
         def boom(**k):
             raise RuntimeError("rate limit 429")
+
         monkeypatch.setattr(mod.default_agentic_worker_loop, "execute", boom)
         manager = self._manager()
         subtask = make_subtask()
@@ -302,7 +338,8 @@ class TestExecuteSubtaskDecisionLogic:
     def test_simulation_worker_fails(self, monkeypatch, make_subtask):
         monkeypatch.setattr(mod, "get_durable_router", lambda: _router(""))
         monkeypatch.setattr(
-            mod.default_agentic_worker_loop, "execute",
+            mod.default_agentic_worker_loop,
+            "execute",
             lambda **k: {"status": "failed", "reason": "simulation_fallback", "final_text": "fake"},
         )
         manager = self._manager()
@@ -317,9 +354,15 @@ class TestExecuteSubtaskDecisionLogic:
         monkeypatch.setenv("SWARM_WORKER_MODE", "opencode")
         monkeypatch.setattr(mod, "get_durable_router", lambda: _router(""))
         monkeypatch.setattr(
-            mod.OpenCodeSwarmManager, "_run_opencode_worker",
-            lambda self, wid, role, sp, task: {"status": "completed", "reason": None,
-                                               "final_text": "opencode ok", "files_written": [], "commands_run": []},
+            mod.OpenCodeSwarmManager,
+            "_run_opencode_worker",
+            lambda self, wid, role, sp, task: {
+                "status": "completed",
+                "reason": None,
+                "final_text": "opencode ok",
+                "files_written": [],
+                "commands_run": [],
+            },
         )
         subtask = make_subtask()
         result = self._manager().execute_subtask_with_worker(subtask, WorkerRole.CORE_ENGINEER)
@@ -332,6 +375,7 @@ class TestExecuteSubtaskDecisionLogic:
             def launch_worker(self, spec, prompt):
                 assert spec.role == WorkerRole.CORE_ENGINEER
                 return {"status": "completed", "evidence": "opencode did it"}
+
         monkeypatch.setattr(wra, "get_runtime_adapter", lambda mode: FakeAdapter())
         result = self._manager()._run_opencode_worker(
             "w1", WorkerRole.CORE_ENGINEER, "sp", {"title": "t", "description": "d"}
@@ -345,6 +389,7 @@ class TestExecuteSubtaskDecisionLogic:
         class FakeAdapter:
             def launch_worker(self, spec, prompt):
                 return {"status": "failed", "evidence": "auth died"}
+
         monkeypatch.setattr(wra, "get_runtime_adapter", lambda mode: FakeAdapter())
         result = self._manager()._run_opencode_worker(
             "w1", WorkerRole.CORE_ENGINEER, "sp", {"title": "t", "description": "d"}

@@ -11,6 +11,7 @@ All tests stub ``fast_fallback.pool_dispatch`` and replace the fabric's route
 table with a fixed two-route list (providers ``primary``/``fallback``) so probes
 are deterministic and no real provider is contacted.
 """
+
 import time
 from unittest.mock import MagicMock, patch
 
@@ -141,10 +142,12 @@ class TestParallelProbe:
             time.sleep(0.1)
             return _mock_response(_anthropic_response(text="fallback ok"))
 
-        mock_dispatch.side_effect = _url_routed({
-            "primary": _unauthorized,
-            "fallback": _delayed_fallback,
-        })
+        mock_dispatch.side_effect = _url_routed(
+            {
+                "primary": _unauthorized,
+                "fallback": _delayed_fallback,
+            }
+        )
 
         result = router.dispatch("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
 
@@ -178,9 +181,7 @@ class TestParallelProbe:
     @patch("merged_agentic_swarm.fast_fallback.pool_dispatch")
     def test_slow_primary_with_stagger_lets_primary_win(self, mock_dispatch, isolated_key_pool):
         """With probe_stagger_ms, the primary's head-start lets it win even if slower."""
-        router = _router_with_keys(
-            isolated_key_pool, FastFallbackConfig(parallel_probes=2, probe_stagger_ms=50.0)
-        )
+        router = _router_with_keys(isolated_key_pool, FastFallbackConfig(parallel_probes=2, probe_stagger_ms=50.0))
 
         def _primary(*_args, **_kwargs):
             time.sleep(0.03)
@@ -234,10 +235,12 @@ class TestCircuitBreaker:
         router = _router_with_keys(isolated_key_pool, FastFallbackConfig(circuit_breaker_threshold=1))
         router._circuit_open_until["primary"] = time.time() - 0.01  # expired cooldown
 
-        mock_dispatch.side_effect = _url_routed({
-            "primary": _mock_response(_anthropic_response(text="primary back")),
-            "fallback": _mock_response(_anthropic_response(text="fallback")),
-        })
+        mock_dispatch.side_effect = _url_routed(
+            {
+                "primary": _mock_response(_anthropic_response(text="primary back")),
+                "fallback": _mock_response(_anthropic_response(text="fallback")),
+            }
+        )
         result = router.dispatch("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
         assert result["content"][0]["text"] == "primary back"
         assert router.circuit_status().get("primary", {}).get("open_until", 0.0) == 0.0
@@ -248,10 +251,12 @@ class TestCircuitBreaker:
         router = _router_with_keys(isolated_key_pool)
         _permanently_dead["primary"] = time.time() + 86400
 
-        mock_dispatch.side_effect = _url_routed({
-            "primary": _mock_response(_anthropic_response(text="should not happen")),
-            "fallback": _mock_response(_anthropic_response(text="fallback ok")),
-        })
+        mock_dispatch.side_effect = _url_routed(
+            {
+                "primary": _mock_response(_anthropic_response(text="should not happen")),
+                "fallback": _mock_response(_anthropic_response(text="fallback ok")),
+            }
+        )
         result = router.dispatch("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
         assert result["content"][0]["text"] == "fallback ok"
         assert mock_dispatch.call_count == 1  # only fallback probed
@@ -270,10 +275,12 @@ class TestCircuitBreaker:
             time.sleep(0.1)
             return _mock_response(_anthropic_response(text="fallback ok"))
 
-        mock_dispatch.side_effect = _url_routed({
-            "primary": _throttled,
-            "fallback": _delayed_fallback,
-        })
+        mock_dispatch.side_effect = _url_routed(
+            {
+                "primary": _throttled,
+                "fallback": _delayed_fallback,
+            }
+        )
         result = router.dispatch("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
         assert result["content"][0]["text"] == "fallback ok"
         assert _circuit_open_until.get("primary") is None  # no provider breaker trip
@@ -358,10 +365,12 @@ class TestDispatchBehavior:
         bad.text = "[]"
         bad.request = MagicMock()
         bad.json.return_value = ["not", "a", "dict"]
-        mock_dispatch.side_effect = _url_routed({
-            "primary": bad,
-            "fallback": _mock_response(_anthropic_response(text="fallback")),
-        })
+        mock_dispatch.side_effect = _url_routed(
+            {
+                "primary": bad,
+                "fallback": _mock_response(_anthropic_response(text="fallback")),
+            }
+        )
 
         result = router.dispatch("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
         assert result["content"][0]["text"] == "fallback"
@@ -375,10 +384,12 @@ class TestDispatchBehavior:
         bad.text = "<html>not json</html>"
         bad.request = MagicMock()
         bad.json.side_effect = ValueError("No JSON")
-        mock_dispatch.side_effect = _url_routed({
-            "primary": bad,
-            "fallback": _mock_response(_anthropic_response(text="fallback")),
-        })
+        mock_dispatch.side_effect = _url_routed(
+            {
+                "primary": bad,
+                "fallback": _mock_response(_anthropic_response(text="fallback")),
+            }
+        )
 
         result = router.dispatch("claude-3-7-sonnet", [{"role": "user", "content": "hi"}])
         assert result["content"][0]["text"] == "fallback"

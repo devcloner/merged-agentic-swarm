@@ -2,6 +2,7 @@
 Durable Agent Factory & Knowledge-Box -> Spawn Chain Registry
 Turns validated learnings into HOT micro-specialists or COLD durable agents, maintaining a persistent chain registry.
 """
+
 import json
 import logging
 import os
@@ -14,6 +15,7 @@ from merged_agentic_swarm.models.agent_models import AgentSpec, AgentType, Spawn
 from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
 
 logger = logging.getLogger("agent_factory")
+
 
 class ChainRegistry:
     def __init__(self, registry_file: str | None = None):
@@ -36,7 +38,7 @@ class ChainRegistry:
                             agent_type=AgentType(d["agent_type"]),
                             trigger_reason=d["trigger_reason"],
                             parent_entry_id=d.get("parent_entry_id"),
-                            timestamp=d.get("timestamp", time.time())
+                            timestamp=d.get("timestamp", time.time()),
                         )
                         for d in data
                     ]
@@ -51,19 +53,27 @@ class ChainRegistry:
         except Exception as e:
             logger.error(f"Failed saving spawn chain registry: {e}")
 
-    def register_spawn(self, source_learning_id: str, spawned_agent_id: str, agent_type: AgentType, trigger_reason: str, parent_entry_id: str | None = None) -> SpawnChainEntry:
+    def register_spawn(
+        self,
+        source_learning_id: str,
+        spawned_agent_id: str,
+        agent_type: AgentType,
+        trigger_reason: str,
+        parent_entry_id: str | None = None,
+    ) -> SpawnChainEntry:
         entry = SpawnChainEntry(
-            entry_id=f"CHAIN-{len(self.entries)+1:04d}",
+            entry_id=f"CHAIN-{len(self.entries) + 1:04d}",
             source_learning_id=source_learning_id,
             spawned_agent_id=spawned_agent_id,
             agent_type=agent_type,
             trigger_reason=trigger_reason,
-            parent_entry_id=parent_entry_id
+            parent_entry_id=parent_entry_id,
         )
         self.entries.append(entry)
         self.save_registry()
         logger.info(f"Registered spawn chain entry {entry.entry_id}: {agent_type.value} agent {spawned_agent_id}")
         return entry
+
 
 class DurableAgentFactory:
     def __init__(self, chain_registry: ChainRegistry | None = None):
@@ -75,10 +85,7 @@ class DurableAgentFactory:
     def purge_expired(self) -> int:
         """Remove and return count of expired HOT micro-specialists (FIX-09)."""
         now = time.time()
-        expired_ids = [
-            aid for aid, spec in self.active_hot_specialists.items()
-            if spec.is_expired
-        ]
+        expired_ids = [aid for aid, spec in self.active_hot_specialists.items() if spec.is_expired]
         for aid in expired_ids:
             expired = self.active_hot_specialists.pop(aid, None)
             if expired:
@@ -167,7 +174,9 @@ class DurableAgentFactory:
             task_tags = "none"
 
         ttl_sec = agent_spec.get("ttl_sec", "null")
-        ttl_display = f"{ttl_sec} (null = permanent / no expiry)" if ttl_sec is None or ttl_sec == "null" else str(ttl_sec)
+        ttl_display = (
+            f"{ttl_sec} (null = permanent / no expiry)" if ttl_sec is None or ttl_sec == "null" else str(ttl_sec)
+        )
 
         content = f"""# Agent: {name}
 
@@ -223,7 +232,9 @@ class DurableAgentFactory:
         logger.info(f"synced {count} new agent spec file(s)")
         return count
 
-    def spawn_from_learning(self, learning_id: str, trigger_reason: str, force_type: AgentType | None = None) -> AgentSpec:
+    def spawn_from_learning(
+        self, learning_id: str, trigger_reason: str, force_type: AgentType | None = None
+    ) -> AgentSpec:
         """Evaluates validated learning from Knowledge-Box and spawns HOT or COLD agent."""
         learning = default_knowledge_cache.get_learning(learning_id)
 
@@ -238,15 +249,17 @@ class DurableAgentFactory:
             else:
                 agent_type = AgentType.COLD_DURABLE
 
-        agent_id = f"agent-{agent_type.value}-{int(time.time()*1000)}"
+        agent_id = f"agent-{agent_type.value}-{int(time.time() * 1000)}"
         system_prompt = f"""You are a specialized Agent ({agent_type.value}) created from Validated Learning [{learning_id}].
-Topic/Pattern: {learning.get('title', 'General Learning') if learning else 'Custom Task'}
+Topic/Pattern: {learning.get("title", "General Learning") if learning else "Custom Task"}
 Directives:
 1. Apply proven resolution patterns.
 2. Maintain strict verification and zero-regression standards.
 """
 
-        role = WorkerRole.HOT_MICRO_SPECIALIST if agent_type == AgentType.HOT_MICRO_SPECIALIST else WorkerRole.COLD_DURABLE
+        role = (
+            WorkerRole.HOT_MICRO_SPECIALIST if agent_type == AgentType.HOT_MICRO_SPECIALIST else WorkerRole.COLD_DURABLE
+        )
         spec = AgentSpec(
             id=agent_id,
             name=f"Specialist-{learning_id}",
@@ -254,7 +267,7 @@ Directives:
             agent_type=agent_type,
             system_prompt=system_prompt,
             ttl_sec=300.0 if agent_type == AgentType.HOT_MICRO_SPECIALIST else None,
-            validated_learnings_applied=[learning_id]
+            validated_learnings_applied=[learning_id],
         )
 
         if agent_type == AgentType.HOT_MICRO_SPECIALIST:
@@ -267,10 +280,11 @@ Directives:
             source_learning_id=learning_id,
             spawned_agent_id=agent_id,
             agent_type=agent_type,
-            trigger_reason=trigger_reason
+            trigger_reason=trigger_reason,
         )
 
         return spec
+
 
 # Global Singleton
 default_agent_factory = DurableAgentFactory()

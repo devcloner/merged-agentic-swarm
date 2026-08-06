@@ -2,6 +2,7 @@
 Knowledge Cache Service
 Persistent cache for validated learnings, obstacle resolution patterns, and AST symbol manifests.
 """
+
 import json
 import logging
 import os
@@ -9,6 +10,7 @@ import time
 from typing import Any
 
 logger = logging.getLogger("knowledge_cache")
+
 
 class KnowledgeCache:
     def __init__(self, cache_file: str | None = None, max_learnings: int = 200):
@@ -34,7 +36,7 @@ class KnowledgeCache:
                 deduped: dict[str, dict[str, Any]] = {}
                 dupes_removed = 0
                 for lid, entry in raw_learnings.items():
-                    key = f"{entry.get('title','')}|{entry.get('category','')}|{entry.get('solution','')}"
+                    key = f"{entry.get('title', '')}|{entry.get('category', '')}|{entry.get('solution', '')}"
                     if key in seen:
                         dupes_removed += 1
                     else:
@@ -49,26 +51,34 @@ class KnowledgeCache:
 
     def save_cache(self):
         os.makedirs(os.path.dirname(self.cache_file), exist_ok=True)
-        data = {
-            "learnings": self.learnings,
-            "symbols": self.symbol_cache,
-            "saved_at": time.time()
-        }
+        data = {"learnings": self.learnings, "symbols": self.symbol_cache, "saved_at": time.time()}
         with open(self.cache_file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
 
-    def add_learning(self, title: str, category: str, pattern_solution: str, tags: list[str] | None = None, ttl_sec: float | None = None) -> str:
+    def add_learning(
+        self,
+        title: str,
+        category: str,
+        pattern_solution: str,
+        tags: list[str] | None = None,
+        ttl_sec: float | None = None,
+    ) -> str:
         # Dedup via content hash: title + category + solution (prevents semantic duplicates
         # like LEARN-0001 through LEARN-0005 that share identical content under different IDs)
         for existing in self.learnings.values():
-            if existing.get("title") == title and existing.get("category") == category and existing.get("solution") == pattern_solution:
+            if (
+                existing.get("title") == title
+                and existing.get("category") == category
+                and existing.get("solution") == pattern_solution
+            ):
                 logger.info(f"Skipped duplicate learning (content match): {existing['id']}")
                 return existing["id"]
 
         # Evict expired learnings first
         now = time.time()
         expired_ids = [
-            lid for lid, l in self.learnings.items()
+            lid
+            for lid, l in self.learnings.items()
             if l.get("ttl_sec") is not None and l.get("created_at", 0) + l["ttl_sec"] < now
         ]
         for lid in expired_ids:
@@ -112,6 +122,7 @@ class KnowledgeCache:
             if q in l["title"].lower() or q in l["solution"].lower() or any(q in t.lower() for t in l["tags"]):
                 results.append(l)
         return results
+
 
 # Global Singleton
 default_knowledge_cache = KnowledgeCache()

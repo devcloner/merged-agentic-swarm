@@ -2,6 +2,7 @@
 Merged Agentic Swarm — CLI Entry Point
 Provides run, status, promote, and config subcommands.
 """
+
 import argparse
 import json
 import logging
@@ -43,8 +44,10 @@ def cmd_run(args):
         print(f"  Chain entries:   {result.get('chain_registry_entries', '?')}")
         cp = result.get("cold_path", {})
         if cp:
-            print(f"  Cold-path:       {cp.get('total_knowledge_records', 0)} knowledge, "
-                  f"{cp.get('total_durable_agents', 0)} agents promoted")
+            print(
+                f"  Cold-path:       {cp.get('total_knowledge_records', 0)} knowledge, "
+                f"{cp.get('total_durable_agents', 0)} agents promoted"
+            )
         print()
 
         if args.verbose:
@@ -71,8 +74,10 @@ def cmd_status(args):
             print("=" * 60)
             print(f"  Overall completion: {progress.get('overall_completion_pct', '?')}%")
             for phase, status in progress.get("phase_status", {}).items():
-                print(f"  {phase}: {status.get('completion_pct', '?')}% "
-                      f"[{status.get('color', '?')}] — {status.get('status', '?')}")
+                print(
+                    f"  {phase}: {status.get('completion_pct', '?')}% "
+                    f"[{status.get('color', '?')}] — {status.get('status', '?')}"
+                )
             print(f"  Blockers: {len(progress.get('blockers', []))}")
             for i, b in enumerate(progress.get("blockers", []), 1):
                 print(f"    {i}. {b[:110]}...")
@@ -115,8 +120,7 @@ def cmd_promote(args):
     try:
         orch = MultiLayeredAgenticOrchestrator()
         result = orch._promote_cold_path(phase_label="manual_cli")
-        print(f"Promoted: {result.get('promoted_knowledge', 0)} knowledge, "
-              f"{result.get('promoted_agents', 0)} agents")
+        print(f"Promoted: {result.get('promoted_knowledge', 0)} knowledge, {result.get('promoted_agents', 0)} agents")
         for reg in ["knowledge.jsonl", "agents.jsonl", "chain.jsonl"]:
             path = reg_dir / reg
             if path.exists():
@@ -136,19 +140,24 @@ def cmd_config(args):
     print("CONFIGURATION STATE")
     print("=" * 60)
     from merged_agentic_swarm.providers.key_pool import default_key_pool
+
     summary = default_key_pool.get_summary()
     print(f"Key Pool ({len(summary)} providers):")
     for provider, info in summary.items():
-        print(f"  {provider}: {info.get('active_keys', '?')}/{info.get('total_keys', '?')} active, "
-              f"{info.get('total_requests', 0)} requests")
+        print(
+            f"  {provider}: {info.get('active_keys', '?')}/{info.get('total_keys', '?')} active, "
+            f"{info.get('total_requests', 0)} requests"
+        )
 
     from merged_agentic_swarm.providers.multi_provider_fabric import MODEL_FABRIC_ROUTES
+
     for alias, routes in MODEL_FABRIC_ROUTES.items():
         print(f"Route: {alias}")
         for r in routes:
             print(f"  → {r['provider']:15s} {r['model']}")
 
     from merged_agentic_swarm.models.agent_models import WorkerPoolConfig
+
     cfg = WorkerPoolConfig()
     print(f"Swarm: {cfg.max_total_workers} max workers, roles={list(cfg.role_allocations.keys())}")
 
@@ -163,10 +172,13 @@ def main():
   agentic-cli status
   agentic-cli promote
   agentic-cli config
-        """)
+        """,
+    )
     sub = parser.add_subparsers(dest="command")
     p_run = sub.add_parser("run", help="Run full orchestrator workflow")
-    p_run.add_argument("--prd", help="Path to PRD file (default: .taskmaster/docs/prd_agentic_codebase_optimization.md)")
+    p_run.add_argument(
+        "--prd", help="Path to PRD file (default: .taskmaster/docs/prd_agentic_codebase_optimization.md)"
+    )
     p_run.add_argument("--title", default="Merged Agentic Swarm OS", help="PRD title")
     p_run.add_argument("--verbose", "-v", action="store_true", help="Print full result JSON")
     p_run.set_defaults(func=cmd_run)

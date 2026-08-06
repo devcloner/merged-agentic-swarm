@@ -4,6 +4,7 @@ Tests for models/prd_models.py
 Coverage: TaskStatus, TaskPriority, SubTask, EpicTask, SpecGap,
 PRDDocument, PRDAnalysisResult.
 """
+
 import time
 
 from merged_agentic_swarm.models.prd_models import (
@@ -57,8 +58,9 @@ class TestSubTask:
         assert st.completed_at > 0
 
     def test_with_error(self):
-        st = SubTask(id="ST-003", title="Fail", description="D",
-                     status=TaskStatus.FAILED, error_message="Something broke")
+        st = SubTask(
+            id="ST-003", title="Fail", description="D", status=TaskStatus.FAILED, error_message="Something broke"
+        )
         assert st.status == TaskStatus.FAILED
         assert st.error_message == "Something broke"
 
@@ -91,7 +93,8 @@ class TestEpicTask:
 class TestSpecGap:
     def test_default_creation(self):
         gap = SpecGap(
-            id="GAP-01", epic_id="EPIC-00",
+            id="GAP-01",
+            epic_id="EPIC-00",
             missing_requirement="Missing service",
             affected_files=["services/missing.py"],
             suggested_fix="Create service",
@@ -101,8 +104,10 @@ class TestSpecGap:
 
     def test_resolve(self):
         gap = SpecGap(
-            id="GAP-01", epic_id="EPIC-00",
-            missing_requirement="X", affected_files=["x.py"],
+            id="GAP-01",
+            epic_id="EPIC-00",
+            missing_requirement="X",
+            affected_files=["x.py"],
             suggested_fix="Add X",
         )
         gap.resolved = True
@@ -112,8 +117,10 @@ class TestSpecGap:
 
     def test_to_dict(self):
         gap = SpecGap(
-            id="GAP-01", epic_id="EPIC-00",
-            missing_requirement="X", affected_files=["x.py"],
+            id="GAP-01",
+            epic_id="EPIC-00",
+            missing_requirement="X",
+            affected_files=["x.py"],
             suggested_fix="Add X",
         )
         d = gap.to_dict()
@@ -136,7 +143,8 @@ class TestPRDDocument:
 class TestPRDAnalysisResult:
     def test_default_creation(self):
         result = PRDAnalysisResult(
-            title="Analysis", summary="Done",
+            title="Analysis",
+            summary="Done",
         )
         assert result.total_estimated_turns == 0
         assert result.epics == []
@@ -148,7 +156,6 @@ class TestPRDAnalysisResult:
         assert "fabric_response_preview" not in d
 
     def test_to_dict_with_preview(self):
-        result = PRDAnalysisResult(title="A", summary="S",
-                                   fabric_response_preview="Raw AI output")
+        result = PRDAnalysisResult(title="A", summary="S", fabric_response_preview="Raw AI output")
         d = result.to_dict()
         assert d["fabric_response_preview"] == "Raw AI output"

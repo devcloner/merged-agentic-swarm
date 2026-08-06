@@ -4,6 +4,7 @@ Tests for services/codebase_map_service.py
 Coverage: CodebaseMapService — scan_repository, detect_spec_gaps,
 close_spec_gap, _parse_python_ast.
 """
+
 import os
 
 from merged_agentic_swarm.models.prd_models import SpecGap
@@ -12,6 +13,7 @@ from merged_agentic_swarm.models.prd_models import SpecGap
 class TestCodebaseMapService:
     def test_scan_empty_repo(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
         mapper = CodebaseMapService(repo_root=temp_dir)
         result = mapper.scan_repository()
         assert result["total_files"] == 0
@@ -19,6 +21,7 @@ class TestCodebaseMapService:
 
     def test_scan_repo_with_python_file(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
         # Create a Python file in temp_dir
         subdir = os.path.join(temp_dir, "services")
         os.makedirs(subdir)
@@ -32,6 +35,7 @@ class TestCodebaseMapService:
 
     def test_scan_preserves_state_file(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
         mapper = CodebaseMapService(repo_root=temp_dir)
         mapper.scan_repository()
         state_path = mapper._state_file
@@ -39,6 +43,7 @@ class TestCodebaseMapService:
 
     def test_load_from_cache(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
         mapper1 = CodebaseMapService(repo_root=temp_dir)
         mapper1.scan_repository()
 
@@ -47,6 +52,7 @@ class TestCodebaseMapService:
 
     def test_detect_spec_gaps_no_gaps(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
         mapper = CodebaseMapService(repo_root=temp_dir)
         # Create the required component
         os.makedirs(os.path.join(temp_dir, "models"))
@@ -55,6 +61,7 @@ class TestCodebaseMapService:
 
     def test_detect_spec_gaps_with_gaps(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
         mapper = CodebaseMapService(repo_root=temp_dir)
         gaps = mapper.detect_spec_gaps(required_components=["nonexistent_component"])
         assert len(gaps) == 1
@@ -63,11 +70,14 @@ class TestCodebaseMapService:
 
     def test_close_spec_gap(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
         mapper = CodebaseMapService(repo_root=temp_dir)
         mapper.spec_gaps = [
             SpecGap(
-                id="GAP-01", epic_id="EPIC-00",
-                missing_requirement="X", affected_files=["x.py"],
+                id="GAP-01",
+                epic_id="EPIC-00",
+                missing_requirement="X",
+                affected_files=["x.py"],
                 suggested_fix="Add X",
             )
         ]
@@ -77,12 +87,14 @@ class TestCodebaseMapService:
 
     def test_close_spec_gap_not_found(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
         mapper = CodebaseMapService(repo_root=temp_dir)
         result = mapper.close_spec_gap("GAP-MISSING", "note")
         assert result is False
 
     def test_parse_python_ast_extracts_symbols(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
         mapper = CodebaseMapService(repo_root=temp_dir)
         file_path = os.path.join(temp_dir, "example.py")
         with open(file_path, "w") as f:
@@ -103,12 +115,14 @@ def my_func():
 
     def test_parse_invalid_file(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
         mapper = CodebaseMapService(repo_root=temp_dir)
         symbols = mapper._parse_python_ast(os.path.join(temp_dir, "nonexistent.py"))
         assert "error" in symbols
 
     def test_detect_hidden_directory(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
         mapper = CodebaseMapService(repo_root=temp_dir)
         os.makedirs(os.path.join(temp_dir, ".opencode"))
         gaps = mapper.detect_spec_gaps(required_components=["opencode"])

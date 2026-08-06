@@ -53,6 +53,7 @@ FAST_FALLBACK_WAVE_TIMEOUT_SLACK     wave_timeout_slack       2.0  Extra wait ab
 FAST_FALLBACK_MAX_WORKER_THREADS     max_worker_threads       8  Probe pool size
 ===============  =====================  ============  =========================
 """
+
 from __future__ import annotations
 
 import json
@@ -256,9 +257,7 @@ class FastFallbackRouter:
         # Empty conversation is a malformed request — don't burn provider calls.
         if not messages and not system_prompt:
             logger.warning("Fast-fallback dispatch called with empty messages; returning error response.")
-            return self._error_response(
-                model_alias, "[ERROR] Empty conversation: provide at least one message."
-            )
+            return self._error_response(model_alias, "[ERROR] Empty conversation: provide at least one message.")
 
         candidates = self._order_candidates(self.fabric._build_route_list(model_alias))
         if not candidates:
@@ -299,8 +298,10 @@ class FastFallbackRouter:
                     "latency_samples": self._latency_samples.get(provider, 0),
                 }
                 for provider in sorted(
-                    set(self._circuit_failures) | set(self._circuit_open_until)
-                    | set(self._ewma_latency) | set(self._latency_samples)
+                    set(self._circuit_failures)
+                    | set(self._circuit_open_until)
+                    | set(self._ewma_latency)
+                    | set(self._latency_samples)
                 )
             }
 
@@ -496,15 +497,11 @@ class FastFallbackRouter:
                 # trip the breakers and treat as a failure (matches the fabric).
                 _fabric_record_failure(provider)
                 self._record_failure(provider)
-                return _ProbeResult(
-                    success=False, provider=provider, route=route, error="non-JSON response body"
-                )
+                return _ProbeResult(success=False, provider=provider, route=route, error="non-JSON response body")
             if not isinstance(resp_json, dict):
                 _fabric_record_failure(provider)
                 self._record_failure(provider)
-                return _ProbeResult(
-                    success=False, provider=provider, route=route, error="non-object response body"
-                )
+                return _ProbeResult(success=False, provider=provider, route=route, error="non-object response body")
 
             latency_ms = (time.time() - start_time) * 1000
             tokens = resp_json.get("usage", {}).get("total_tokens", 0)
@@ -615,7 +612,7 @@ class FastFallbackRouter:
             "Using simulation fallback."
         )
         return {
-            "id": f"msg_sim_{int(time.time()*1000)}",
+            "id": f"msg_sim_{int(time.time() * 1000)}",
             "type": "message",
             "role": "assistant",
             "model": model_alias,
@@ -623,7 +620,7 @@ class FastFallbackRouter:
                 {
                     "type": "text",
                     "text": f"[SIMULATION — Model: {model_alias}]\n"
-                    "Request processed via offline backup synthesis. All live providers failed."
+                    "Request processed via offline backup synthesis. All live providers failed.",
                 }
             ],
             "stop_reason": "end_turn",
@@ -635,7 +632,7 @@ class FastFallbackRouter:
     @staticmethod
     def _error_response(model_alias: str, text: str) -> dict[str, Any]:
         return {
-            "id": f"msg_err_{int(time.time()*1000)}",
+            "id": f"msg_err_{int(time.time() * 1000)}",
             "type": "message",
             "role": "assistant",
             "model": model_alias,

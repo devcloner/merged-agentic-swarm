@@ -4,6 +4,7 @@ Tests for tools/knowledge_cache.py
 Coverage: KnowledgeCache — load_cache, save_cache, add_learning (with dedup,
 expiry, max enforce), get_learning, search_learnings.
 """
+
 import json
 import os
 import time
@@ -89,16 +90,28 @@ class TestKnowledgeCache:
         preloaded = {
             "learnings": {
                 "LEARN-0001": {
-                    "id": "LEARN-0001", "title": "Dup", "category": "general",
-                    "solution": "Same", "tags": [], "created_at": 1000,
+                    "id": "LEARN-0001",
+                    "title": "Dup",
+                    "category": "general",
+                    "solution": "Same",
+                    "tags": [],
+                    "created_at": 1000,
                 },
                 "LEARN-0002": {
-                    "id": "LEARN-0002", "title": "Dup", "category": "general",
-                    "solution": "Same", "tags": [], "created_at": 2000,
+                    "id": "LEARN-0002",
+                    "title": "Dup",
+                    "category": "general",
+                    "solution": "Same",
+                    "tags": [],
+                    "created_at": 2000,
                 },
                 "LEARN-0003": {
-                    "id": "LEARN-0003", "title": "Unique", "category": "general",
-                    "solution": "Different", "tags": [], "created_at": 3000,
+                    "id": "LEARN-0003",
+                    "title": "Unique",
+                    "category": "general",
+                    "solution": "Different",
+                    "tags": [],
+                    "created_at": 3000,
                 },
             },
             "symbols": {},

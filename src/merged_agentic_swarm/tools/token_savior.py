@@ -2,10 +2,12 @@
 Token Savior & Context Compactor
 Optimizes context window consumption via symbol-level extraction, log compaction, and prose compression.
 """
+
 import logging
 import re
 
 logger = logging.getLogger("token_savior")
+
 
 class TokenSavior:
     @staticmethod
@@ -19,7 +21,10 @@ class TokenSavior:
                 continue
             compacted.append(line)
         if len(compacted) > max_lines:
-            return "\n".join(compacted[:max_lines]) + f"\n... [Truncated {len(compacted)-max_lines} lines by Token Savior]"
+            return (
+                "\n".join(compacted[:max_lines])
+                + f"\n... [Truncated {len(compacted) - max_lines} lines by Token Savior]"
+            )
         return "\n".join(compacted)
 
     @staticmethod
@@ -29,7 +34,11 @@ class TokenSavior:
         if len(lines) <= max_lines:
             return output
 
-        error_lines = [l for l in lines if any(k in l.lower() for k in ("error", "fail", "exception", "traceback", "warning", "passed", "failed"))]
+        error_lines = [
+            l
+            for l in lines
+            if any(k in l.lower() for k in ("error", "fail", "exception", "traceback", "warning", "passed", "failed"))
+        ]
         tail_lines = lines[-max_lines:]
 
         combined = list(dict.fromkeys(error_lines + tail_lines))
@@ -43,12 +52,13 @@ class TokenSavior:
             r"\bI hope this helps!?\b",
             r"\bFeel free to ask if you have any questions.?\b",
             r"\bCertainly!?\b",
-            r"\bHere is the code you requested:?\b"
+            r"\bHere is the code you requested:?\b",
         ]
         res = text
         for filler in fillers:
             res = re.sub(filler, "", res, flags=re.IGNORECASE)
         return res.strip()
+
 
 # Helper
 default_token_savior = TokenSavior()

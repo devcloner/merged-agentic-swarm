@@ -2,6 +2,7 @@
 Multi-Backend Model Fabric
 Routes requests across providers with priority fallbacks, format normalization, and key pool rotation.
 """
+
 import json
 import logging
 import threading
@@ -37,8 +38,7 @@ def _record_failure(provider: str, http_code: int | None = None):
         if _circuit_breaker[provider] >= CIRCUIT_BREAKER_THRESHOLD:
             _circuit_open_until[provider] = time.time() + CIRCUIT_BREAKER_COOLDOWN
             logger.warning(
-                f"Circuit breaker tripped for {provider} "
-                f"({_circuit_breaker[provider]} consecutive failures)."
+                f"Circuit breaker tripped for {provider} ({_circuit_breaker[provider]} consecutive failures)."
             )
 
 
@@ -49,6 +49,7 @@ def _record_success(provider: str, model_alias: str | None = None):
         _circuit_open_until.pop(provider, None)
         if model_alias:
             _last_successful_provider[model_alias] = provider
+
 
 # Fallback Routing Table
 #
@@ -82,85 +83,325 @@ def _record_success(provider: str, model_alias: str | None = None):
 MODEL_FABRIC_ROUTES: dict[str, list[dict[str, Any]]] = {
     # ── deep tier (claude-3-opus) — strongest available models ─────────────
     "claude-3-opus": [
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
-        {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
-        {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "litellm",
+            "model": "gemini-2.5-flash",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "meta/llama-3.1-70b-instruct",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
         {"provider": "mistral", "model": "mistral-large-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
-        {"provider": "litellm", "model": "gemini-3.6-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
-        {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
-        {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
-        {"provider": "fcc-proxy", "model": "nvidia_nim/meta/llama-3.1-70b-instruct", "url": "http://localhost:8080/v1/messages"},
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash-lite",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "litellm",
+            "model": "gemini-3.6-flash",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "openai/gpt-oss-20b",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "z-ai/glm-5.2",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
+        {
+            "provider": "fcc-proxy",
+            "model": "nvidia_nim/meta/llama-3.1-70b-instruct",
+            "url": "http://localhost:8080/v1/messages",
+        },
         {"provider": "mistral", "model": "codestral-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "nvidia_nim", "model": "meta/llama-3.3-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions", "timeout": 60},
-        {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
-        {"provider": "routatic-proxy", "model": "deepseek-v4-pro", "url": "http://localhost:3456/v1/messages", "timeout": 30},
-        {"provider": "routatic-proxy", "model": "deepseek-v4-flash", "url": "http://localhost:3456/v1/messages", "timeout": 30},
+        {
+            "provider": "nvidia_nim",
+            "model": "meta/llama-3.3-70b-instruct",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+            "timeout": 60,
+        },
+        {
+            "provider": "openrouter",
+            "model": "deepseek/deepseek-chat-v3.1:free",
+            "url": "https://openrouter.ai/api/v1/chat/completions",
+        },
+        {
+            "provider": "routatic-proxy",
+            "model": "deepseek-v4-pro",
+            "url": "http://localhost:3456/v1/messages",
+            "timeout": 30,
+        },
+        {
+            "provider": "routatic-proxy",
+            "model": "deepseek-v4-flash",
+            "url": "http://localhost:3456/v1/messages",
+            "timeout": 30,
+        },
     ],
     # ── main tier (claude-3-7-sonnet) ──────────────────────────────────────
     "claude-3-7-sonnet": [
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
-        {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
-        {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "litellm",
+            "model": "gemini-2.5-flash",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "meta/llama-3.1-70b-instruct",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
-        {"provider": "litellm", "model": "gemini-3.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
-        {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
-        {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash-lite",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "litellm",
+            "model": "gemini-3.5-flash",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "openai/gpt-oss-20b",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "z-ai/glm-5.2",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
         {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
-        {"provider": "routatic-proxy", "model": "deepseek-v4-pro", "url": "http://localhost:3456/v1/messages", "timeout": 30},
-        {"provider": "routatic-proxy", "model": "deepseek-v4-flash", "url": "http://localhost:3456/v1/messages", "timeout": 30},
+        {
+            "provider": "openrouter",
+            "model": "deepseek/deepseek-chat-v3.1:free",
+            "url": "https://openrouter.ai/api/v1/chat/completions",
+        },
+        {
+            "provider": "routatic-proxy",
+            "model": "deepseek-v4-pro",
+            "url": "http://localhost:3456/v1/messages",
+            "timeout": 30,
+        },
+        {
+            "provider": "routatic-proxy",
+            "model": "deepseek-v4-flash",
+            "url": "http://localhost:3456/v1/messages",
+            "timeout": 30,
+        },
     ],
     # ── main tier (claude-3-5-sonnet) ──────────────────────────────────────
     "claude-3-5-sonnet": [
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
-        {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
-        {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "litellm",
+            "model": "gemini-2.5-flash",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "meta/llama-3.1-70b-instruct",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
-        {"provider": "litellm", "model": "gemini-3.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
-        {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
-        {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash-lite",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "litellm",
+            "model": "gemini-3.5-flash",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "openai/gpt-oss-20b",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "z-ai/glm-5.2",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
         {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
-        {"provider": "routatic-proxy", "model": "deepseek-v4-pro", "url": "http://localhost:3456/v1/messages", "timeout": 30},
-        {"provider": "routatic-proxy", "model": "deepseek-v4-flash", "url": "http://localhost:3456/v1/messages", "timeout": 30},
+        {
+            "provider": "openrouter",
+            "model": "deepseek/deepseek-chat-v3.1:free",
+            "url": "https://openrouter.ai/api/v1/chat/completions",
+        },
+        {
+            "provider": "routatic-proxy",
+            "model": "deepseek-v4-pro",
+            "url": "http://localhost:3456/v1/messages",
+            "timeout": 30,
+        },
+        {
+            "provider": "routatic-proxy",
+            "model": "deepseek-v4-flash",
+            "url": "http://localhost:3456/v1/messages",
+            "timeout": 30,
+        },
     ],
     # ── fast tier (claude-3-5-haiku) — cheapest/latency-first ──────────────
     "claude-3-5-haiku": [
-        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
-        {"provider": "litellm", "model": "gemini-2.5-flash-lite", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
-        {"provider": "nvidia_nim", "model": "meta/llama-3.1-8b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash-lite",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "litellm",
+            "model": "gemini-2.5-flash-lite",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "meta/llama-3.1-8b-instruct",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
         {"provider": "mistral", "model": "mistral-tiny", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
-        {"provider": "litellm", "model": "gemini-3.5-flash-lite", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
-        {"provider": "nvidia_nim", "model": "mistralai/mistral-nemotron", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
-        {"provider": "fcc-proxy", "model": "nvidia_nim/meta/llama-3.1-8b-instruct", "url": "http://localhost:8080/v1/messages"},
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "litellm",
+            "model": "gemini-3.5-flash-lite",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "mistralai/mistral-nemotron",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
+        {
+            "provider": "fcc-proxy",
+            "model": "nvidia_nim/meta/llama-3.1-8b-instruct",
+            "url": "http://localhost:8080/v1/messages",
+        },
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
-        {"provider": "routatic-proxy", "model": "deepseek-v4-pro", "url": "http://localhost:3456/v1/messages", "timeout": 30},
-        {"provider": "routatic-proxy", "model": "deepseek-v4-flash", "url": "http://localhost:3456/v1/messages", "timeout": 30},
+        {
+            "provider": "openrouter",
+            "model": "deepseek/deepseek-chat-v3.1:free",
+            "url": "https://openrouter.ai/api/v1/chat/completions",
+        },
+        {
+            "provider": "routatic-proxy",
+            "model": "deepseek-v4-pro",
+            "url": "http://localhost:3456/v1/messages",
+            "timeout": 30,
+        },
+        {
+            "provider": "routatic-proxy",
+            "model": "deepseek-v4-flash",
+            "url": "http://localhost:3456/v1/messages",
+            "timeout": 30,
+        },
     ],
     # ── general-purpose alias (fabCFA) — mirrors main tier ─────────────────
     "fabCFA": [
-        {"provider": "gemini", "model": "gemini-2.5-flash", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
-        {"provider": "litellm", "model": "gemini-2.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
-        {"provider": "nvidia_nim", "model": "meta/llama-3.1-70b-instruct", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "litellm",
+            "model": "gemini-2.5-flash",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "meta/llama-3.1-70b-instruct",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
         {"provider": "mistral", "model": "mistral-small-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "gemini", "model": "gemini-2.5-flash-lite", "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "timeout": 30},
-        {"provider": "litellm", "model": "gemini-3.5-flash", "url": "http://localhost:4000/v1/chat/completions", "timeout": 30},
-        {"provider": "nvidia_nim", "model": "openai/gpt-oss-20b", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
-        {"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "https://integrate.api.nvidia.com/v1/chat/completions"},
+        {
+            "provider": "gemini",
+            "model": "gemini-2.5-flash-lite",
+            "url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "litellm",
+            "model": "gemini-3.5-flash",
+            "url": "http://localhost:4000/v1/chat/completions",
+            "timeout": 30,
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "openai/gpt-oss-20b",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
+        {
+            "provider": "nvidia_nim",
+            "model": "z-ai/glm-5.2",
+            "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        },
         {"provider": "fcc-proxy", "model": "mistral/mistral-small-latest", "url": "http://localhost:8080/v1/messages"},
         {"provider": "mistral", "model": "ministral-8b-latest", "url": "https://api.mistral.ai/v1/chat/completions"},
-        {"provider": "openrouter", "model": "deepseek/deepseek-chat-v3.1:free", "url": "https://openrouter.ai/api/v1/chat/completions"},
-        {"provider": "routatic-proxy", "model": "deepseek-v4-pro", "url": "http://localhost:3456/v1/messages", "timeout": 30},
-        {"provider": "routatic-proxy", "model": "deepseek-v4-flash", "url": "http://localhost:3456/v1/messages", "timeout": 30},
+        {
+            "provider": "openrouter",
+            "model": "deepseek/deepseek-chat-v3.1:free",
+            "url": "https://openrouter.ai/api/v1/chat/completions",
+        },
+        {
+            "provider": "routatic-proxy",
+            "model": "deepseek-v4-pro",
+            "url": "http://localhost:3456/v1/messages",
+            "timeout": 30,
+        },
+        {
+            "provider": "routatic-proxy",
+            "model": "deepseek-v4-flash",
+            "url": "http://localhost:3456/v1/messages",
+            "timeout": 30,
+        },
     ],
 }
+
 
 class MultiProviderFabric:
     def __init__(self, key_pool=None):
@@ -181,7 +422,9 @@ class MultiProviderFabric:
             return "\n".join(text_parts)
         return ""
 
-    def format_anthropic_to_openai(self, messages: list[dict[str, Any]], system_prompt: str | None = None) -> list[dict[str, Any]]:
+    def format_anthropic_to_openai(
+        self, messages: list[dict[str, Any]], system_prompt: str | None = None
+    ) -> list[dict[str, Any]]:
         """Convert normalized messages (Anthropic-shaped) to OpenAI Chat Completions format.
 
         Handles assistant ``tool_calls`` and ``tool`` result messages so an
@@ -194,27 +437,31 @@ class MultiProviderFabric:
             role = msg.get("role", "user")
             content = self._flatten_content_to_text(msg.get("content", ""))
             if role == "tool":
-                openai_messages.append({
-                    "role": "tool",
-                    "tool_call_id": msg.get("tool_call_id", ""),
-                    "content": content,
-                })
+                openai_messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": msg.get("tool_call_id", ""),
+                        "content": content,
+                    }
+                )
             elif role == "assistant" and msg.get("tool_calls"):
-                openai_messages.append({
-                    "role": "assistant",
-                    "content": content,
-                    "tool_calls": [
-                        {
-                            "id": tc.get("id", ""),
-                            "type": "function",
-                            "function": {
-                                "name": tc.get("name", ""),
-                                "arguments": json.dumps(tc.get("input", {})),
-                            },
-                        }
-                        for tc in msg["tool_calls"]
-                    ],
-                })
+                openai_messages.append(
+                    {
+                        "role": "assistant",
+                        "content": content,
+                        "tool_calls": [
+                            {
+                                "id": tc.get("id", ""),
+                                "type": "function",
+                                "function": {
+                                    "name": tc.get("name", ""),
+                                    "arguments": json.dumps(tc.get("input", {})),
+                                },
+                            }
+                            for tc in msg["tool_calls"]
+                        ],
+                    }
+                )
             else:
                 openai_messages.append({"role": role, "content": content})
         return openai_messages
@@ -230,7 +477,9 @@ class MultiProviderFabric:
             return content
         return []
 
-    def format_anthropic_to_anthropic(self, messages: list[dict[str, Any]], system_prompt: str | None = None) -> list[dict[str, Any]]:
+    def format_anthropic_to_anthropic(
+        self, messages: list[dict[str, Any]], system_prompt: str | None = None
+    ) -> list[dict[str, Any]]:
         """Convert normalized messages to Anthropic Messages API format.
 
         Used for Anthropic-compatible endpoints (``/v1/messages``, e.g. fcc-proxy).
@@ -243,27 +492,35 @@ class MultiProviderFabric:
             if role == "assistant" and msg.get("tool_calls"):
                 blocks = self._content_to_anthropic_blocks(msg.get("content", ""))
                 for tc in msg["tool_calls"]:
-                    blocks.append({
-                        "type": "tool_use",
-                        "id": tc.get("id", ""),
-                        "name": tc.get("name", ""),
-                        "input": tc.get("input", {}),
-                    })
+                    blocks.append(
+                        {
+                            "type": "tool_use",
+                            "id": tc.get("id", ""),
+                            "name": tc.get("name", ""),
+                            "input": tc.get("input", {}),
+                        }
+                    )
                 anthropic_messages.append({"role": "assistant", "content": blocks})
             elif role == "tool":
-                anthropic_messages.append({
-                    "role": "user",
-                    "content": [{
-                        "type": "tool_result",
-                        "tool_use_id": msg.get("tool_call_id", ""),
-                        "content": self._flatten_content_to_text(msg.get("content", "")),
-                    }],
-                })
+                anthropic_messages.append(
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": msg.get("tool_call_id", ""),
+                                "content": self._flatten_content_to_text(msg.get("content", "")),
+                            }
+                        ],
+                    }
+                )
             else:
-                anthropic_messages.append({
-                    "role": role,
-                    "content": self._content_to_anthropic_blocks(msg.get("content", "")),
-                })
+                anthropic_messages.append(
+                    {
+                        "role": role,
+                        "content": self._content_to_anthropic_blocks(msg.get("content", "")),
+                    }
+                )
         return anthropic_messages
 
     @staticmethod
@@ -272,11 +529,13 @@ class MultiProviderFabric:
         converted = []
         for tool in tools:
             fn = tool.get("function", tool)
-            converted.append({
-                "name": fn.get("name", ""),
-                "description": fn.get("description", ""),
-                "input_schema": fn.get("parameters", {"type": "object", "properties": {}}),
-            })
+            converted.append(
+                {
+                    "name": fn.get("name", ""),
+                    "description": fn.get("description", ""),
+                    "input_schema": fn.get("parameters", {"type": "object", "properties": {}}),
+                }
+            )
         return converted
 
     @staticmethod
@@ -311,11 +570,13 @@ class MultiProviderFabric:
                         arguments = json.loads(fn.get("arguments", "{}"))
                     except (json.JSONDecodeError, TypeError):
                         arguments = {}
-                    tool_calls.append({
-                        "id": tc.get("id", ""),
-                        "name": fn.get("name", ""),
-                        "input": arguments,
-                    })
+                    tool_calls.append(
+                        {
+                            "id": tc.get("id", ""),
+                            "name": fn.get("name", ""),
+                            "input": arguments,
+                        }
+                    )
             if not content_text and not tool_calls:
                 # Reasoning-only response (e.g. Gemini thinking models): extract from finish_reason context
                 finish_reason = choices[0].get("finish_reason", "")
@@ -326,22 +587,17 @@ class MultiProviderFabric:
 
         usage = openai_resp.get("usage", {})
         result = {
-            "id": f"msg_{int(time.time()*1000)}",
+            "id": f"msg_{int(time.time() * 1000)}",
             "type": "message",
             "role": "assistant",
             "model": model_alias,
-            "content": [
-                {
-                    "type": "text",
-                    "text": content_text
-                }
-            ],
+            "content": [{"type": "text", "text": content_text}],
             "stop_reason": "end_turn",
             "stop_sequence": None,
             "usage": {
                 "input_tokens": usage.get("prompt_tokens", 0),
-                "output_tokens": usage.get("completion_tokens", 0)
-            }
+                "output_tokens": usage.get("completion_tokens", 0),
+            },
         }
         if tool_calls:
             result["tool_calls"] = tool_calls
@@ -357,7 +613,15 @@ class MultiProviderFabric:
                 routes.insert(0, routes.pop(idx))
         return routes
 
-    def dispatch_request(self, model_alias: str, messages: list[dict[str, Any]], system_prompt: str | None = None, max_tokens: int = 4096, temperature: float = 0.7, tools: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    def dispatch_request(
+        self,
+        model_alias: str,
+        messages: list[dict[str, Any]],
+        system_prompt: str | None = None,
+        max_tokens: int = 4096,
+        temperature: float = 0.7,
+        tools: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
         """Dispatches request across multi-backend provider fallback cascade.
 
         ``tools`` is a list of OpenAI function-tool schemas. They are converted
@@ -372,7 +636,7 @@ class MultiProviderFabric:
         if not messages and not system_prompt:
             logger.warning("dispatch_request called with empty messages; returning error response.")
             return {
-                "id": f"msg_err_{int(time.time()*1000)}",
+                "id": f"msg_err_{int(time.time() * 1000)}",
                 "type": "message",
                 "role": "assistant",
                 "model": model_alias,
@@ -520,16 +784,18 @@ class MultiProviderFabric:
                     break
 
         # Fallback offline simulation
-        logger.warning(f"All live API providers unreachable or unconfigured for {model_alias}. Using simulation fallback (last error: {last_error}).")
+        logger.warning(
+            f"All live API providers unreachable or unconfigured for {model_alias}. Using simulation fallback (last error: {last_error})."
+        )
         return {
-            "id": f"msg_sim_{int(time.time()*1000)}",
+            "id": f"msg_sim_{int(time.time() * 1000)}",
             "type": "message",
             "role": "assistant",
             "model": model_alias,
             "content": [
                 {
                     "type": "text",
-                    "text": f"[SIMULATION — Model: {model_alias}]\nRequest processed via offline backup synthesis. All live providers failed."
+                    "text": f"[SIMULATION — Model: {model_alias}]\nRequest processed via offline backup synthesis. All live providers failed.",
                 }
             ],
             "stop_reason": "end_turn",
@@ -537,6 +803,7 @@ class MultiProviderFabric:
             "usage": {"input_tokens": 0, "output_tokens": 0},
             "simulation_fallback": True,  # flag for callers to detect synthetic responses
         }
+
 
 # Global Singleton
 default_fabric = MultiProviderFabric()

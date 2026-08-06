@@ -3,6 +3,7 @@ Tests for models/wave_models.py
 
 Coverage: WavePhase, WaveStatus, WaveGateCriteria, WaveExecutionState.
 """
+
 from merged_agentic_swarm.models.wave_models import WaveExecutionState, WaveGateCriteria, WavePhase, WaveStatus
 
 
@@ -43,10 +44,7 @@ class TestWaveGateCriteria:
         assert d["tests_passing"] is False
 
     def test_custom_checks(self):
-        criteria = WaveGateCriteria(
-            wave_id=2, name="Custom",
-            custom_checks=["check_ownership", "check_security"]
-        )
+        criteria = WaveGateCriteria(wave_id=2, name="Custom", custom_checks=["check_ownership", "check_security"])
         assert len(criteria.custom_checks) == 2
 
 
@@ -63,13 +61,15 @@ class TestWaveExecutionState:
         state = WaveExecutionState(wave_id=1, name="Wave 1")
         state.status = WaveStatus.IN_PROGRESS
         import time
+
         state.started_at = time.time()
         assert state.status == WaveStatus.IN_PROGRESS
         assert state.started_at > 0
 
     def test_to_dict(self):
         state = WaveExecutionState(
-            wave_id=2, name="Wave 2",
+            wave_id=2,
+            name="Wave 2",
             status=WaveStatus.PASSED,
             tasks_assigned=["T1", "T2"],
             tasks_completed=["T1"],

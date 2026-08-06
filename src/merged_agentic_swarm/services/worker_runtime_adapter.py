@@ -47,6 +47,7 @@ def _resolve_opencode_bin() -> str | None:
     ]
     # Also check PATH
     import shutil
+
     path_bin = shutil.which("opencode")
     if path_bin:
         candidates.insert(0, path_bin)
@@ -57,6 +58,7 @@ def _resolve_opencode_bin() -> str | None:
             return candidate
     _OPENCODE_BIN_RESOLVED = ""  # sentinel for "not found"
     return None
+
 
 # ── Mode auto-detection ────────────────────────────────────────────────
 
@@ -115,10 +117,7 @@ class WorkerRuntimeAdapter:
         if mode == "auto":
             mode = detect_mode()
         if mode not in ("opencode", "native_subagent", "direct_fabric"):
-            raise ValueError(
-                f"Invalid mode '{mode}'. Must be one of: "
-                f"opencode, native_subagent, direct_fabric, auto"
-            )
+            raise ValueError(f"Invalid mode '{mode}'. Must be one of: opencode, native_subagent, direct_fabric, auto")
         self.mode: str = mode
         self._worker_processes: dict[str, subprocess.Popen[str]] = {}
         self._lock = threading.Lock()
@@ -224,25 +223,25 @@ class WorkerRuntimeAdapter:
                 try:
                     results.append(future.result())
                 except Exception as exc:
-                    results.append({
-                        "run_id": str(uuid.uuid4()),
-                        "task_id": f"batch-task-{futures[future]:02d}",
-                        "worker_id": "batch-error",
-                        "role": role.value,
-                        "model_tier": "claude-3-7-sonnet",
-                        "start_time": time.time(),
-                        "end_time": time.time(),
-                        "status": "failed",
-                        "evidence": str(exc),
-                    })
+                    results.append(
+                        {
+                            "run_id": str(uuid.uuid4()),
+                            "task_id": f"batch-task-{futures[future]:02d}",
+                            "worker_id": "batch-error",
+                            "role": role.value,
+                            "model_tier": "claude-3-7-sonnet",
+                            "start_time": time.time(),
+                            "end_time": time.time(),
+                            "status": "failed",
+                            "evidence": str(exc),
+                        }
+                    )
 
         return results
 
     # ── Internal launchers ───────────────────────────────────────────
 
-    def _launch_via_opencode(
-        self, worker_spec: AgentSpec, task: str
-    ) -> tuple[str, str]:
+    def _launch_via_opencode(self, worker_spec: AgentSpec, task: str) -> tuple[str, str]:
         """Launch a task via the OpenCode CLI.
 
         Spawns `opencode serve --port <N>` as a short-lived worker,
@@ -255,8 +254,10 @@ class WorkerRuntimeAdapter:
 
         port = self._next_port()
         cmd = [
-            opencode_bin, "serve",
-            "--port", str(port),
+            opencode_bin,
+            "serve",
+            "--port",
+            str(port),
             "--print-logs",
         ]
         try:
@@ -275,10 +276,12 @@ class WorkerRuntimeAdapter:
             import urllib.error
             import urllib.request
 
-            payload = json.dumps({
-                "prompt": task,
-                "system": worker_spec.system_prompt,
-            }).encode("utf-8")
+            payload = json.dumps(
+                {
+                    "prompt": task,
+                    "system": worker_spec.system_prompt,
+                }
+            ).encode("utf-8")
 
             req = urllib.request.Request(
                 f"http://127.0.0.1:{port}/v1/agent",
@@ -305,9 +308,7 @@ class WorkerRuntimeAdapter:
             # Fallback to native if opencode fails
             return self._launch_via_native(worker_spec, task)
 
-    def _launch_via_native(
-        self, worker_spec: AgentSpec, task: str
-    ) -> tuple[str, str]:
+    def _launch_via_native(self, worker_spec: AgentSpec, task: str) -> tuple[str, str]:
         """Launch a task via native subagent fallback.
 
         Calls the multi-provider fabric directly with the worker's
@@ -332,9 +333,7 @@ class WorkerRuntimeAdapter:
         except Exception as exc:
             return "failed", str(exc)
 
-    def _launch_via_fabric(
-        self, worker_spec: AgentSpec, task: str
-    ) -> tuple[str, str]:
+    def _launch_via_fabric(self, worker_spec: AgentSpec, task: str) -> tuple[str, str]:
         """Launch a task via direct fabric dispatch.
 
         Identical to native_subagent in implementation — the

@@ -138,7 +138,7 @@ class ProxyChainHealth:
                 meta["p95_latency_ms"] = metrics.get("p95_latency_ms")
                 meta["requests_success"] = metrics.get("requests_success")
                 meta["requests_failed"] = metrics.get("requests_failed")
-            except ValueError, AttributeError:
+            except (ValueError, AttributeError):
                 pass
             detail = _truncate(resp.text)
             return HopResult("routatic", ok, round(elapsed_ms, 2), resp.status_code, detail, meta)
@@ -253,7 +253,7 @@ class ProxyChainHealth:
                     model_count = len(data)
                 elif isinstance(data, dict) and isinstance(data.get("data"), list):
                     model_count = len(data["data"])
-            except ValueError, AttributeError:
+            except (ValueError, AttributeError):
                 pass
             detail = f"models={model_count}" if model_count is not None else _truncate(resp.text, 120)
             meta = {"models_served": model_count} if model_count is not None else {}
