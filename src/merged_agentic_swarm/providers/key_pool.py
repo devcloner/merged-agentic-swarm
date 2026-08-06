@@ -145,6 +145,11 @@ class KeyPoolManager:
         #     does not interfere with FCC on port 8080. Uses same ANTHROPIC_AUTH_TOKEN.
         self.add_key("routatic-proxy", fcc_proxy_key, key_id="routatic-proxy-main")
 
+        # 13. CloudCLI (cloneclove.com) — remote agent-triggering API
+        cloudcli_key = env_vars.get("CLOUDCLI_API_KEY") or os.environ.get("CLOUDCLI_API_KEY")
+        if cloudcli_key:
+            self.add_key("cloudcli", cloudcli_key, key_id="cloudcli-main")
+
         logger.info(f"Loaded key pools for providers: {list(self.keys_by_provider.keys())}")
 
     def add_key(self, provider: str, secret_value: str, key_id: str):

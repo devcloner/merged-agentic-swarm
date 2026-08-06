@@ -568,7 +568,7 @@ class MultiProviderFabric:
                     fn = tc.get("function", {})
                     try:
                         arguments = json.loads(fn.get("arguments", "{}"))
-                    except (json.JSONDecodeError, TypeError):
+                    except json.JSONDecodeError, TypeError:
                         arguments = {}
                     tool_calls.append(
                         {

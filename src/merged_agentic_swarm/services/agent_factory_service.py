@@ -158,7 +158,7 @@ class DurableAgentFactory:
         promoted_at = agent_spec.get("promoted_at", 0.0)
         try:
             created_str = datetime.fromtimestamp(promoted_at, tz=UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
-        except (OSError, ValueError):
+        except OSError, ValueError:
             created_str = str(promoted_at)
 
         derived = agent_spec.get("derived_from_learnings", [])

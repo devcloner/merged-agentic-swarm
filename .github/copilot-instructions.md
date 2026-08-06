@@ -46,8 +46,9 @@ For Claude-shaped calls (`/v1/messages`), use the fcc gateway on `:8080`.
 
 ## Code rules that matter here
 
-- Python 3.14 target. `except A, B:` is a **SyntaxError** — always parenthesize:
-  `except (A, B):`.
+- Python 3.14 target (ruff `py314`). Under PEP 758, `except A, B:` is valid on
+  3.14 only — do not parenthesize except clauses, ruff strips the parens back
+  and 3.12/3.13 reject both forms' grammar anyway (hence the 3.14 floor).
 - No `# type: ignore`. Fix the underlying type.
 - Prefer top-level imports; avoid `TYPE_CHECKING` for first-party code.
 - DRY; remove dead code; config over literals.

@@ -234,7 +234,7 @@ None (null = permanent / no expiry)
         with open(progress_path) as f:
             try:
                 progress = json.load(f)
-            except (OSError, json.JSONDecodeError):
+            except OSError, json.JSONDecodeError:
                 pass
     milestones = progress.get("milestone_history", [])
     milestones.append(

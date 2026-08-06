@@ -40,6 +40,12 @@ class TestKeyPoolManager:
         all_providers = list(pool.keys_by_provider.keys())
         assert len(all_providers) > 0
 
+    def test_cloudcli_key_loaded_from_env(self, monkeypatch):
+        monkeypatch.setenv("CLOUDCLI_API_KEY", "ck-x")
+        pool = KeyPoolManager(env_file_path="/dev/null")
+        assert "cloudcli" in pool.keys_by_provider
+        assert pool.keys_by_provider["cloudcli"][0].key_id == "cloudcli-main"
+
     def test_add_key_skips_placeholder(self):
         pool = KeyPoolManager(env_file_path="/dev/null")
         pool.keys_by_provider = {}  # clear env-loaded keys

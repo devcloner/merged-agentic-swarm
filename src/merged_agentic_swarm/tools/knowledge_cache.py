@@ -96,7 +96,7 @@ class KnowledgeCache:
             if lid.startswith("LEARN-"):
                 try:
                     max_idx = max(max_idx, int(lid.split("-")[1]))
-                except (ValueError, IndexError):
+                except ValueError, IndexError:
                     pass
         learning_id = f"LEARN-{max_idx + 1:04d}"
         self.learnings[learning_id] = {

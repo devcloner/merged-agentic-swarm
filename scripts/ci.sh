@@ -8,9 +8,9 @@ export PYTHONPATH="${ROOT}/src${PYTHONPATH:+:$PYTHONPATH}"
 echo "=== Merged Agentic Swarm CI ==="
 echo ""
 
-# 1. Python syntax check
+# 1. Python syntax check (3.14 — ruff targets py314, PEP 758 allows bare `except A, B:`)
 echo "--- Syntax check ---"
-python3 << 'PYEOF'
+uv run python << 'PYEOF'
 import sys
 files = [
     'src/merged_agentic_swarm/providers/multi_provider_fabric.py',

@@ -151,13 +151,13 @@ class FastFallbackConfig:
         def _env_int(name: str, default: int) -> int:
             try:
                 return int(os.environ.get(name, default))
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 return default
 
         def _env_float(name: str, default: float) -> float:
             try:
                 return float(os.environ.get(name, default))
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 return default
 
         return cls(

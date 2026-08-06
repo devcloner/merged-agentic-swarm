@@ -7,7 +7,7 @@ provider-aware model fabric, and a cold-path knowledge learning loop.
 waves of OpenCode workers, verifies the integration with an adversarial gate, and promotes
 validated learnings into durable agent specs — so the system gets better across runs.
 
-**Current version:** 1.5.1 · Python ≥3.11 · **Status:** active development
+**Current version:** 1.6.0 · Python ≥3.14 · **Status:** active development
 
 ---
 
@@ -52,6 +52,7 @@ around two ideas:
 | Fast fallback | `src/merged_agentic_swarm/fast_pool.py`, `fast_fallback.py` | tiered failover across local proxies |
 | Streaming proxy | `src/merged_agentic_swarm/streaming_proxy.py` | SSE worker API |
 | Latency tracker | `src/merged_agentic_swarm/latency_tracker.py` | TTFB / total / tokens-per-sec percentiles |
+| CloudCLI client | `src/merged_agentic_swarm/services/cloudcli_service.py` | trigger remote agents via cloneclove.com (`CLOUDCLI_API_KEY`) |
 | Wave gate | `src/merged_agentic_swarm/services/wave_gate_service.py` | blocks unsafe progression |
 | Learning cache | `src/merged_agentic_swarm/tools/knowledge_cache.py` | hot-cache → cold-registry promotion |
 | Worker pools | `opencode-swarm.json` | 4 pool definitions, ramp `[4,8,16,24,40]` |
@@ -69,7 +70,7 @@ current is throttled or failing:
 ## Quickstart
 
 ```bash
-# Install (requires Python 3.11+ and uv)
+# Install (requires Python 3.14+ and uv)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 uv sync
 
