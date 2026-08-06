@@ -192,7 +192,7 @@ class TestClaudeProxyHandler:
         req = urllib.request.Request(
             f"{self.base_url}/v1/chat/completions",
             data=b"not json",
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "x-api-key": "freecc"},
             method="POST",
         )
         with pytest.raises(HTTPError) as exc:
@@ -212,7 +212,7 @@ class TestClaudeProxyHandler:
         req = urllib.request.Request(
             f"{self.base_url}/v1/messages",
             data=payload,
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "x-api-key": "freecc"},
             method="POST",
         )
         resp = urllib.request.urlopen(req, timeout=10)
@@ -220,6 +220,67 @@ class TestClaudeProxyHandler:
         data = json.loads(resp.read().decode("utf-8"))
         # Should have content (even if simulation)
         assert "content" in data
+
+    def test_post_v1_messages_without_token_returns_401(self):
+        """POST /v1/messages without an auth token → 401."""
+        import urllib.request
+        from urllib.error import HTTPError
+
+        payload = json.dumps(
+            {
+                "model": "claude-3-7-sonnet",
+                "messages": [{"role": "user", "content": "Hi"}],
+            }
+        ).encode("utf-8")
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/messages",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with pytest.raises(HTTPError) as exc:
+            urllib.request.urlopen(req, timeout=5)
+        assert exc.value.code == 401
+
+    def test_post_v1_messages_with_wrong_token_returns_401(self):
+        """POST /v1/messages with an invalid token → 401."""
+        import urllib.request
+        from urllib.error import HTTPError
+
+        payload = json.dumps(
+            {
+                "model": "claude-3-7-sonnet",
+                "messages": [{"role": "user", "content": "Hi"}],
+            }
+        ).encode("utf-8")
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/messages",
+            data=payload,
+            headers={"Content-Type": "application/json", "x-api-key": "bad-token-xyz"},
+            method="POST",
+        )
+        with pytest.raises(HTTPError) as exc:
+            urllib.request.urlopen(req, timeout=5)
+        assert exc.value.code == 401
+
+    def test_post_v1_messages_with_bearer_token(self):
+        """POST /v1/messages authenticated via Authorization: Bearer → 200."""
+        import urllib.request
+
+        payload = json.dumps(
+            {
+                "model": "claude-3-7-sonnet",
+                "messages": [{"role": "user", "content": "Hi"}],
+            }
+        ).encode("utf-8")
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/messages",
+            data=payload,
+            headers={"Content-Type": "application/json", "Authorization": "Bearer freecc"},
+            method="POST",
+        )
+        resp = urllib.request.urlopen(req, timeout=10)
+        assert resp.status == 200
 
     def test_options_request(self):
         """OPTIONS request should return CORS headers."""
@@ -241,7 +302,7 @@ class TestClaudeProxyHandler:
         req = urllib.request.Request(
             f"{self.base_url}/unsupported",
             data=payload,
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "x-api-key": "freecc"},
             method="POST",
         )
         with pytest.raises(HTTPError) as exc:
@@ -255,7 +316,7 @@ class TestClaudeProxyHandler:
         req = urllib.request.Request(
             f"{self.base_url}/v1/messages",
             data=b"{}",
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "x-api-key": "freecc"},
             method="POST",
         )
         resp = urllib.request.urlopen(req, timeout=10)
@@ -285,7 +346,7 @@ class TestClaudeProxyHandler:
         req = urllib.request.Request(
             f"{self.base_url}/v1/chat/completions",
             data=payload,
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "x-api-key": "freecc"},
             method="POST",
         )
         resp = urllib.request.urlopen(req, timeout=10)
@@ -309,7 +370,7 @@ class TestClaudeProxyHandler:
         req = urllib.request.Request(
             f"{self.base_url}/v1/audio/transcriptions",
             data=_multipart_body(),
-            headers={"Content-Type": "multipart/form-data; boundary=boundary123"},
+            headers={"Content-Type": "multipart/form-data; boundary=boundary123", "x-api-key": "freecc"},
             method="POST",
         )
         resp = urllib.request.urlopen(req, timeout=10)
@@ -332,7 +393,7 @@ class TestClaudeProxyHandler:
         req = urllib.request.Request(
             f"{self.base_url}/v1/audio/transcriptions",
             data=_multipart_body(include_file=False),
-            headers={"Content-Type": "multipart/form-data; boundary=boundary123"},
+            headers={"Content-Type": "multipart/form-data; boundary=boundary123", "x-api-key": "freecc"},
             method="POST",
         )
         with pytest.raises(HTTPError) as exc:
@@ -353,7 +414,7 @@ class TestClaudeProxyHandler:
         req = urllib.request.Request(
             f"{self.base_url}/v1/audio/transcriptions",
             data=_multipart_body(),
-            headers={"Content-Type": "multipart/form-data; boundary=boundary123"},
+            headers={"Content-Type": "multipart/form-data; boundary=boundary123", "x-api-key": "freecc"},
             method="POST",
         )
         with pytest.raises(HTTPError) as exc:

@@ -4,6 +4,7 @@ Exposes Anthropic-compatible, OpenAI-compatible API endpoints, and audio transcr
 backed by multi-provider key pools / NVIDIA NIM Whisper.
 """
 
+import argparse
 import json
 import logging
 import os
@@ -136,6 +137,23 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.end_headers()
 
+    def _authorized(self) -> bool:
+        """Enforce the inbound proxy token (ANTHROPIC_AUTH_TOKEN, default 'freecc').
+
+        Health/status endpoints and CORS preflight stay unauthenticated so
+        monitors can probe the service; all data endpoints gate on the token.
+        """
+        expected = os.environ.get("ANTHROPIC_AUTH_TOKEN") or "freecc"
+        supplied = self.headers.get("x-api-key")
+        if supplied is None:
+            authz = self.headers.get("Authorization", "")
+            if authz.startswith("Bearer "):
+                supplied = authz[len("Bearer ") :]
+        if not supplied or supplied != expected:
+            self.send_json_response(401, {"error": "Invalid or missing API token"})
+            return False
+        return True
+
     def do_GET(self):
         if self.path == "/health":
             self.send_json_response(
@@ -148,6 +166,9 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
             self.send_json_response(404, {"error": "Endpoint not found"})
 
     def do_POST(self):
+        if not self._authorized():
+            return
+
         content_len = int(self.headers.get("Content-Length", 0))
         post_body = self.rfile.read(content_len) if content_len > 0 else b"{}"
 
@@ -260,10 +281,15 @@ class ProxyServerDaemon:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Claude-Shaped Key Pool Proxy")
+    parser.add_argument("--host", default="0.0.0.0", help="Bind address (default: 0.0.0.0)")
+    parser.add_argument("--port", type=int, default=8089, help="Bind port (default: 8089)")
+    args = parser.parse_args()
+
     logging.basicConfig(level=logging.INFO)
-    srv = ProxyServerDaemon(port=8089)
+    srv = ProxyServerDaemon(host=args.host, port=args.port)
     srv.start()
-    print("Proxy server running on port 8089... Press Ctrl+C to stop.")
+    print(f"Proxy server running on {args.host}:{args.port}... Press Ctrl+C to stop.")
     try:
         while True:
             time.sleep(1)

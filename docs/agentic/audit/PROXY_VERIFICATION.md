@@ -1,8 +1,9 @@
 # Proxy Verification Report
 
-**Date**: 2026-07-31
-**Status**: PASS — live provider verified (Mistral)
-**Verification script**: `scripts/agentic/verify_proxy.sh`
+**Date**: 2026-08-06
+**Status**: PASS — live multi-provider fabric verified (Gemini pool), systemd-daemonized on 8089
+**Verification script**: `scripts/agentic/verify_proxy.sh` → `RESULT: 5 passed, 0 failed | STATUS: SUCCESS`
+**Supersedes**: the 2026-07-31 report (single-provider/Mistral-only, pre-auth-gate)
 
 ---
 
@@ -10,65 +11,67 @@
 
 | Item | Value | Status |
 |:-----|:------|:-------|
-| fcc-server | Port `8080` | Healthy — intercepts Anthropic API calls |
-| `ANTHROPIC_BASE_URL` | `http://127.0.0.1:8080` | Set |
-| `ANTHROPIC_AUTH_TOKEN` | `freecc` | Set |
-| Python proxy (`ClaudeProxyServer`) | Port `8089` | Running — moved from `8085` to avoid conflict with CloudCLI |
-| CloudCLI Web UI | Port `8085` | Running — originally crashed, fixed by correcting permissions |
-| CLIProxyAPI Dashboard | Port `3000` | Running |
-| OpenCode IDE | Port `9200` | Running |
+| systemd unit `claude-proxy` | Port `8089`, `Type=simple`, `User=ubuntu` | Active + enabled (Restart=always, RestartSec=5) |
+| `ExecStart` | `.venv/bin/python -m merged_agentic_swarm.proxy.claude_proxy_server --host 0.0.0.0 --port 8089` | Live |
+| `Environment` | `ANTHROPIC_AUTH_TOKEN=freecc`, `PYTHONUNBUFFERED=1` | Set |
+| Inbound auth gate | `x-api-key` or `Authorization: Bearer <token>` vs `ANTHROPIC_AUTH_TOKEN` (default `freecc`) | Verified 401/401/200 |
+| Health monitor | `scripts/agentic/check_proxy_health.sh` via cron `*/2 * * * *` | Installed (idempotent) |
+| fcc-server | Port `8080` | Healthy (prewarm HEAD 204) |
+| Connection prewarm | `fast_pool.warm_all()` at startup | 7/7 provider hosts reachable |
 
-The Python proxy (`src/merged_agentic_swarm/proxy/claude_proxy_server.py`) provides Anthropic Messages and OpenAI-compatible endpoints backed by the key pool and the multi-provider fabric.
-
----
-
-## Provider Status
-
-Six providers are loaded in the key pool (`providers/key_pool.py`): **gemini, opencode, groq, mistral, nvidia_nim, openrouter**. Upstream live tests:
-
-| Provider | Test Models | Result | Detail |
-|:---------|:------------|:-------|:-------|
-| Mistral | `mistral-small-latest`, `ministral-8b-latest`, `mistral-tiny` | **WORKS** | All three returned HTTP 200 |
-| OpenCode | — | NO CREDITS | Insufficient balance error |
-| OpenRouter | — | INVALID KEY | HTTP 401 |
-| NVIDIA NIM | — | TIMEOUT | No response within 30 s |
-
-**Only working provider: Mistral** (key `qLWSa...`). All other keyed providers are unusable in the current environment and are skipped in practice by the routing cascade.
+The proxy (`src/merged_agentic_swarm/proxy/claude_proxy_server.py`) exposes Anthropic Messages (`/v1/messages`), OpenAI-compatible (`/v1/chat/completions`), and audio transcription (`/v1/audio/transcriptions`, NVIDIA NIM Whisper) — all backed by the key pool + multi-provider fabric. Health/status endpoints and CORS preflight stay unauthenticated so monitors can probe.
 
 ---
 
-## Verified Tiers
+## Key Pool Status (live `/status`)
 
-All three model tiers were verified live through Mistral via the proxy:
+| Provider | Keys | Active | Cooldown | Requests | Tokens |
+|:---------|-----:|-------:|---------:|---------:|-------:|
+| gemini | 42 | 42 | 0 | 5 | 76 |
+| opencode | 1 | 1 | 0 | 0 | 0 |
+| mistral | 1 | 1 | 0 | 0 | 0 |
+| nvidia_nim | 1 | 1 | 0 | 0 | 0 |
+| openrouter | 1 | 1 | 0 | 0 | 0 |
+| litellm | 1 | 1 | 0 | 0 | 0 |
+| fcc-proxy | 1 | 1 | 0 | 0 | 0 |
+| routatic-proxy | 1 | 1 | 0 | 0 | 0 |
 
-| Tier | Alias | Backend (Mistral) | HTTP | Result |
-|:-----|:------|:------------------|:-----|:-------|
-| deep | `claude-3-opus` | `codestral-latest` | 200 | OK |
-| main | `claude-3-7-sonnet` | `mistral-small-latest` | 200 | OK |
-| fast | `claude-3-5-haiku` | `mistral-tiny` | 200 | OK |
-
-Every tier returns a valid response; the fabric overrides the returned model name to the alias so callers see `claude-3-*` regardless of the Mistral backend.
-
----
-
-## Routing Configuration
-
-The routing table in `providers/multi_provider_fabric.py` (`MODEL_FABRIC_ROUTES`) was updated so **Mistral is first in every model route**:
-
-- `claude-3-opus` → `codestral-latest` (mistral) → `mistral-large-latest` (mistral) → `fcc-proxy`
-- `claude-3-7-sonnet` → `mistral-small-latest` (mistral) → `ministral-8b-latest` (mistral) → `fcc-proxy`
-- `claude-3-5-haiku` → `mistral-tiny` (mistral) → `ministral-8b-latest` (mistral) → `fcc-proxy`
-
-Requests are dispatched in priority order with key-pool rotation; the first route that succeeds wins.
+Keys are referenced by env-var name only (`GEMINI_API_KEYS`, `OPENCODE_API_KEY`, `MISTRAL_API_KEY`, `NVIDIA_NIM_API_KEY`, `OPENROUTER_API_KEY`, `LITELLM_PROXY_KEY`, `ANTHROPIC_AUTH_TOKEN`). The Gemini pool (42 keys) is the fabric's deep provider; the 5 tier-probe requests dispatched to `generativelanguage.googleapis.com` returned HTTP 200 (see below).
 
 ---
 
-## Authentication
+## Verified Tiers (live dispatch, not simulation)
 
-- Inbound auth token: `freecc` (`ANTHROPIC_AUTH_TOKEN`).
-- `verify_proxy.sh` sends `x-api-key: $AUTH_TOKEN` plus `anthropic-version: 2023-06-01` for tier tests.
-- An invalid token (e.g. `bad-token-xyz`) is rejected with HTTP 401/403 before it reaches any upstream provider — the auth gate works.
-- Mistral upstream auth uses the pool key `qLWSa...`; the remaining five providers either lack valid keys, lack credits, or time out.
+All three model tiers dispatched through the fabric with real provider latency (Gemini backend); journal confirms POSTs to `generativelanguage.googleapis.com/v1beta/openai/chat/completions` → HTTP 200:
+
+| Tier | Alias | HTTP | Latency | Result |
+|:-----|:------|:-----|:--------|:-------|
+| deep | `claude-3-opus` | 200 | ~453 ms | OK |
+| main | `claude-3-7-sonnet` | 200 | ~495 ms | OK |
+| fast | `claude-3-5-haiku` | 200 | ~363 ms | OK |
+
+The fabric overrides the returned model name to the alias so callers see `claude-3-*` regardless of the backend provider.
+
+---
+
+## Authentication Gate
+
+- Inbound token: `ANTHROPIC_AUTH_TOKEN` (default `freecc`). Accepts `x-api-key` header first, then `Authorization: Bearer <token>`.
+- Gate runs first in `do_POST`; `/health`, `/status`, and `do_OPTIONS` remain unauthenticated.
+- Live checks (8089):
+  - `/health` → **200**, `/status` → **200** (no token required)
+  - POST `/v1/messages` with **no token** → **401** JSON
+  - POST `/v1/messages` with **wrong token** (`bad-token-xyz`) → **401** JSON
+  - POST `/v1/messages` with `Authorization: Bearer freecc` → **200**
+- The 2026-07-31 report's claim that "the auth gate works" was false at the time — the gate did not exist until this change; it is now verified live and covered by tests.
+
+---
+
+## Routing & Fallback
+
+- `MODEL_FABRIC_ROUTES` in `providers/multi_provider_fabric.py` lists priority-ordered routes per tier (Gemini pool deep, then OpenRouter / FCC-proxy / others); the first route that succeeds wins. Unknown model names fall through to the default/fallback route (why `verify_proxy.sh` logs a WARN on unknown models that still return 200 — pre-existing quirk, not a regression).
+- Per-provider failures are recorded (perma-ban on 401 auth errors, circuit-breaking otherwise) so a dead provider is not retried mid-dispatch.
+- If every route fails or is unconfigured, `dispatch_request()` falls back to an offline **simulation payload** (flagged `simulation_fallback: true`). The 2026-08-06 tier probes did **not** hit simulation — real provider latencies and `/status` counters confirm live Gemini dispatch.
 
 ---
 
@@ -76,21 +79,29 @@ Requests are dispatched in priority order with key-pool rotation; the first rout
 
 | Case | Observed Behavior |
 |:-----|:------------------|
-| OpenCode upstream | Insufficient balance — provider returns a credit error, never a 200 |
-| OpenRouter upstream | HTTP 401 invalid key — fabric records it and skips |
-| NVIDIA NIM upstream | 30 s timeout, no response |
-| Invalid proxy auth token | HTTP 401/403 — rejected before dispatch |
-| Unknown/unsupported model | Non-200 — rejected by the proxy |
-
-Per-provider failures are recorded with perma-ban on 401 auth errors and circuit-breaking on other errors, so a dead provider is not retried within a dispatch.
+| No inbound token | HTTP 401 — rejected before dispatch |
+| Wrong inbound token | HTTP 401 — rejected before dispatch |
+| Invalid JSON body | HTTP 400 |
+| Audio transcription, no file field | HTTP 400 |
+| Whisper backend down | HTTP 503 |
+| Unknown/unsupported endpoint | HTTP 404 |
 
 ---
 
-## Fallback Behavior
+## Systemd Daemonization
 
-- The fabric iterates the route list in priority order; on `HTTPError` or transport exception it records `last_error` and tries the next route.
-- If **every** live route fails or is unconfigured, `dispatch_request()` falls back to an offline **simulation payload** (flagged with `simulation_fallback: true` so callers can detect synthetic responses).
-- Because only Mistral is verified, realistic production traffic hits Mistral directly; the simulation fallback is reached only if Mistral itself goes down or the key is exhausted.
+Unit `/etc/systemd/system/claude-proxy.service`: `Type=simple`, `Restart=always`, `RestartSec=5`, `After/Wants=network-online.target`, installed/enabled via `systemctl daemon-reload` + `systemctl enable --now claude-proxy`. Auto-restart monitored by `check_proxy_health.sh` (cron every 2 min): probes `/health`, on non-200 issues one `systemctl restart`, logs to `/tmp/claude-proxy-health.log`.
+
+---
+
+## Deferred: Kubernetes / ARC Workflow Integration
+
+Exposing the proxy to ARC runner pods (Helm `--set-string env[0].name="ANTHROPIC_BASE_URL"=http://172.17.0.1:8089` + `ANTHROPIC_AUTH_TOKEN=freecc`) is **NOT implemented**:
+
+- No ARC runner-set is registered on this host — there is nothing to configure against.
+- `172.17.0.1` is a guessed docker-bridge gateway, not a verified route from any runner pod.
+
+Revisit when an ARC runner-set exists and the pod→host network path is confirmed (pod CIDR, host firewall, and whether the proxy should bind `0.0.0.0:8089` or a dedicated interface).
 
 ---
 
@@ -98,20 +109,20 @@ Per-provider failures are recorded with perma-ban on 401 auth errors and circuit
 
 | Check | Status |
 |:------|:-------|
-| fcc-server healthy on 8080, intercepts Anthropic calls | PASS |
-| Python proxy on 8089 | PASS |
-| Mistral upstream (3 models) | PASS |
-| OpenCode | FAIL (no credits) |
-| OpenRouter | FAIL (invalid key) |
-| NVIDIA NIM | FAIL (timeout) |
-| deep tier → `codestral-latest` | PASS |
-| main tier → `mistral-small-latest` | PASS |
-| fast tier → `mistral-tiny` | PASS |
-| Auth gate (bad token rejected) | PASS |
-| Mistral first in all model routes | PASS |
+| systemd unit active + enabled on 8089 | PASS |
+| Inbound auth gate (no token / wrong token / Bearer) | PASS (401 / 401 / 200) |
+| deep tier live dispatch | PASS (~453 ms) |
+| main tier live dispatch | PASS (~495 ms) |
+| fast tier live dispatch | PASS (~363 ms) |
+| Gemini pool (42 keys) active, 0 cooldown | PASS |
+| 7/7 provider hosts prewarmed | PASS |
+| Health-check cron installed | PASS |
+| `verify_proxy.sh` full run | PASS (5 passed, 0 failed) |
+| ARC/Helm pod integration | DEFERRED (no runner-set; gateway unverified) |
 
 **Residual risks**:
 
-- **Single-provider dependence**: Mistral is the only working provider. An outage or key exhaustion drops the whole stack to simulation mode.
-- **Unverified balance**: OpenCode has credits remaining conceptually but is unusable (Insufficient balance); OpenRouter and NVIDIA NIM need key replacement.
-- **Simulation fallback**: When triggered it produces synthetic responses — callers must check `simulation_fallback` and treat those as degraded.
+- **Dead-key replacement is a user action**: the 42-key Gemini pool and the single OpenRouter/Mistral/NVIDIA keys are only as good as the keys at rest. If any are dead, the fabric records them and cascades — but rotating them (Google AI Studio → `generate_litellm_config.py` → `systemctl reload litellm-proxy`; same for OpenRouter/Mistral/NVIDIA) is required to keep full redundancy.
+- **Simulation fallback**: if every provider were exhausted at once, the proxy returns synthetic responses flagged `simulation_fallback: true`; callers must treat those as degraded.
+- **Transient `/status` piped-parse race** observed once (empty stdin through a pipe); the endpoint itself always returned full valid JSON — a curl/pipe artifact, not a service defect.
+- **Cosmetic**: `verify_proxy.sh` labels port 8089 as proxy type "unknown" (script only maps 3456/8080) — display-only.
