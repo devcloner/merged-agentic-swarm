@@ -8,7 +8,7 @@ Used as the fallback when the real Task Master AI spine
 
 Persistence: .taskmaster/tasks/task_spine.json
 Locking: fcntl.flock (blocking, per-process; no-op on non-POSIX)
-Atomicity: write to temp file then os.rename
+Atomicity: write to temp file then os.replace
 """
 
 from __future__ import annotations
@@ -159,7 +159,7 @@ class TaskSpineStore:
         ) as tf:
             json.dump(data, tf, indent=2)
             tmp_name = tf.name
-        os.rename(tmp_name, self.state_path)
+        os.replace(tmp_name, self.state_path)
 
     # ---- public CRUD -------------------------------------------------------
 

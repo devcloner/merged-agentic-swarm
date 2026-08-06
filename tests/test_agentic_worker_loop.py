@@ -101,7 +101,7 @@ class TestRealToolExecution:
 
     def test_run_command_respects_timeout(self, tmp_path):
         loop = AgenticWorkerLoop(workdir=str(tmp_path), command_timeout=2)
-        _, err = loop._tool_run_command({"command": "sleep 10"}, str(tmp_path))
+        _, err = loop._tool_run_command({"command": 'uv run python -c "import time; time.sleep(10)"'}, str(tmp_path))
         assert err is not None
         assert "timed out" in err
 

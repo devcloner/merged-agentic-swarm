@@ -6,6 +6,7 @@ Integrates Task Master AI, Codebase Mapper, Wave Gates, OpenCode 40-Worker Swarm
 import json
 import logging
 import os
+import sys
 import time
 from pathlib import Path
 
@@ -69,16 +70,26 @@ class MultiLayeredAgenticOrchestrator:
     def _run_syntax_verification(self) -> dict[str, Any]:
         """Run actual syntax + import verification instead of hardcoded unittest (FIX-10).
 
-        Tries scripts/ci.sh first, falls back to inline syntax check on core files.
+        Tries scripts/ci.ps1 (Windows) / scripts/ci.sh (POSIX) first, falls back
+        to inline syntax check on core files.
         Returns dict with exit_code and output_summary.
         """
         import subprocess
 
-        # Try CI script first
-        ci_script = str(_REPO_ROOT / "scripts" / "ci.sh")
+        # Try CI script first — platform-appropriate script + interpreter
+        script_name = "ci.ps1" if sys.platform == "win32" else "ci.sh"
+        ci_script = str(_REPO_ROOT / "scripts" / script_name)
         if os.path.exists(ci_script):
             try:
-                result = subprocess.run(["bash", ci_script], capture_output=True, text=True, timeout=60)
+                if sys.platform == "win32":
+                    result = subprocess.run(
+                        ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ci_script],
+                        capture_output=True,
+                        text=True,
+                        timeout=60,
+                    )
+                else:
+                    result = subprocess.run(["bash", ci_script], capture_output=True, text=True, timeout=60)
                 summary = result.stdout.strip().split("\n")[-1]  # Last line = pass/fail banner
                 return {
                     "exit_code": result.returncode,

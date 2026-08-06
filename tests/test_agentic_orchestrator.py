@@ -13,6 +13,7 @@ calls) runs for real against a tmp registry dir.
 """
 
 import logging
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -289,9 +290,13 @@ class TestRunSyntaxVerificationPaths:
         assert "Syntax check FAILED" in result["output_summary"]
 
     def test_ci_script_nonzero_exit(self, tmp_path, monkeypatch):
-        ci = tmp_path / "scripts" / "ci.sh"
+        script_name = "ci.ps1" if sys.platform == "win32" else "ci.sh"
+        ci = tmp_path / "scripts" / script_name
         ci.parent.mkdir(parents=True, exist_ok=True)
-        ci.write_text("#!/usr/bin/env bash\necho CI_BROKEN\nexit 1\n", encoding="utf-8")
+        if sys.platform == "win32":
+            ci.write_text('Write-Output "CI_BROKEN"\nexit 1\n', encoding="utf-8")
+        else:
+            ci.write_text("#!/usr/bin/env bash\necho CI_BROKEN\nexit 1\n", encoding="utf-8")
         monkeypatch.setattr(orch_mod, "_REPO_ROOT", tmp_path)
         orch = MultiLayeredAgenticOrchestrator()
         result = orch._run_syntax_verification()
