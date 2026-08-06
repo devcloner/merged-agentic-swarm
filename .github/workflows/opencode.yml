@@ -11,19 +11,22 @@ on:
         description: >-
           Routing mode. gateway = public LiteLLM (:4000), internal = LiteLLM on
           localhost (self-hosted runner), fcc = FCC proxy (:8080), direct = OpenAI/
-          Anthropic/OpenRouter keys with no custom proxy.
+          Anthropic/OpenRouter keys with no custom proxy, cloneclove = CloudCLI UI
+          API (cloneclove.com) with real API key.
         type: choice
         options:
           - gateway
           - internal
           - fcc
           - direct
+          - cloneclove
         default: gateway
       model:
         description: >-
           Model id for the run (provider/model). Empty uses the per-mode default
           (gateway/internal -> litellm/smart-auto, fcc -> deepseek-v4-flash,
-          direct -> openrouter/anthropic/claude-sonnet-4-5).
+          direct -> openrouter/anthropic/claude-sonnet-4-5, cloneclove -> claude
+          managed by cloneclove.com).
         type: string
         default: ""
       prompt:
@@ -58,6 +61,7 @@ jobs:
       FCC_AUTH_TOKEN: ${{ secrets.FCC_AUTH_TOKEN }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      CLONECLOVE_API_KEY: ${{ secrets.CLONECLOVE_API_KEY }}
       INPUT_MODE: ${{ inputs.mode }}
     steps:
       - uses: actions/checkout@v4
@@ -84,12 +88,17 @@ jobs:
               MODEL="openrouter/anthropic/claude-sonnet-4-5"
               CONFIG=""
               ;;
+            cloneclove)
+              MODEL="claude"
+              CONFIG=""
+              ;;
             gateway|*)
               MODEL="litellm/smart-auto"
               CONFIG=""
               ;;
           esac
           {
+            echo "MODE=${MODE}"
             echo "MODEL=${MODEL}"
             if [ -n "$CONFIG" ]; then
               echo "OPENCODE_CONFIG_CONTENT<<EOF"
@@ -101,6 +110,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Run OpenCode
+        if: env.MODE != 'cloneclove'
         uses: anomalyco/opencode/github@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -114,3 +124,37 @@ jobs:
           prompt: ${{ inputs.prompt }}
           share: ${{ inputs.share }}
           use_github_token: true
+
+      - name: Run via cloneclove (real API key)
+        if: env.MODE == 'cloneclove'
+        shell: bash
+        env:
+          CLONECLOVE_API_KEY: ${{ secrets.CLONECLOVE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROMPT: ${{ inputs.prompt || github.event.comment.body }}
+        run: |
+          set -euo pipefail
+          BODY=$(python3 - "$PROMPT" <<'PY'
+          import json, sys
+          print(json.dumps(sys.argv[1]))
+          PY
+          )
+          echo "::group::cloneclove stream"
+          curl -sS --max-time 900 -N -X POST https://cloneclove.com/api/agent \
+            -H "X-API-Key: ${CLONECLOVE_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"provider\":\"claude\",\"message\":${BODY},\"githubUrl\":\"https://github.com/${GITHUB_REPOSITORY}\",\"githubToken\":\"${GITHUB_TOKEN}\",\"stream\":true}" \
+            | tee /tmp/cloneclove-stream.txt
+          echo "::endgroup::"
+          echo "::group::Assistant output"
+          grep '"kind":"text"' /tmp/cloneclove-stream.txt \
+            | sed -E 's/^data: //' \
+            | python3 -c 'import sys, json
+          for line in sys.stdin:
+              try: d = json.loads(line)
+              except Exception: continue
+              c = d.get("content")
+              if c: print(c)'
+          echo "::endgroup::"
+          grep -q '"kind":"complete"' /tmp/cloneclove-stream.txt \
+            || { echo "::error::cloneclove agent did not complete"; exit 1; }
