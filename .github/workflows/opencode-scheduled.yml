@@ -1,0 +1,42 @@
+name: opencode-scheduled
+
+on:
+  schedule:
+    - cron: "23 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      model:
+        description: >-
+          Model id for the run (provider/model). Empty uses litellm/fast-flash.
+        type: string
+        default: ""
+      prompt:
+        description: Override the default maintenance prompt.
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  maintenance:
+    name: OpenCode maintenance sweep
+    runs-on: ${{ vars.OPENCODE_RUNNER || 'ubuntu-latest' }}
+    env:
+      LITELLM_MASTER_KEY: ${{ secrets.LITELLM_MASTER_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run OpenCode maintenance sweep
+        uses: anomalyco/opencode/github@latest
+        env:
+          LITELLM_MASTER_KEY: ${{ secrets.LITELLM_MASTER_KEY }}
+        with:
+          model: ${{ inputs.model || 'litellm/fast-flash' }}
+          use_github_token: true
+          prompt: ${{ inputs.prompt || 'Scan the repository for TODO/FIXME/HACK comments, deprecated APIs, and unmaintained scripts. Open a single issue summarizing findings with file:line references, or close nothing.' }}

@@ -1,0 +1,42 @@
+name: opencode-review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      model:
+        description: >-
+          Model id for the review (provider/model). Empty uses litellm/fast-flash.
+        type: string
+        default: ""
+      prompt:
+        description: Override the default review prompt.
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: read
+  id-token: write
+
+jobs:
+  review:
+    name: OpenCode review
+    runs-on: ${{ vars.OPENCODE_RUNNER || 'ubuntu-latest' }}
+    env:
+      LITELLM_MASTER_KEY: ${{ secrets.LITELLM_MASTER_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run OpenCode review
+        uses: anomalyco/opencode/github@latest
+        env:
+          LITELLM_MASTER_KEY: ${{ secrets.LITELLM_MASTER_KEY }}
+        with:
+          model: ${{ inputs.model || 'litellm/fast-flash' }}
+          use_github_token: true
+          prompt: ${{ inputs.prompt || 'Review this pull request for bugs, security issues, and code quality problems. Post findings as a review on the PR.' }}

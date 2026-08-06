@@ -1,0 +1,115 @@
+name: opencode
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: >-
+          Routing mode. gateway = public LiteLLM (:4000), internal = LiteLLM on
+          localhost (self-hosted runner), fcc = FCC proxy (:8080), direct = OpenAI/
+          Anthropic/OpenRouter keys with no custom proxy.
+        type: choice
+        options:
+          - gateway
+          - internal
+          - fcc
+          - direct
+        default: gateway
+      model:
+        description: >-
+          Model id for the run (provider/model). Empty uses the per-mode default
+          (gateway/internal -> litellm/smart-auto, fcc -> deepseek-v4-flash,
+          direct -> openrouter/anthropic/claude-sonnet-4-5).
+        type: string
+        default: ""
+      prompt:
+        description: Task prompt. Ignored for comment triggers (the comment is the prompt).
+        type: string
+        default: ""
+      share:
+        description: Share the session with OpenCode (default false).
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  opencode:
+    name: OpenCode (${{ inputs.mode || 'gateway' }})
+    runs-on: ${{ vars.OPENCODE_RUNNER || 'ubuntu-latest' }}
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' &&
+        (contains(github.event.comment.body, '/opencode') ||
+         contains(github.event.comment.body, '/oc'))) ||
+      (github.event_name == 'pull_request_review_comment' &&
+        (contains(github.event.comment.body, '/opencode') ||
+         contains(github.event.comment.body, '/oc')))
+    env:
+      LITELLM_MASTER_KEY: ${{ secrets.LITELLM_MASTER_KEY }}
+      FCC_AUTH_TOKEN: ${{ secrets.FCC_AUTH_TOKEN }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      INPUT_MODE: ${{ inputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve model and provider config
+        shell: bash
+        run: |
+          set -euo pipefail
+          MODE="${INPUT_MODE:-gateway}"
+          MODEL=""
+          CONFIG=""
+          case "$MODE" in
+            internal)
+              MODEL="litellm/smart-auto"
+              CONFIG='{"provider":{"litellm":{"npm":"@ai-sdk/openai-compatible","name":"LiteLLM Gateway","options":{"baseURL":"http://127.0.0.1:4000/v1","apiKey":"{env:LITELLM_MASTER_KEY}"},"models":{"smart-auto":{"name":"Smart Auto","limit":{"context":1000000,"output":8192}},"fast-flash":{"name":"Fast Flash","limit":{"context":1000000,"output":8192}},"high-throughput":{"name":"High Throughput","limit":{"context":1000000,"output":8192}}}}}}'
+              ;;
+            fcc)
+              MODEL="fcc/anthropic/opencode_go/deepseek-v4-flash"
+              CONFIG='{"provider":{"fcc":{"npm":"@ai-sdk/openai-compatible","name":"FCC Proxy","options":{"baseURL":"http://150.230.171.227:8080","apiKey":"{env:FCC_AUTH_TOKEN}"},"models":{"anthropic/opencode_go/deepseek-v4-flash":{"name":"DeepSeek V4 Flash"},"anthropic/nvidia_nim/deepseek-v4":{"name":"NVIDIA NIM DeepSeek V4"}}}}}'
+              ;;
+            direct)
+              MODEL="openrouter/anthropic/claude-sonnet-4-5"
+              CONFIG=""
+              ;;
+            gateway|*)
+              MODEL="litellm/smart-auto"
+              CONFIG=""
+              ;;
+          esac
+          {
+            echo "MODEL=${MODEL}"
+            if [ -n "$CONFIG" ]; then
+              echo "OPENCODE_CONFIG_CONTENT<<EOF"
+              echo "$CONFIG"
+              echo "EOF"
+            else
+              echo "OPENCODE_CONFIG_CONTENT={}"
+            fi
+          } >> "$GITHUB_ENV"
+
+      - name: Run OpenCode
+        uses: anomalyco/opencode/github@latest
+        env:
+          LITELLM_MASTER_KEY: ${{ secrets.LITELLM_MASTER_KEY }}
+          FCC_AUTH_TOKEN: ${{ secrets.FCC_AUTH_TOKEN }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENCODE_CONFIG_CONTENT: ${{ env.OPENCODE_CONFIG_CONTENT }}
+        with:
+          model: ${{ inputs.model || env.MODEL }}
+          prompt: ${{ inputs.prompt }}
+          share: ${{ inputs.share }}
+          use_github_token: true
