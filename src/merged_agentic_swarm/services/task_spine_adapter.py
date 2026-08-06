@@ -7,14 +7,13 @@ Used as the fallback when the real Task Master AI spine
 (Anthropic API) is unreachable.
 
 Persistence: .taskmaster/tasks/task_spine.json
-Locking: fcntl.flock (blocking, per-process)
+Locking: fcntl.flock (blocking, per-process; no-op on non-POSIX)
 Atomicity: write to temp file then os.rename
 """
 
 from __future__ import annotations
 
 import argparse
-import fcntl
 import json
 import os
 import sys
@@ -23,6 +22,13 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
+
+try:
+    import fcntl
+except ImportError:
+    # Non-POSIX (e.g. Windows): advisory file locking is unavailable; the store
+    # still works via atomic rename, just without cross-process mutual exclusion.
+    fcntl = None
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -119,11 +125,13 @@ class TaskSpineStore:
         self._ensure_dir()
         lock_path = self.state_path + ".lock"
         self._lock_fd = os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o644)
-        fcntl.flock(self._lock_fd, fcntl.LOCK_EX)
+        if fcntl is not None:
+            fcntl.flock(self._lock_fd, fcntl.LOCK_EX)
 
     def _release_lock(self) -> None:
         if self._lock_fd is not None:
-            fcntl.flock(self._lock_fd, fcntl.LOCK_UN)
+            if fcntl is not None:
+                fcntl.flock(self._lock_fd, fcntl.LOCK_UN)
             os.close(self._lock_fd)
             self._lock_fd = None
             # best-effort cleanup of lock file
