@@ -78,7 +78,7 @@ jobs:
           case "$MODE" in
             internal)
               MODEL="litellm/smart-auto"
-              CONFIG='{"provider":{"litellm":{"npm":"@ai-sdk/openai-compatible","name":"LiteLLM Gateway","options":{"baseURL":"http://127.0.0.1:4000/v1","apiKey":"{env:LITELLM_MASTER_KEY}"},"models":{"smart-auto":{"name":"Smart Auto","limit":{"context":1000000,"output":8192}},"fast-flash":{"name":"Fast Flash","limit":{"context":1000000,"output":8192}},"high-throughput":{"name":"High Throughput","limit":{"context":1000000,"output":8192}}}}}}'
+              CONFIG='{"provider":{"litellm":{"npm":"@ai-sdk/openai-compatible","name":"LiteLLM Gateway","options":{"baseURL":"http://host.docker.internal:4000/v1","apiKey":"{env:LITELLM_MASTER_KEY}"},"models":{"smart-auto":{"name":"Smart Auto","limit":{"context":1000000,"output":8192}},"fast-flash":{"name":"Fast Flash","limit":{"context":1000000,"output":8192}},"high-throughput":{"name":"High Throughput","limit":{"context":1000000,"output":8192}}}}}}'
               ;;
             fcc)
               MODEL="fcc/anthropic/opencode_go/deepseek-v4-flash"
