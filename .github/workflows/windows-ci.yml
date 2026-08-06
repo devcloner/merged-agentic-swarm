@@ -1,0 +1,37 @@
+name: Windows Native CI
+
+# Runs the Python 3.14 checks natively on the FETTI self-hosted Windows runner.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  windows-job:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Host diagnostics
+        shell: pwsh
+        run: |
+          Write-Host "Running natively on host runner: FETTI"
+          Get-ComputerInfo | Select-Object WindowsProductName, OsVersion
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Lint (ruff)
+        run: uv run ruff check .
+
+      - name: Format check (ruff)
+        run: uv run ruff format --check .
+
+      - name: Tests (no live providers)
+        run: uv run pytest -v -m "not live" --tb=short

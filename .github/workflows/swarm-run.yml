@@ -1,0 +1,65 @@
+name: Swarm Run
+
+# Triggers a real merged-agentic-swarm orchestration run from the GitHub UI.
+# Provider keys must exist as repo secrets and the target runner must be able to
+# reach the providers/gateway (litellm :4000, gemini, cloudcli, ...). Defaults to
+# the FETTI self-hosted runner (the only runner registered today); switch to
+# arc-runner-set once the ARC scale set is registered, or add the VPS as a
+# self-hosted runner for swarm runs where the gateway already lives.
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Swarm profile
+        type: choice
+        options: [build, review, ultra, patch, learning]
+        default: patch
+      title:
+        description: PRD title
+        type: string
+        default: GitHub-triggered swarm run
+      prd:
+        description: PRD body (markdown)
+        type: string
+        default: "# GitHub-triggered swarm run\n\nRun the configured swarm profile against the repository."
+      runner:
+        description: Target runner label
+        type: choice
+        options: [self-hosted, arc-runner-set]
+        default: self-hosted
+
+jobs:
+  swarm:
+    runs-on: ${{ inputs.runner }}
+    env:
+      LITELLM_PROXY_KEY: ${{ secrets.LITELLM_PROXY_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+      CLOUDCLI_API_KEY: ${{ secrets.CLOUDCLI_API_KEY }}
+      NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
+      MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Write PRD
+        shell: bash
+        env:
+          PRD: ${{ inputs.prd }}
+          PRD_TITLE: ${{ inputs.title }}
+        run: |
+          mkdir -p .taskmaster/docs
+          printf '%s\n' "$PRD" > .taskmaster/docs/github_prd.md
+          printf '%s\n' "$PRD_TITLE" > .taskmaster/docs/github_prd.title
+
+      - name: Run swarm profile
+        run: |
+          uv run agentic-cli run --profile "${{ inputs.profile }}" \
+            --prd .taskmaster/docs/github_prd.md \
+            --title "${{ inputs.title }}"

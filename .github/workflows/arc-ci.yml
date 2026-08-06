@@ -1,0 +1,37 @@
+name: ARC Kubernetes CI
+
+# Runs the full merged-agentic-swarm CI inside an ephemeral ARC Kubernetes pod
+# (Docker-in-Docker enabled). NOTE: this requires the `arc-runner-set` scale set
+# to be registered for this repo; until then the job stays queued, so it is
+# workflow_dispatch-only. Flip on `push` once the runner reports online.
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: arc-runner-set
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inspect pod environment
+        run: |
+          echo "Executing inside auto-scaled Kubernetes pod"
+          uname -a
+          whoami
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Full CI (ruff, syntax, tests)
+        run: bash scripts/ci.sh
+
+      - name: Docker-in-Docker sanity
+        run: |
+          docker version
+          docker run --rm alpine echo "Docker-in-Docker is working cleanly!"

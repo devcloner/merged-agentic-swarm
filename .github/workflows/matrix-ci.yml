@@ -1,0 +1,29 @@
+name: Multi-Runner Parallel Check
+
+# Exercises both runner targets on the same lightweight check. dispatch-only
+# because the arc-runner-set leg would otherwise hang the push queue until the
+# ARC scale set is registered for this repo.
+on:
+  workflow_dispatch:
+
+jobs:
+  cross-platform-check:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [arc-runner-set, self-hosted]
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Report runner
+        run: 'echo "Successfully running on: ${{ matrix.runner }} ($(uname -s 2>/dev/null || echo Windows))"'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Import-chain smoke
+        run: |
+          uv sync --frozen
+          uv run python -c "import merged_agentic_swarm; print('import ok')"
