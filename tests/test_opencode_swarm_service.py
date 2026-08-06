@@ -179,6 +179,88 @@ class TestOpenCodeSwarmManager:
             manager.execute_subtask_batch_parallel(subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=wave)
             assert captured["max_workers"] == expected
 
+    def test_batch_parallel_uses_custom_ramp(self, monkeypatch, make_subtask):
+        """A provided ramp_sequence overrides the default wave_gate_level mapping."""
+        import concurrent.futures as cf
+
+        manager = OpenCodeSwarmManager()
+        monkeypatch.setattr(
+            manager,
+            "execute_subtask_with_worker",
+            lambda st, role: {"status": "completed", "subtask_id": st.id, "worker_id": "w"},
+        )
+        captured: dict[str, int] = {}
+
+        class FakeExecutor:
+            def __init__(self, max_workers):
+                captured["max_workers"] = max_workers
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def submit(self, fn, *args, **kwargs):
+                fut = cf.Future()
+                fut.set_result(fn(*args, **kwargs))
+                return fut
+
+        monkeypatch.setattr(mod, "ThreadPoolExecutor", FakeExecutor)
+        ramp = [2, 4, 8]
+        for wave, expected in enumerate(ramp):
+            captured.clear()
+            subtasks = [make_subtask(task_id=f"T-{wave}-{i}") for i in range(1)]
+            manager.execute_subtask_batch_parallel(
+                subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=wave, ramp_sequence=ramp
+            )
+            assert captured["max_workers"] == expected
+
+    def test_batch_parallel_custom_ramp_clamped_and_bounded(self, monkeypatch, make_subtask):
+        """A custom ramp past the configured cap is clamped to max_total_workers;
+        levels beyond the end of the ramp reuse its last value."""
+        import concurrent.futures as cf
+
+        from merged_agentic_swarm.models.agent_models import WorkerPoolConfig
+
+        config = WorkerPoolConfig()
+        manager = OpenCodeSwarmManager(config=config)
+        monkeypatch.setattr(
+            manager,
+            "execute_subtask_with_worker",
+            lambda st, role: {"status": "completed", "subtask_id": st.id, "worker_id": "w"},
+        )
+        captured: dict[str, int] = {}
+
+        class FakeExecutor:
+            def __init__(self, max_workers):
+                captured["max_workers"] = max_workers
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def submit(self, fn, *args, **kwargs):
+                fut = cf.Future()
+                fut.set_result(fn(*args, **kwargs))
+                return fut
+
+        monkeypatch.setattr(mod, "ThreadPoolExecutor", FakeExecutor)
+        subtasks = [make_subtask(task_id="T-clamp")]
+        # A ramp value above the cap is clamped to max_total_workers.
+        manager.execute_subtask_batch_parallel(
+            subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=1, ramp_sequence=[1, 999]
+        )
+        assert captured["max_workers"] == config.max_total_workers
+        # A level beyond the end of the ramp reuses its last value (under the cap).
+        captured.clear()
+        manager.execute_subtask_batch_parallel(
+            subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=99, ramp_sequence=[2, 6, 12]
+        )
+        assert captured["max_workers"] == 12
+
 
 def _router(agents_jsonl_content="", agents_dir=None):
     """Build a real DurableAgentRouter over tmp JSONL + agent dir."""

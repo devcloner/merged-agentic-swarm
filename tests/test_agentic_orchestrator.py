@@ -160,6 +160,68 @@ class TestRunFullAgenticWorkflow:
         assert result["status"] == "success"
         assert sorted(seen) == [1, 2, 3, 4]
 
+    def test_workflow_threads_profile_ramp_and_model(self, monkeypatch, tmp_path):
+        """A provided ramp_sequence reaches every swarm batch, and default_model is
+        recorded as the model on every log_progress entry (run-report timeline)."""
+        orch = self._stub_workflow(monkeypatch, tmp_path)
+        batch_calls: list[tuple[int, object]] = []
+
+        def recording(subtasks, role=None, wave_gate_level=0, ramp_sequence=None):
+            batch_calls.append((wave_gate_level, ramp_sequence))
+            return [
+                {
+                    "status": "completed",
+                    "worker_id": "w1",
+                    "files_written": [],
+                    "commands_run": [],
+                    "final_text": "done",
+                }
+            ]
+
+        monkeypatch.setattr(orch_mod.default_swarm_manager, "execute_subtask_batch_parallel", recording)
+        seen_models: list[object] = []
+        monkeypatch.setattr(
+            orch_mod.default_progress_ledger,
+            "log_progress",
+            lambda **k: seen_models.append(k.get("model")),
+        )
+        result = orch.run_full_agentic_workflow("# PRD", ramp_sequence=[2, 4, 8], default_model="gemini-batch")
+        assert result["status"] == "success"
+        assert [level for level, _ in batch_calls] == [1, 2, 3, 4]
+        assert all(ramp == [2, 4, 8] for _, ramp in batch_calls)
+        assert seen_models
+        assert all(model == "gemini-batch" for model in seen_models)
+
+    def test_workflow_default_path_omits_profile_kwargs(self, monkeypatch, tmp_path):
+        """Without a profile, the swarm batch gets no ramp_sequence kwarg and the
+        ledger gets no model kwarg — call signatures stay exactly as before."""
+        orch = self._stub_workflow(monkeypatch, tmp_path)
+        batch_kwarg_sets: list[set[str]] = []
+        ledger_kwarg_sets: list[set[str]] = []
+
+        def recording(subtasks, role=None, wave_gate_level=0, **kwargs):
+            batch_kwarg_sets.append(set(kwargs))
+            return [
+                {
+                    "status": "completed",
+                    "worker_id": "w1",
+                    "files_written": [],
+                    "commands_run": [],
+                    "final_text": "done",
+                }
+            ]
+
+        monkeypatch.setattr(orch_mod.default_swarm_manager, "execute_subtask_batch_parallel", recording)
+        monkeypatch.setattr(
+            orch_mod.default_progress_ledger,
+            "log_progress",
+            lambda **k: ledger_kwarg_sets.append(set(k)),
+        )
+        result = orch.run_full_agentic_workflow("# PRD")
+        assert result["status"] == "success"
+        assert all("ramp_sequence" not in ks for ks in batch_kwarg_sets)
+        assert all("model" not in ks for ks in ledger_kwarg_sets)
+
 
 class TestRunSyntaxVerificationPaths:
     def _make_core_files(self, root, bad=None):

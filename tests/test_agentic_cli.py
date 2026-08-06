@@ -39,6 +39,7 @@ def _args(**overrides):
     a.progress = overrides.get("progress", None)
     a.ledger = overrides.get("ledger", None)
     a.out = overrides.get("out", None)
+    a.profile = overrides.get("profile", None)
     return a
 
 
@@ -178,6 +179,58 @@ class TestCmdRun:
             agentic_cli.cmd_run(_args(prd=str(prd)))
         assert exc.value.code == 1
         assert "ERROR: Workflow failed" in capsys.readouterr().out
+
+    def test_run_profile_resolves_and_passes_ramp_and_model(self, tmp_path, capsys, monkeypatch):
+        """`run --profile review` resolves the profile's waves as the ramp and the
+        tier-resolved model alias, then forwards both to the orchestrator."""
+        from merged_agentic_swarm.services import resolve_model_alias_for_profile
+
+        prd = _write(tmp_path, "prd.md", "# PRD\n")
+        captured = {}
+
+        def fake_run(self, prd, **kwargs):
+            captured.update(kwargs)
+            return {"status": "completed", "waves_completed": 4, "cold_path": {}}
+
+        monkeypatch.setattr(
+            "merged_agentic_swarm.tools.agentic_orchestrator.MultiLayeredAgenticOrchestrator.run_full_agentic_workflow",
+            fake_run,
+        )
+        _patch_auto_save(monkeypatch)
+        result = agentic_cli.cmd_run(_args(prd=str(prd), profile="review"))
+        out = capsys.readouterr().out
+        assert result["status"] == "completed"
+        assert captured["ramp_sequence"] == [4, 8]
+        assert captured["default_model"] == resolve_model_alias_for_profile("review")
+        assert "Using swarm profile: review" in out
+        assert "[4, 8]" in out
+        assert captured["default_model"] in out
+
+    def test_run_unknown_profile_exits(self, tmp_path, capsys):
+        prd = _write(tmp_path, "prd.md", "# PRD\n")
+        with pytest.raises(SystemExit) as exc:
+            agentic_cli.cmd_run(_args(prd=str(prd), profile="no-such-profile"))
+        assert exc.value.code == 1
+        assert "Unknown swarm profile" in capsys.readouterr().out
+
+    def test_run_profile_through_main(self, tmp_path, capsys, monkeypatch):
+        """argparse wires `run --profile patch` into cmd_run with profile resolved."""
+        prd = _write(tmp_path, "prd.md", "# PRD\n")
+        captured = {}
+
+        def fake_run(self, prd, **kwargs):
+            captured.update(kwargs)
+            return {"status": "completed", "waves_completed": 4, "cold_path": {}}
+
+        monkeypatch.setattr(
+            "merged_agentic_swarm.tools.agentic_orchestrator.MultiLayeredAgenticOrchestrator.run_full_agentic_workflow",
+            fake_run,
+        )
+        _patch_auto_save(monkeypatch)
+        _main_with_args(["run", "--prd", str(prd), "--profile", "patch"])
+        assert captured["ramp_sequence"] == [4]
+        out = capsys.readouterr().out
+        assert "Using swarm profile: patch" in out
 
 
 class TestCmdStatus:

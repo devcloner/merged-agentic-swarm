@@ -26,12 +26,30 @@ def cmd_run(args):
         print(f"ERROR: PRD file not found at {prd_path}")
         sys.exit(1)
 
+    profile_name = getattr(args, "profile", None)
+    run_kwargs = {}
+    if profile_name:
+        from merged_agentic_swarm.services import resolve_model_alias_for_profile, resolve_profile
+
+        try:
+            profile = resolve_profile(profile_name)
+        except (KeyError, ValueError) as e:
+            print(f"ERROR: {e}")
+            sys.exit(1)
+        ramp_sequence = profile.get("waves", []) or None  # empty waves -> default ramp
+        default_model = resolve_model_alias_for_profile(profile_name)
+        run_kwargs = {"ramp_sequence": ramp_sequence, "default_model": default_model}
+        print(f"Using swarm profile: {profile_name}")
+        print(f"  Wave ramp:     {ramp_sequence or '[4, 8, 16, 24, 40] (default)'}")
+        print(f"  Model alias:   {default_model}")
+        print()
+
     try:
         with open(prd_path) as f:
             prd = f.read()
 
         orch = MultiLayeredAgenticOrchestrator(prd_title=args.title or "Merged Agentic Swarm OS")
-        result = orch.run_full_agentic_workflow(prd)
+        result = orch.run_full_agentic_workflow(prd, **run_kwargs)
 
         print()
         print("=" * 60)
@@ -376,6 +394,11 @@ def main():
     p_run = sub.add_parser("run", help="Run full orchestrator workflow")
     p_run.add_argument(
         "--prd", help="Path to PRD file (default: .taskmaster/docs/prd_agentic_codebase_optimization.md)"
+    )
+    p_run.add_argument(
+        "--profile",
+        help="Named swarm profile (build/review/ultra/patch/learning): drives the wave ramp "
+        "and model tier of the run instead of the default ramp",
     )
     p_run.add_argument("--title", default="Merged Agentic Swarm OS", help="PRD title")
     p_run.add_argument("--verbose", "-v", action="store_true", help="Print full result JSON")

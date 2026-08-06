@@ -292,16 +292,19 @@ class ConcurrencyRampController:
 
     ramp_sequence = [4, 8, 16, 24, 40]
 
-    def get_current_max_workers(self, wave_gate_level: int) -> int:
+    def get_current_max_workers(self, wave_gate_level: int, ramp_sequence: list[int] | None = None) -> int:
         """Map wave gate level to max workers.
 
         Gate 0 -> 4, gate 1 -> 8, gate 2 -> 16, gate 3 -> 24, after all gates -> 40.
+        A custom ``ramp_sequence`` overrides the default [4, 8, 16, 24, 40] mapping
+        (wave index -> worker count, last value used once the ramp is exhausted).
         """
+        ramp = ramp_sequence if ramp_sequence else self.ramp_sequence
         if wave_gate_level < 0:
-            return self.ramp_sequence[0]
-        if wave_gate_level < len(self.ramp_sequence):
-            return self.ramp_sequence[wave_gate_level]
-        return self.ramp_sequence[-1]
+            return ramp[0]
+        if wave_gate_level < len(ramp):
+            return ramp[wave_gate_level]
+        return ramp[-1]
 
     def get_ramp_sequence(self) -> list[int]:
         """Return the full ramp sequence."""
@@ -548,11 +551,21 @@ class OpenCodeSwarmManager:
         }
 
     def execute_subtask_batch_parallel(
-        self, subtasks: list[SubTask], role: WorkerRole = WorkerRole.CORE_ENGINEER, wave_gate_level: int = 0
+        self,
+        subtasks: list[SubTask],
+        role: WorkerRole = WorkerRole.CORE_ENGINEER,
+        wave_gate_level: int = 0,
+        ramp_sequence: list[int] | None = None,
     ) -> list[dict[str, Any]]:
-        """Executes a batch of subtasks in parallel using ThreadPoolExecutor up to max pool capacity."""
+        """Executes a batch of subtasks in parallel using ThreadPoolExecutor up to max pool capacity.
+
+        ``ramp_sequence`` overrides the ConcurrencyRampController's default
+        wave_gate_level -> worker-count mapping when provided; the controller
+        default ([4, 8, 16, 24, 40]) is used when None. The resolved worker count
+        is always clamped to ``config.max_total_workers``.
+        """
         results = []
-        max_workers = self.ramp_controller.get_current_max_workers(wave_gate_level)
+        max_workers = self.ramp_controller.get_current_max_workers(wave_gate_level, ramp_sequence)
         with ThreadPoolExecutor(max_workers=min(max_workers, self.config.max_total_workers)) as executor:
             future_to_subtask = {executor.submit(self.execute_subtask_with_worker, st, role): st for st in subtasks}
             for future in as_completed(future_to_subtask):

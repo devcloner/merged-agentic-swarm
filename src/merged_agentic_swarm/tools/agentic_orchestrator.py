@@ -414,9 +414,30 @@ class MultiLayeredAgenticOrchestrator:
             "timestamp": time.time(),
         }
 
-    def run_full_agentic_workflow(self, prd_content: str) -> dict[str, Any]:
-        """Runs the complete self-healing 6-step agent-to-agent workflow."""
+    def run_full_agentic_workflow(
+        self,
+        prd_content: str,
+        ramp_sequence: list[int] | None = None,
+        default_model: str | None = None,
+    ) -> dict[str, Any]:
+        """Runs the complete self-healing 6-step agent-to-agent workflow.
+
+        ``ramp_sequence`` (when set) is threaded into every swarm batch so the
+        wave_gate_level -> worker-count mapping follows the profile's ramp instead
+        of the hard-coded [4, 8, 16, 24, 40]. ``default_model`` (when set) is
+        recorded as the ``model`` on each progress-ledger log_progress entry so the
+        run-report timeline carries the model tier that served the run.
+        """
         logger.info("=== STARTING MULTI-LAYERED AGENTIC WORKFLOW ===")
+
+        # Profile-driven overrides are only forwarded when present so the default
+        # call path stays byte-for-byte identical (None -> no extra kwargs).
+        swarm_kwargs: dict[str, Any] = {}
+        if ramp_sequence is not None:
+            swarm_kwargs["ramp_sequence"] = ramp_sequence
+        ledger_kwargs: dict[str, Any] = {}
+        if default_model is not None:
+            ledger_kwargs["model"] = default_model
 
         # Step 0: System Init & Proxy Check
         self.initialize_system()
@@ -432,6 +453,7 @@ class MultiLayeredAgenticOrchestrator:
             action="prd_parsed",
             status="completed",
             details={"epics_count": len(prd_result.epics)},
+            **ledger_kwargs,
         )
 
         # Step 2: Map Codebase & Close Spec Gaps
@@ -456,7 +478,7 @@ class MultiLayeredAgenticOrchestrator:
         for epic in wave_1_epics:
             try:
                 results = default_swarm_manager.execute_subtask_batch_parallel(
-                    epic.subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=1
+                    epic.subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=1, **swarm_kwargs
                 )
             except Exception as e:
                 logger.error(f"Wave 1 batch failed: {e}")
@@ -513,7 +535,7 @@ class MultiLayeredAgenticOrchestrator:
         for epic in wave_2_epics:
             try:
                 results = default_swarm_manager.execute_subtask_batch_parallel(
-                    epic.subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=2
+                    epic.subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=2, **swarm_kwargs
                 )
             except Exception as e:
                 logger.error(f"Wave 2 batch failed: {e}")
@@ -603,6 +625,7 @@ class MultiLayeredAgenticOrchestrator:
                 status="completed",
                 learning_generated=learning_id,
                 details={"files_applied": files_written},
+                **ledger_kwargs,
             )
 
         passed_w2, reason_w2 = default_wave_controller.advance_wave()
@@ -623,7 +646,7 @@ class MultiLayeredAgenticOrchestrator:
         for epic in wave_3_epics:
             try:
                 results = default_swarm_manager.execute_subtask_batch_parallel(
-                    epic.subtasks, role=WorkerRole.SECURITY_VERIFIER, wave_gate_level=3
+                    epic.subtasks, role=WorkerRole.SECURITY_VERIFIER, wave_gate_level=3, **swarm_kwargs
                 )
             except Exception as e:
                 logger.error(f"Wave 3 batch failed: {e}")
@@ -686,7 +709,7 @@ class MultiLayeredAgenticOrchestrator:
         for epic in wave_4_epics:
             try:
                 results = default_swarm_manager.execute_subtask_batch_parallel(
-                    epic.subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=4
+                    epic.subtasks, role=WorkerRole.CORE_ENGINEER, wave_gate_level=4, **swarm_kwargs
                 )
             except Exception as e:
                 logger.error(f"Wave 4 batch failed: {e}")
@@ -720,6 +743,7 @@ class MultiLayeredAgenticOrchestrator:
                 action="synthesis_completed",
                 status="completed" if all_ok else "failed",
                 details={"files_applied": files_written},
+                **ledger_kwargs,
             )
 
         passed_w4, reason_w4 = default_wave_controller.advance_wave()
