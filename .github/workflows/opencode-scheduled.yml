@@ -32,11 +32,21 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set OpenCode gateway config
+        shell: bash
+        run: |
+          {
+            echo 'OPENCODE_CONFIG_CONTENT<<EOF'
+            echo '{"provider":{"litellm":{"npm":"@ai-sdk/openai-compatible","name":"LiteLLM Gateway","options":{"baseURL":"http://150.230.171.227:4000/v1","apiKey":"{env:LITELLM_MASTER_KEY}"},"models":{"smart-auto":{"name":"Smart Auto","limit":{"context":1000000,"output":8192}},"fast-flash":{"name":"Fast Flash","limit":{"context":1000000,"output":8192}},"high-throughput":{"name":"High Throughput","limit":{"context":1000000,"output":8192}}}}}}'
+            echo 'EOF'
+          } >> "$GITHUB_ENV"
+
       - name: Run OpenCode maintenance sweep
         uses: anomalyco/opencode/github@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LITELLM_MASTER_KEY: ${{ secrets.LITELLM_MASTER_KEY }}
+          OPENCODE_CONFIG_CONTENT: ${{ env.OPENCODE_CONFIG_CONTENT }}
         with:
           model: ${{ inputs.model || 'litellm/fast-flash' }}
           use_github_token: true

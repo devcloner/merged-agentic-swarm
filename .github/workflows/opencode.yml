@@ -38,6 +38,10 @@ on:
         type: boolean
         default: false
 
+concurrency:
+  group: opencode-${{ github.event.issue.number || github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
   pull-requests: write
@@ -78,7 +82,8 @@ jobs:
           case "$MODE" in
             internal)
               MODEL="litellm/smart-auto"
-              CONFIG='{"provider":{"litellm":{"npm":"@ai-sdk/openai-compatible","name":"LiteLLM Gateway","options":{"baseURL":"http://host.docker.internal:4000/v1","apiKey":"{env:LITELLM_MASTER_KEY}"},"models":{"smart-auto":{"name":"Smart Auto","limit":{"context":1000000,"output":8192}},"fast-flash":{"name":"Fast Flash","limit":{"context":1000000,"output":8192}},"high-throughput":{"name":"High Throughput","limit":{"context":1000000,"output":8192}}}}}}'
+              # Self-hosted runner that shares the box with the LiteLLM gateway.
+              CONFIG='{"provider":{"litellm":{"npm":"@ai-sdk/openai-compatible","name":"LiteLLM Gateway","options":{"baseURL":"http://127.0.0.1:4000/v1","apiKey":"{env:LITELLM_MASTER_KEY}"},"models":{"smart-auto":{"name":"Smart Auto","limit":{"context":1000000,"output":8192}},"fast-flash":{"name":"Fast Flash","limit":{"context":1000000,"output":8192}},"high-throughput":{"name":"High Throughput","limit":{"context":1000000,"output":8192}}}}}}'
               ;;
             fcc)
               MODEL="fcc/anthropic/opencode_go/deepseek-v4-flash"
@@ -94,7 +99,8 @@ jobs:
               ;;
             gateway|*)
               MODEL="litellm/smart-auto"
-              CONFIG=""
+              # Public LiteLLM gateway (reachable from GitHub-hosted runners).
+              CONFIG='{"provider":{"litellm":{"npm":"@ai-sdk/openai-compatible","name":"LiteLLM Gateway","options":{"baseURL":"http://150.230.171.227:4000/v1","apiKey":"{env:LITELLM_MASTER_KEY}"},"models":{"smart-auto":{"name":"Smart Auto","limit":{"context":1000000,"output":8192}},"fast-flash":{"name":"Fast Flash","limit":{"context":1000000,"output":8192}},"high-throughput":{"name":"High Throughput","limit":{"context":1000000,"output":8192}}}}}}'
               ;;
           esac
           {
@@ -108,6 +114,28 @@ jobs:
               echo "OPENCODE_CONFIG_CONTENT={}"
             fi
           } >> "$GITHUB_ENV"
+
+      - name: Verify provider reachability
+        shell: bash
+        env:
+          LITELLM_MASTER_KEY: ${{ secrets.LITELLM_MASTER_KEY }}
+        run: |
+          set -euo pipefail
+          case "${INPUT_MODE:-gateway}" in
+            gateway) BASE="http://150.230.171.227:4000/v1" ;;
+            internal) BASE="http://127.0.0.1:4000/v1" ;;
+            *) exit 0 ;;
+          esac
+          if [ -z "${LITELLM_MASTER_KEY:-}" ]; then
+            echo "::error::LITELLM_MASTER_KEY secret is not set — required for mode ${INPUT_MODE:-gateway}. Set it in repo settings → secrets and variables."
+            exit 1
+          fi
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$BASE/models" -H "Authorization: Bearer ${LITELLM_MASTER_KEY}")
+          if [ "$CODE" != "200" ]; then
+            echo "::error::provider check failed: HTTP ${CODE} at ${BASE}. Check the gateway is up and LITELLM_MASTER_KEY holds a valid gateway key."
+            exit 1
+          fi
+          echo "provider OK: ${BASE} (HTTP ${CODE})"
 
       - name: Run OpenCode
         if: env.MODE != 'cloneclove'

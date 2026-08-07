@@ -1,0 +1,7 @@
+{
+  "name": "merged-agentic-swarm",
+  "private": true,
+  "scripts": {
+    "test": "uv run pytest -q"
+  }
+}

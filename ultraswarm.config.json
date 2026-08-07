@@ -1,5 +1,6 @@
 {
   "notes": [
+    "2026-08-07: re-pointed opencode overrides from the dead litellm provider path (litellm/gemini-*, LITELLM_MASTER_KEY unset \u2014 401) to the cliproxyapi provider (localhost:8317, defined in ~/.config/opencode/opencode.json, smoke-verified from isolated temp dirs; google/* only worked from the repo cwd and fails the runner's isolated smoke probe). Raised maxParallelWorkers 12 \u2014 16. Added root package.json so the 'test' gate resolves (runner requires a package.json 'test' script). agy remains unhealthy (writes to ~/.gemini scratch, not the worktree).",
     "Active orchestrator config for this machine, created 2026-08-02. None existed before \u2014 loadConfig() returned {} and the runner fell back to DEFAULT_REGISTRY with a 2-worker healthy minimum.",
     "enabled lists the 5 workers for this machine: the 4 CLIs verified installed (codex, agy, opencode, pi) plus the claude alias (the Claude Code CLI, authenticated here). pi-local is dropped: it routes through an Ollama provider (--provider ollama) and no provider is registered in ~/.pi/agent/models.json here. gemini/grok/droid/agent/small-harness are excluded because the binaries are not installed (failed --version).",
     "Thin-pool policy history: preflight on 2026-08-02 showed 0/10 workers functional. After connecting the claude CLI (Anthropic), re-pointing opencode at its stored Google provider, and redirecting pi to the local routatic-proxy gateway, preflight shows 3/5 functional \u2014 all verified by smoke probe (actually wrote the artifact). minimumHealthyWorkers is 2 and requireCompetitionForRisk is [\"high\"].",
@@ -30,7 +31,7 @@
   ],
   "policy": {
     "minimumHealthyWorkers": 3,
-    "maxParallelWorkers": 12,
+    "maxParallelWorkers": 16,
     "requireCompetitionForRisk": [
       "high"
     ]
@@ -67,20 +68,20 @@
     "opencode": {
       "models": {
         "simple": {
-          "model": "litellm/gemini-2.5-flash",
-          "invocation": "opencode run --format json -m \"litellm/gemini-2.5-flash\" \"$(cat .ultraswarm-prompt.txt)\""
+          "model": "cliproxyapi/gemini-2.5-flash",
+          "invocation": "opencode run --format json -m \"cliproxyapi/gemini-2.5-flash\" \"$(cat .ultraswarm-prompt.txt)\""
         },
         "moderate": {
-          "model": "litellm/gemini-3.5-flash",
-          "invocation": "opencode run --format json -m \"litellm/gemini-3.5-flash\" \"$(cat .ultraswarm-prompt.txt)\""
+          "model": "cliproxyapi/gemini-2.5-flash",
+          "invocation": "opencode run --format json -m \"cliproxyapi/gemini-2.5-flash\" \"$(cat .ultraswarm-prompt.txt)\""
         },
         "complex": {
-          "model": "litellm/gemini-3.6-flash",
-          "invocation": "opencode run --format json -m \"litellm/gemini-3.6-flash\" \"$(cat .ultraswarm-prompt.txt)\""
+          "model": "cliproxyapi/gemini-3.6-flash",
+          "invocation": "opencode run --format json -m \"cliproxyapi/gemini-3.6-flash\" \"$(cat .ultraswarm-prompt.txt)\""
         },
         "expert": {
-          "model": "litellm/gemini-3.6-flash",
-          "invocation": "opencode run --format json -m \"litellm/gemini-3.6-flash\" \"$(cat .ultraswarm-prompt.txt)\""
+          "model": "cliproxyapi/gemini-3.6-flash",
+          "invocation": "opencode run --format json -m \"cliproxyapi/gemini-3.6-flash\" \"$(cat .ultraswarm-prompt.txt)\""
         }
       }
     },
