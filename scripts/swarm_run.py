@@ -33,11 +33,33 @@ DEFAULT_PROJECT = "lunaclone/merged-agentic-swarm"
 ULTRASWARM_HOME = Path(os.environ.get("ULTRASWARM_HOME", "~/projects/ultraswarm")).expanduser()
 
 # Plan-schema task keys (runner rejects unknown keys).
-_TASK_KEYS = ("id", "description", "files", "complexity_score", "risk", "dependencies", "prompt", "cli", "model_tier", "effort", "competition", "requirements", "contract")
+_TASK_KEYS = (
+    "id",
+    "description",
+    "files",
+    "complexity_score",
+    "risk",
+    "dependencies",
+    "prompt",
+    "cli",
+    "model_tier",
+    "effort",
+    "competition",
+    "requirements",
+    "contract",
+)
 _ID_OK = re.compile(r"^[A-Za-z0-9._-]+$")
 
 # Modules that must never get a pytest/ruff task target (data, no code).
-_LIVING_DOCS = ["README.md", "docs/swarm_project_prd.md", "docs/stack-analysis-2026-08-06.md", "docs/agentic/OPERATOR_RUNBOOK.md", "docs/agentic/RUNBOOK.md", "docs/agentic/AGENT_SPEC_CONTRACT.md", "docs/agentic/KNOWLEDGE_BOX_SCHEMA.md"]
+_LIVING_DOCS = [
+    "README.md",
+    "docs/swarm_project_prd.md",
+    "docs/stack-analysis-2026-08-06.md",
+    "docs/agentic/OPERATOR_RUNBOOK.md",
+    "docs/agentic/RUNBOOK.md",
+    "docs/agentic/AGENT_SPEC_CONTRACT.md",
+    "docs/agentic/KNOWLEDGE_BOX_SCHEMA.md",
+]
 
 
 def _slug(name: str) -> str:
@@ -233,7 +255,9 @@ def make_docs_task(doc: str) -> dict[str, Any]:
     }
 
 
-def build_tasks(target: str, project: str, agents: int, feature_desc: str | None) -> tuple[list[dict[str, Any]], dict[str, int]]:
+def build_tasks(
+    target: str, project: str, agents: int, feature_desc: str | None
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
     breakdown: dict[str, int] = {}
     tasks: list[dict[str, Any]] = []
 
@@ -282,15 +306,17 @@ def build_tasks(target: str, project: str, agents: int, feature_desc: str | None
             desc = target.split(":", 1)[1]
         else:
             desc = "implement the requested feature"
-        tasks.append({
-            "id": "feature-main",
-            "description": f"Feature: {desc[:120]}",
-            "files": ["src/merged_agentic_swarm", "tests"],
-            "complexity_score": 5,
-            "risk": "high",
-            "dependencies": [],
-            "prompt": f"Implement the requested feature in this repo: {desc}. Add tests and update docs. `uv run pytest -q` must pass.",
-        })
+        tasks.append(
+            {
+                "id": "feature-main",
+                "description": f"Feature: {desc[:120]}",
+                "files": ["src/merged_agentic_swarm", "tests"],
+                "complexity_score": 5,
+                "risk": "high",
+                "dependencies": [],
+                "prompt": f"Implement the requested feature in this repo: {desc}. Add tests and update docs. `uv run pytest -q` must pass.",
+            }
+        )
         breakdown["feature"] = 1
 
     # Pad to the requested agent count with low-risk per-module subtasks (logged, no silent inflation).
