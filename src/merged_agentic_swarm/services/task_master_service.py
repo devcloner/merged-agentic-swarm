@@ -6,6 +6,7 @@ PRD optimization, task parsing, dependency resolution, and single source of trut
 import json
 import logging
 import os
+import tempfile
 import threading
 import time
 
@@ -73,11 +74,20 @@ class TaskMasterService:
         """Saves Task Master state as the authoritative single source of truth."""
         os.makedirs(os.path.dirname(self.state_file_path), exist_ok=True)
         if self.current_analysis:
-            # Atomic write: temp file → rename to avoid corruption
-            tmp = self.state_file_path + ".tmp"
-            with open(tmp, "w", encoding="utf-8") as f:
-                json.dump(self.current_analysis.to_dict(), f, indent=2)
-            os.replace(tmp, self.state_file_path)
+            # Atomic write: unique temp file → rename to avoid corruption on
+            # concurrent saves (a fixed <file>.tmp would be clobbered mid-write).
+            dirname = os.path.dirname(self.state_file_path)
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=dirname,
+                prefix=".task_master_",
+                suffix=".tmp",
+                delete=False,
+            ) as tf:
+                json.dump(self.current_analysis.to_dict(), tf, indent=2)
+                tmp_name = tf.name
+            os.replace(tmp_name, self.state_file_path)
             logger.info(f"Saved Task Master state to {self.state_file_path}")
 
     def _estimate_turns(self, task_description: str) -> int:

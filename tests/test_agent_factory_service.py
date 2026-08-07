@@ -373,3 +373,13 @@ class TestDurableAgentFactory:
 
         count = factory.sync_agent_specs()
         assert count == 0
+
+    def test_default_factory_resolves_shared_registry_path(self, temp_dir, monkeypatch):
+        """#31: the factory's default registry path goes through the shared resolver."""
+        import merged_agentic_swarm.services.agent_factory_service as afs_mod
+        from merged_agentic_swarm.services.agent_factory_service import DurableAgentFactory
+
+        registry = os.path.join(temp_dir, "agents.jsonl")
+        monkeypatch.setattr(afs_mod, "agents_registry_path", lambda explicit=None: registry)
+        factory = DurableAgentFactory()
+        assert factory._agents_registry_path() == registry

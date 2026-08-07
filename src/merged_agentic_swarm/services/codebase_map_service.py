@@ -4,6 +4,7 @@ Maps repository structure, AST symbols, and closes spec gaps before mass edits.
 """
 
 import ast
+import fnmatch
 import json
 import logging
 import os
@@ -22,14 +23,7 @@ class CodebaseMapService:
         self.symbol_cache: dict[str, Any] = {}
         self.spec_gaps: list[SpecGap] = []
         self._state_file: str = os.path.join(repo_root, ".opencode", "codebase_cache.json")
-        self._load_state()
-
-    def scan_repository(self) -> dict[str, Any]:
-        """Scans workspace repository files and parses AST definitions."""
-        file_tree = []
-        symbol_index = {}
-
-        ignore_dirs = {
+        self._ignore_dirs = {
             ".git",
             "node_modules",
             ".cache",
@@ -55,17 +49,91 @@ class CodebaseMapService:
             ".serena",
             "claudecodeui",
             "Spotify-project-main",
+            "venv",
+            ".venv",
+            "build",
+            "dist",
+            "target",
+            "vendor",
+            "site-packages",
         }
+        self._ignore_patterns: list[tuple[str, bool]] = []
+        self._ignore_negations: list[tuple[str, bool]] = []
+        self._load_gitignore()
+        self._load_state()
+
+    def _load_gitignore(self) -> None:
+        """Load the repo-root .gitignore into (pattern, dir_only) matcher lists.
+
+        Covers the common gitignore forms: comments, `!` negation, trailing `/`
+        (directory-only), and slash-anchored vs basename patterns. Full gitignore
+        semantics (nested .gitignore files, ** globs) are out of scope.
+        """
+        path = os.path.join(self.repo_root, ".gitignore")
+        if not os.path.exists(path):
+            return
+        with open(path, "r", encoding="utf-8", errors="ignore") as f:
+            for raw in f:
+                line = raw.rstrip("\n").rstrip()
+                if not line or line.startswith("#"):
+                    continue
+                negate = line.startswith("!")
+                if negate:
+                    line = line[1:].lstrip()
+                dir_only = line.endswith("/")
+                pattern = line.rstrip("/")
+                if not pattern:
+                    continue
+                target = self._ignore_negations if negate else self._ignore_patterns
+                target.append((pattern, dir_only))
+
+    def _is_gitignored(self, rel: str, is_dir: bool) -> bool:
+        if not self._ignore_patterns and not self._ignore_negations:
+            return False
+        matched = False
+        for pattern, dir_only in self._ignore_patterns:
+            if dir_only and not is_dir:
+                continue
+            if self._pattern_matches(pattern, rel):
+                matched = True
+                break
+        if matched:
+            for pattern, dir_only in self._ignore_negations:
+                if dir_only and not is_dir:
+                    continue
+                if self._pattern_matches(pattern, rel):
+                    return False
+        return matched
+
+    @staticmethod
+    def _pattern_matches(pattern: str, rel: str) -> bool:
+        if "/" in pattern:
+            return fnmatch.fnmatch(rel, pattern)
+        return fnmatch.fnmatch(os.path.basename(rel), pattern)
+
+    def _is_ignored_path(self, full_path: str, is_dir: bool) -> bool:
+        name = os.path.basename(full_path)
+        if is_dir and (name in self._ignore_dirs or name.startswith(".") or os.path.islink(full_path)):
+            return True
+        rel = os.path.relpath(full_path, self.repo_root).replace(os.sep, "/")
+        return self._is_gitignored(rel, is_dir)
+
+    def scan_repository(self) -> dict[str, Any]:
+        """Scans workspace repository files and parses AST definitions."""
+        file_tree = []
+        symbol_index = {}
 
         for root, dirs, files in os.walk(self.repo_root):
-            dirs[:] = [d for d in dirs if d not in ignore_dirs and not d.startswith(".")]
+            dirs[:] = [d for d in dirs if not self._is_ignored_path(os.path.join(root, d), is_dir=True)]
             try:
                 for file in files:
-                    rel_path = os.path.relpath(os.path.join(root, file), self.repo_root)
+                    full_path = os.path.join(root, file)
+                    if self._is_ignored_path(full_path, is_dir=False):
+                        continue
+                    rel_path = os.path.relpath(full_path, self.repo_root)
                     file_tree.append(rel_path)
 
                     if file.endswith(".py"):
-                        full_path = os.path.join(root, file)
                         symbols = self._parse_python_ast(full_path)
                         if symbols:
                             symbol_index[rel_path] = symbols

@@ -23,6 +23,10 @@ from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric
 
 logger = logging.getLogger("claude_proxy")
 
+# ── Request body size limits ─────────────────────────────────────────────
+MAX_JSON_BODY_BYTES = 5 * 1024 * 1024  # 5 MiB for JSON endpoints
+MAX_AUDIO_BODY_BYTES = 25 * 1024 * 1024  # 25 MiB for audio transcription
+
 # ── Audio transcription helpers ──────────────────────────────────────────
 
 MIME_MAP = {
@@ -130,6 +134,17 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _send_413(self, message: str):
+        """Reject an oversized body. Close the connection since the unread
+        bytes would otherwise desync the request stream."""
+        self.send_response(413)
+        self.send_header("Content-Type", "application/json")
+        body = json.dumps({"error": message}).encode("utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Connection", "close")
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -170,6 +185,15 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
             return
 
         content_len = int(self.headers.get("Content-Length", 0))
+        # Reject oversized bodies up front so a large/malicious request is
+        # never buffered into memory. Audio multipart gets a higher cap.
+        if self.path in ("/v1/audio/transcriptions", "/v1/audio/transcriptions/"):
+            if content_len > MAX_AUDIO_BODY_BYTES:
+                self._send_413("Audio request body exceeds size limit")
+                return
+        elif content_len > MAX_JSON_BODY_BYTES:
+            self._send_413("Request body exceeds size limit")
+            return
         post_body = self.rfile.read(content_len) if content_len > 0 else b"{}"
 
         # ── Audio transcription (multipart) ────────────────────────────

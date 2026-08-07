@@ -33,6 +33,67 @@ class TestCodebaseMapService:
         assert result["total_files"] >= 1
         assert result["python_files"] >= 1
 
+    def test_scan_excludes_vendored_and_gitignored_paths(self, temp_dir):
+        """#37: vendored/build dirs and .gitignore'd paths must be excluded."""
+        from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
+        for d in ("venv/lib", ".venv", "node_modules/pkg", "build", "docs"):
+            os.makedirs(os.path.join(temp_dir, d), exist_ok=True)
+        for rel, content in {
+            os.path.join("venv", "lib", "x.py"): "x = 1\n",
+            os.path.join(".venv", "y.py"): "y = 1\n",
+            os.path.join("node_modules", "pkg", "z.py"): "z = 1\n",
+            os.path.join("build", "out.py"): "out = 1\n",
+            os.path.join("docs", "keep.py"): "keep = 1\n",
+            "debug.log": "log\n",
+        }.items():
+            with open(os.path.join(temp_dir, rel), "w") as f:
+                f.write(content)
+        with open(os.path.join(temp_dir, ".gitignore"), "w") as f:
+            f.write("*.log\n")
+
+        mapper = CodebaseMapService(repo_root=temp_dir)
+        result = mapper.scan_repository()
+        file_list = result["file_list"]
+        assert "docs/keep.py" in file_list
+        assert "debug.log" not in file_list  # .gitignore
+        assert not any(p.startswith("venv/") for p in file_list)
+        assert not any(p.startswith(".venv/") for p in file_list)
+        assert not any(p.startswith("node_modules/") for p in file_list)
+        assert not any(p.startswith("build/") for p in file_list)
+
+    def test_scan_skips_symlinked_directories(self, temp_dir):
+        """#37: symlinked dirs must not be walked (avoids duplicate trees)."""
+        from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
+        os.makedirs(os.path.join(temp_dir, "real"), exist_ok=True)
+        with open(os.path.join(temp_dir, "real", "a.py"), "w") as f:
+            f.write("a = 1\n")
+        os.symlink(os.path.join(temp_dir, "real"), os.path.join(temp_dir, "link"))
+
+        mapper = CodebaseMapService(repo_root=temp_dir)
+        result = mapper.scan_repository()
+        assert "real/a.py" in result["file_list"]
+        assert not any(p.startswith("link") for p in result["file_list"])
+
+    def test_gitignore_negation_allows_ignored_dir_file(self, temp_dir):
+        """#37: `!` negation re-includes a path ignored by a broader pattern."""
+        from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
+
+        os.makedirs(os.path.join(temp_dir, "logs"), exist_ok=True)
+        with open(os.path.join(temp_dir, "logs", "keep.txt"), "w") as f:
+            f.write("keep\n")
+        with open(os.path.join(temp_dir, "logs", "skip.log"), "w") as f:
+            f.write("skip\n")
+        with open(os.path.join(temp_dir, ".gitignore"), "w") as f:
+            f.write("logs/*\n!logs/keep.txt\n")
+
+        mapper = CodebaseMapService(repo_root=temp_dir)
+        result = mapper.scan_repository()
+        file_list = result["file_list"]
+        assert "logs/keep.txt" in file_list
+        assert "logs/skip.log" not in file_list
+
     def test_scan_preserves_state_file(self, temp_dir):
         from merged_agentic_swarm.services.codebase_map_service import CodebaseMapService
 

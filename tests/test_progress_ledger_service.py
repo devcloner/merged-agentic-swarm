@@ -6,6 +6,7 @@ ProgressLedgerService (load, save, log_progress, record_success_marker,
 handle_task_failure).
 """
 
+import json
 import os
 
 
@@ -146,3 +147,51 @@ class TestProgressLedgerService:
 
         ledger2 = ProgressLedgerService(ledger_file=ledger_file)
         assert len(ledger2.success_markers) == 1
+
+    def test_save_ledger_uses_unique_temp_name(self, temp_dir, monkeypatch):
+        """Regression for #41: temp file must not be the fixed <target>.tmp."""
+        from merged_agentic_swarm.services.progress_ledger_service import ProgressLedgerService
+
+        ledger_file = os.path.join(temp_dir, "ledger.json")
+        ledger = ProgressLedgerService(ledger_file=ledger_file)
+
+        replaced_with = []
+        real_replace = os.replace
+        monkeypatch.setattr(
+            os,
+            "replace",
+            lambda src, dst: replaced_with.append(src) or real_replace(src, dst),
+        )
+        ledger.save_ledger()
+
+        assert replaced_with, "os.replace should have been called"
+        tmp = replaced_with[0]
+        assert tmp != ledger_file + ".tmp"  # unique temp, not the fixed name
+        assert os.path.basename(tmp).startswith(".progress_ledger_")
+        assert tmp != ledger_file
+        with open(ledger_file) as f:
+            data = json.load(f)
+        assert "logs" in data and "success_markers" in data
+
+    def test_concurrent_save_ledger_produces_complete_json(self, temp_dir):
+        """Concurrent save_ledger calls must never leave a torn JSON target."""
+        from concurrent.futures import ThreadPoolExecutor
+
+        from merged_agentic_swarm.services.progress_ledger_service import ProgressLedgerService
+
+        ledger_file = os.path.join(temp_dir, "ledger.json")
+        ledger = ProgressLedgerService(ledger_file=ledger_file)
+        ledger.log_progress(
+            task_id="T-01", subtask_id=None, worker_id="w1", wave_id=0,
+            action="test", status="in_progress",
+        )
+
+        with ThreadPoolExecutor(max_workers=4) as ex:
+            list(ex.map(lambda _: ledger.save_ledger(), range(8)))
+
+        with open(ledger_file) as f:
+            data = json.load(f)
+        assert "logs" in data
+        assert data["logs"][0]["task_id"] == "T-01"
+        leftovers = [p for p in os.listdir(temp_dir) if p.endswith(".tmp")]
+        assert leftovers == []

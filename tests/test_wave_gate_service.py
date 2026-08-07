@@ -115,6 +115,31 @@ class TestWaveGateController:
         # But the code handles that gracefully
         assert isinstance(violations, list)
 
+    def test_check_ownership_map_absent_passes(self, temp_dir, monkeypatch):
+        """#36: absent ownership map is an optional gate — warn and pass."""
+        import merged_agentic_swarm.services.wave_gate_service as wave_mod
+
+        monkeypatch.setattr(wave_mod.default_codebase_mapper, "repo_root", temp_dir)
+        subtasks = [SubTask(id="ST-01", title="T", description="D", output_artifacts=["services/x.py"])]
+        assert self.controller._check_ownership(subtasks, "any-pool") == []
+
+    def test_check_ownership_pool_missing_hard_fails(self, temp_dir, monkeypatch):
+        """Map exists but the requested pool is absent — keep the hard-fail."""
+        import merged_agentic_swarm.services.wave_gate_service as wave_mod
+
+        owner_dir = os.path.join(temp_dir, ".opencode")
+        os.makedirs(owner_dir, exist_ok=True)
+        with open(os.path.join(owner_dir, "ownership-map.json"), "w") as f:
+            json.dump(
+                {"pools": [{"pool_id": "other-pool", "owned_paths": ["services/*"], "forbidden_paths": []}]},
+                f,
+            )
+        monkeypatch.setattr(wave_mod.default_codebase_mapper, "repo_root", temp_dir)
+        subtasks = [SubTask(id="ST-01", title="T", description="D", output_artifacts=["services/x.py"])]
+        violations = self.controller._check_ownership(subtasks, "missing-pool")
+        assert len(violations) == 1
+        assert "missing-pool" in violations[0]
+
     def test_fail_advance_if_wave_not_pass(self, temp_dir):
         """Wave 1 fails because task master has no tasks for it."""
         passed, reasons = self.controller.evaluate_gate_criteria(1)
@@ -314,13 +339,14 @@ class TestWaveGatesWithRealState:
         finally:
             wgs.default_task_master.current_analysis = None
 
-    def test_ownership_map_missing(self, tmp_path):
+    def test_ownership_map_missing_warns_and_passes(self, tmp_path):
+        # #36: the ownership gate is optional — an absent map must not block waves.
         controller, wgs = self._controller(tmp_path)
         self._with_epics(tmp_path, wgs, [(TaskStatus.COMPLETED, [TaskStatus.COMPLETED])])
         try:
             passed, reasons = controller.evaluate_gate_criteria(1)
-            assert passed is False
-            assert any("Ownership map not found" in r for r in reasons)
+            assert passed is True
+            assert not any("Ownership map not found" in r for r in reasons)
         finally:
             wgs.default_task_master.current_analysis = None
 

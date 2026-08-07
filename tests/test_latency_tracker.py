@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from merged_agentic_swarm.latency_tracker import (
@@ -17,8 +19,8 @@ def test_percentile_and_pct_stats_edge_cases():
     assert percentile([1, 2, 3, 4], 50) == 2
     assert _pct_stats([]) == {"p50": 0.0, "p95": 0.0, "p99": 0.0}
     assert _pct_stats([3.14159]) == {"p50": 3.14, "p95": 3.14, "p99": 3.14}
-    # nearest-rank percentile: rank = int(0.95 * 4) = 3 -> sorted[2] == 3
-    assert _pct_stats([4, 1, 2, 3]) == {"p50": 2, "p95": 3, "p99": 3}
+    # nearest-rank percentile: rank = ceil(0.95 * 4) = 4 -> sorted[3] == 4
+    assert _pct_stats([4, 1, 2, 3]) == {"p50": 2, "p95": 4, "p99": 4}
 
 
 def test_request_timing_lifecycle(monkeypatch):
@@ -68,11 +70,12 @@ def test_stats_aggregation_and_fail_count(monkeypatch):
     assert stats["errors"] == 1
     assert entry["errors"] == 1
     # Both requests end with a total time (the failed one is finalized too):
-    # [1000ms, 2000ms] -> avg 1500ms; nearest-rank p50/p95/p99 all == 1000ms.
+    # [1000ms, 2000ms] -> avg 1500ms.
+    # nearest-rank: ceil(0.5*2)=1, ceil(0.95*2)=2, ceil(0.99*2)=2.
     assert entry["avg_total_ms"] == pytest.approx(1500.0)
     assert entry["total_ms"]["p50"] == 1000.0
-    assert entry["total_ms"]["p95"] == 1000.0
-    assert entry["total_ms"]["p99"] == 1000.0
+    assert entry["total_ms"]["p95"] == 2000.0
+    assert entry["total_ms"]["p99"] == 2000.0
     assert entry["total_ms"]["p50"] <= entry["total_ms"]["p95"]
     assert "min_total_ms" not in entry
     assert "max_total_ms" not in entry
@@ -95,3 +98,52 @@ def test_format_report_empty_and_populated():
 def test_get_tracker_returns_default_singleton():
     assert isinstance(get_tracker(), LatencyTracker)
     assert get_tracker() is get_tracker()
+
+
+# ── Stale active-record pruning (#38) ─────────────────────────────────────
+
+
+def test_prune_stale_active_finalizes_abandoned():
+    tracker = LatencyTracker(active_stale_seconds=10.0)
+    timing = tracker.start_request("p", "m", "r1")
+    timing.started_at = time.monotonic() - 15.0
+    assert tracker.prune_stale_active() == 1
+    assert tracker.in_flight_count == 0
+    assert tracker.record_count == 1
+    rec = tracker._records[0]
+    assert rec.error == "pruned: abandoned before finish"
+    assert rec.completed is False
+
+
+def test_prune_keeps_recent_in_flight():
+    tracker = LatencyTracker(active_stale_seconds=10.0)
+    tracker.start_request("p", "m", "fresh")
+    assert tracker.prune_stale_active() == 0
+    assert tracker.in_flight_count == 1
+
+
+def test_in_flight_count_excludes_stale():
+    tracker = LatencyTracker(active_stale_seconds=10.0)
+    fresh = tracker.start_request("p", "m", "fresh")
+    stale = tracker.start_request("p", "m", "stale")
+    now = time.monotonic()
+    stale.started_at = now - 20.0
+    fresh.started_at = now
+    assert tracker.in_flight_count == 1  # only the fresh one counts
+
+
+def test_zero_stale_threshold_disables_pruning():
+    tracker = LatencyTracker(active_stale_seconds=0)
+    tracker.start_request("p", "m", "r1")
+    assert tracker.prune_stale_active() == 0
+    assert tracker.in_flight_count == 1
+
+
+def test_stats_prunes_stale_before_reporting():
+    tracker = LatencyTracker(active_stale_seconds=10.0)
+    timing = tracker.start_request("p", "m", "r1")
+    timing.started_at = time.monotonic() - 20.0
+    stats = tracker.stats()
+    assert stats["requests"] == 1
+    assert stats["errors"] == 1
+    assert stats["in_flight"] == 0

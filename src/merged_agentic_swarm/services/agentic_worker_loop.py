@@ -98,7 +98,7 @@ WORKER_TOOLS: list[dict[str, Any]] = [WRITE_FILE_TOOL, READ_FILE_TOOL, LIST_DIR_
 # timeout is the second boundary. In-repo destructive ops are handled through
 # write_file instead of the shell.
 
-_REFUSED_TOKENS: set[str] = {"sudo", "mkfs"}
+_REFUSED_TOKENS: set[str] = {"sudo", "mkfs", "dd", "chmod", "chown", "killall"}
 _REFUSED_PHRASES: tuple[str, ...] = (
     "rm -rf /",
     "rm -fr /",
@@ -107,9 +107,20 @@ _REFUSED_PHRASES: tuple[str, ...] = (
     "git push",
     "git fetch",
     "git pull",
+    "git reset --hard",
+    "git clean",
+    "wget | sh",
+    "curl | sh",
     "shutdown",
     "reboot",
 )
+
+# Shell operators let a single command chain/redirect into host-wide side
+# effects (pipelines, forks, redirects, command substitution). They are refused
+# unless the command begins with an allowlisted runner prefix that legitimately
+# uses them.
+_ALLOWED_META_PREFIXES: tuple[str, ...] = ("uv run", "pytest", "git status", "git diff")
+_SHELL_METACHARS: tuple[str, ...] = ("|", ">", ";", "$(", "`")
 
 
 def _command_safety_error(command: str) -> str | None:
@@ -121,12 +132,19 @@ def _command_safety_error(command: str) -> str | None:
     if not tokens:
         return "empty command"
     lowered = [t.lower() for t in tokens]
-    if _REFUSED_TOKENS.intersection(lowered):
-        return "sudo/mkfs are not allowed"
+    refused = sorted(_REFUSED_TOKENS.intersection(lowered))
+    if refused:
+        return f"forbidden system command: {', '.join(refused)}"
     joined = " ".join(lowered)
     for phrase in _REFUSED_PHRASES:
         if phrase in joined:
             return f"forbidden destructive command: {phrase}"
+
+    stripped = command.strip().lower()
+    if not stripped.startswith(_ALLOWED_META_PREFIXES):
+        for meta in _SHELL_METACHARS:
+            if meta in command:
+                return f"shell operator not allowed: {meta}"
     return None
 
 

@@ -164,3 +164,52 @@ class TestTaskMasterService:
         for epic in result.epics:
             for st in epic.subtasks:
                 assert st.estimated_turns >= 1
+
+    def test_save_state_uses_unique_temp_name(self, temp_dir, monkeypatch):
+        """Regression for #41: temp file must not be the fixed <target>.tmp."""
+        from merged_agentic_swarm.models.prd_models import PRDAnalysisResult
+        from merged_agentic_swarm.services.task_master_service import TaskMasterService
+
+        state = os.path.join(temp_dir, "tasks.json")
+        tm = TaskMasterService(state_file_path=state)
+        tm.current_analysis = PRDAnalysisResult(
+            title="Test PRD", summary="Summary", epics=[], spec_gaps=[], total_estimated_turns=0
+        )
+
+        replaced_with = []
+        real_replace = os.replace
+        monkeypatch.setattr(
+            os,
+            "replace",
+            lambda src, dst: replaced_with.append(src) or real_replace(src, dst),
+        )
+        tm.save_state()
+
+        assert replaced_with, "os.replace should have been called"
+        tmp = replaced_with[0]
+        assert tmp != state + ".tmp"  # unique temp, not the fixed name
+        assert os.path.basename(tmp).startswith(".task_master_")
+        assert tmp != state
+        with open(state) as f:
+            assert json.load(f)["title"] == "Test PRD"
+
+    def test_concurrent_saves_produce_complete_json(self, temp_dir):
+        """Concurrent save_state calls must never leave a torn JSON target."""
+        from concurrent.futures import ThreadPoolExecutor
+
+        from merged_agentic_swarm.models.prd_models import PRDAnalysisResult
+        from merged_agentic_swarm.services.task_master_service import TaskMasterService
+
+        state = os.path.join(temp_dir, "tasks.json")
+        tm = TaskMasterService(state_file_path=state)
+        tm.current_analysis = PRDAnalysisResult(
+            title="Concurrent", summary="s", epics=[], spec_gaps=[], total_estimated_turns=0
+        )
+
+        with ThreadPoolExecutor(max_workers=4) as ex:
+            list(ex.map(lambda _: tm.save_state(), range(8)))
+
+        with open(state) as f:
+            assert json.load(f)["title"] == "Concurrent"
+        leftovers = [p for p in os.listdir(temp_dir) if p.endswith(".tmp")]
+        assert leftovers == []

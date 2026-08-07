@@ -10,6 +10,9 @@ import json
 import time
 from unittest.mock import MagicMock, patch
 
+import pytest
+
+import merged_agentic_swarm.providers.multi_provider_fabric as fabric_mod
 from merged_agentic_swarm.providers.multi_provider_fabric import (
     MultiProviderFabric,
     _circuit_breaker,
@@ -18,6 +21,13 @@ from merged_agentic_swarm.providers.multi_provider_fabric import (
     _record_failure,
     _record_success,
 )
+
+
+@pytest.fixture(autouse=True)
+def _isolated_bans_path(tmp_path, monkeypatch):
+    """Redirect the persisted-bans path so tests never write into the repo."""
+    monkeypatch.setattr(fabric_mod, "_BANS_STATE_PATH", tmp_path / "provider-bans.json")
+    yield
 
 
 class TestFormatConversion:
@@ -232,6 +242,36 @@ class TestCircuitBreaker:
         assert result["role"] == "assistant"
 
 
+class TestBanPersistence:
+    """#40: 401 perma-bans persist to disk and are honored across reloads."""
+
+    def setup_method(self):
+        fabric_mod._permanently_dead.clear()
+
+    def test_401_persists_ban_and_reload_restores(self):
+        fabric_mod._record_failure("test-ban-provider", http_code=401)
+        assert fabric_mod._BANS_STATE_PATH.exists()
+        data = json.loads(fabric_mod._BANS_STATE_PATH.read_text(encoding="utf-8"))
+        assert "test-ban-provider" in data
+
+        # Simulate a restart: in-memory state is gone, disk state is reloaded.
+        fabric_mod._permanently_dead.clear()
+        fabric_mod._load_bans()
+        assert fabric_mod._permanently_dead.get("test-ban-provider", 0) > time.time()
+
+    def test_expired_ban_dropped_on_load(self):
+        fabric_mod._BANS_STATE_PATH.write_text(
+            json.dumps({"test-expired-provider": time.time() - 1}), encoding="utf-8"
+        )
+        fabric_mod._load_bans()
+        assert "test-expired-provider" not in fabric_mod._permanently_dead
+
+    def test_non_401_failure_does_not_persist_ban(self):
+        fabric_mod._record_failure("test-circuit-provider", http_code=500)
+        assert "test-circuit-provider" not in fabric_mod._permanently_dead
+        assert not fabric_mod._BANS_STATE_PATH.exists()
+
+
 class TestDispatchRequest:
     def setup_method(self):
         _circuit_breaker.clear()
@@ -443,7 +483,9 @@ class TestFabricRouteOverlay:
 
         overlay = tmp_path / "fabric-routes.json"
         overlay.write_text(
-            json.dumps({"routes": {"fast-flash": [{"provider": "nvidia_nim", "model": "z-ai/glm-5.2"}]}}),
+            json.dumps(
+                {"routes": {"fast-flash": [{"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "http://localhost:8000/v1/chat/completions"}]}}
+            ),
             encoding="utf-8",
         )
         monkeypatch.setattr(mpf, "_FABRIC_ROUTES_OVERLAY_PATH", overlay)
@@ -459,7 +501,9 @@ class TestFabricRouteOverlay:
         assert code_routes[0]["provider"] == "litellm"
         # Reload after the file changes -> new overlay applies.
         overlay.write_text(
-            json.dumps({"routes": {"fast-flash": [{"provider": "mistral", "model": "mistral-large-latest"}]}}),
+            json.dumps(
+                {"routes": {"fast-flash": [{"provider": "mistral", "model": "mistral-large-latest", "url": "http://localhost:8000/v1/chat/completions"}]}}
+            ),
             encoding="utf-8",
         )
         mpf.reload_fabric_routes()
@@ -475,3 +519,44 @@ class TestFabricRouteOverlay:
         routes = fabric._build_route_list("gemini-batch")
         assert routes[0]["provider"] == "litellm"
         assert routes[0]["url"] == "http://localhost:4000/v1/chat/completions"
+
+
+class TestMalformedOverlayRoutes:
+    """Malformed overlay routes are dropped at load, never crashing dispatch (issue #28)."""
+
+    def _install(self, monkeypatch, tmp_path, payload):
+        import merged_agentic_swarm.providers.multi_provider_fabric as mpf
+
+        overlay = tmp_path / "fabric-routes.json"
+        overlay.write_text(json.dumps(payload), encoding="utf-8")
+        monkeypatch.setattr(mpf, "_FABRIC_ROUTES_OVERLAY_PATH", overlay)
+        monkeypatch.setattr(mpf, "_fabric_routes_overlay", None)
+        return mpf
+
+    def test_malformed_routes_filtered_at_load(self, tmp_path, monkeypatch):
+        mpf = self._install(
+            monkeypatch,
+            tmp_path,
+            {"routes": {"alias": [
+                {"provider": "litellm", "model": "smart-auto", "url": "http://localhost:4000/v1/chat/completions"},
+                {"provider": "litellm", "model": "missing-url"},
+                {"model": "no-provider", "url": "http://x"},
+                {"provider": 7, "model": "smart-auto", "url": "http://x"},
+            ]}},
+        )
+        fabric = mpf.MultiProviderFabric()
+        routes = fabric._build_route_list("alias")
+        assert len(routes) == 1
+        assert routes[0]["provider"] == "litellm"
+        assert routes[0]["url"] == "http://localhost:4000/v1/chat/completions"
+
+    def test_all_malformed_alias_falls_back_to_code_defaults(self, tmp_path, monkeypatch):
+        mpf = self._install(
+            monkeypatch,
+            tmp_path,
+            {"routes": {"gemini-batch": [{"provider": "litellm", "model": "no-url"}]}},
+        )
+        fabric = mpf.MultiProviderFabric()
+        routes = fabric._build_route_list("gemini-batch")
+        assert routes[0]["provider"] == "litellm"
+        assert routes[0]["url"].startswith("http")

@@ -17,6 +17,22 @@ from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
 logger = logging.getLogger("agent_factory")
 
 
+def agents_registry_path(explicit: str | None = None) -> str:
+    """Resolve the durable cold-path agents registry (agents.jsonl).
+
+    Prefers an explicit path, then the user config path, then the repo registry.
+    Shared by DurableAgentFactory, sync_agent_specs, and DurableAgentRouter so an
+    agent persisted to any of these locations is discoverable everywhere.
+    """
+    if explicit:
+        return explicit
+    user_path = os.path.expanduser("~/.config/merged-agentic-swarm/agents.jsonl")
+    if os.path.exists(user_path):
+        return user_path
+    repo_root = Path(__file__).resolve().parents[3]
+    return str(repo_root / "docs" / "agentic" / "registry" / "agents.jsonl")
+
+
 class ChainRegistry:
     def __init__(self, registry_file: str | None = None):
         if registry_file is None:
@@ -117,14 +133,7 @@ class DurableAgentFactory:
         repo registry. Load and persist share this resolution so agents written
         by ``spawn_from_learning`` are discoverable on restart.
         """
-        if self.agents_registry_file:
-            return self.agents_registry_file
-        agents_registry = os.path.expanduser("~/.config/merged-agentic-swarm/agents.jsonl")
-        if not os.path.exists(agents_registry):
-            # Fallback to repo-relative path (file is at src/merged_agentic_swarm/services/)
-            repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-            agents_registry = os.path.join(repo_root, "docs", "agentic", "registry", "agents.jsonl")
-        return agents_registry
+        return agents_registry_path(self.agents_registry_file)
 
     def _load_cold_agents_from_registry(self):
         """Load durable agents from the cold-path agents.jsonl registry.
@@ -263,8 +272,7 @@ class DurableAgentFactory:
         Returns the count of files actually created (skipped pre-existing files
         are not counted).
         """
-        _repo_root = Path(__file__).resolve().parents[3]
-        registry_path = str(_repo_root / "docs" / "agentic" / "registry" / "agents.jsonl")
+        registry_path = self._agents_registry_path()
         count = 0
         if not os.path.exists(registry_path):
             logger.warning(f"Agent registry not found: {registry_path}")

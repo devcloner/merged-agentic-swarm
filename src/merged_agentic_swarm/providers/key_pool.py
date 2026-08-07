@@ -52,8 +52,14 @@ class KeyPoolManager:
         self._lock = threading.Lock()
         self.load_keys()
 
-    def load_keys(self):
-        """Loads API keys from env file, environment variables, and local key files."""
+    def _collect_keys_from_sources(self) -> list[tuple[str, str, str]]:
+        """Gather (provider, secret_value, key_id) candidates from all key sources.
+
+        Placeholder strings (e.g. "Gemini API Key...") are dropped so callers can
+        trust the returned list contains only usable keys.
+        """
+        candidates: list[tuple[str, str, str]] = []
+
         # 1. Parse env.txt if exists
         env_vars = {}
         if os.path.exists(self.env_file_path):
@@ -89,68 +95,112 @@ class KeyPoolManager:
                         gemini_keys.append(k)
 
         for idx, key in enumerate(gemini_keys):
-            self.add_key("gemini", key, key_id=f"gemini-{idx + 1}")
+            candidates.append(("gemini", key, f"gemini-{idx + 1}"))
 
         # 3. OpenCode Keys
         opencode_key = env_vars.get("OPENCODE_API_KEY") or os.environ.get("OPENCODE_API_KEY")
         if opencode_key:
-            self.add_key("opencode", opencode_key, key_id="opencode-main")
+            candidates.append(("opencode", opencode_key, "opencode-main"))
 
         # 4. Groq Keys
         groq_key = env_vars.get("GROQ_API_KEY") or os.environ.get("GROQ_API_KEY")
         if groq_key:
-            self.add_key("groq", groq_key, key_id="groq-main")
+            candidates.append(("groq", groq_key, "groq-main"))
 
         # 5. Mistral Keys
         mistral_key = env_vars.get("MISTRAL_API_KEY") or os.environ.get("MISTRAL_API_KEY")
         if mistral_key:
-            self.add_key("mistral", mistral_key, key_id="mistral-main")
+            candidates.append(("mistral", mistral_key, "mistral-main"))
 
         # 6. NVIDIA NIM Keys
         nim_key = env_vars.get("NVIDIA_NIM_API_KEY") or os.environ.get("NVIDIA_NIM_API_KEY")
         if nim_key:
-            self.add_key("nvidia_nim", nim_key, key_id="nvidia-main")
+            candidates.append(("nvidia_nim", nim_key, "nvidia-main"))
 
         # 7. OpenRouter Keys
         openrouter_key = env_vars.get("OPENROUTER_API_KEY") or os.environ.get("OPENROUTER_API_KEY")
         if openrouter_key:
-            self.add_key("openrouter", openrouter_key, key_id="openrouter-main")
+            candidates.append(("openrouter", openrouter_key, "openrouter-main"))
 
         # 8. AlibabaCloud Keys
         alibaba_key = env_vars.get("ALIBABACLOUD_API_KEY") or os.environ.get("ALIBABACLOUD_API_KEY")
         if alibaba_key:
-            self.add_key("alibabacloud", alibaba_key, key_id="alibabacloud-main")
+            candidates.append(("alibabacloud", alibaba_key, "alibabacloud-main"))
 
         # 9. DigitalOcean / Custom Keys
         do_key = env_vars.get("DO_API_KEY") or env_vars.get("CUSTOM_API_KEY") or os.environ.get("DO_API_KEY")
         if do_key:
-            self.add_key("digitalocean", do_key, key_id="digitalocean-main")
+            candidates.append(("digitalocean", do_key, "digitalocean-main"))
 
         # 10. AWS Bedrock — needs access key + secret (SigV4), store as compound
         aws_access_key = env_vars.get("AWS_ACCESS_KEY_ID") or os.environ.get("AWS_ACCESS_KEY_ID")
         aws_secret_key = env_vars.get("AWS_SECRET_ACCESS_KEY") or os.environ.get("AWS_SECRET_ACCESS_KEY")
         if aws_access_key and aws_secret_key:
-            self.add_key("amazonaws", f"{aws_access_key}:{aws_secret_key}", key_id="aws-bedrock-main")
+            candidates.append(("amazonaws", f"{aws_access_key}:{aws_secret_key}", "aws-bedrock-main"))
 
         # 10. liteLLM Proxy (local, fast, low-latency)
         litellm_key = env_vars.get("LITELLM_PROXY_KEY")
         if litellm_key:
-            self.add_key("litellm", litellm_key, key_id="litellm-main")
+            candidates.append(("litellm", litellm_key, "litellm-main"))
 
         # 11. FCC Proxy (localhost:8080) — uses ANTHROPIC_AUTH_TOKEN or falls back to "freecc"
         fcc_proxy_key = env_vars.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("ANTHROPIC_AUTH_TOKEN") or "freecc"
-        self.add_key("fcc-proxy", fcc_proxy_key, key_id="fcc-proxy-main")
+        candidates.append(("fcc-proxy", fcc_proxy_key, "fcc-proxy-main"))
 
         # 12. Routatic-proxy (localhost:3456) — standalone model router,
         #     does not interfere with FCC on port 8080. Uses same ANTHROPIC_AUTH_TOKEN.
-        self.add_key("routatic-proxy", fcc_proxy_key, key_id="routatic-proxy-main")
+        candidates.append(("routatic-proxy", fcc_proxy_key, "routatic-proxy-main"))
 
         # 13. CloudCLI (cloneclove.com) — remote agent-triggering API
         cloudcli_key = env_vars.get("CLOUDCLI_API_KEY") or os.environ.get("CLOUDCLI_API_KEY")
         if cloudcli_key:
-            self.add_key("cloudcli", cloudcli_key, key_id="cloudcli-main")
+            candidates.append(("cloudcli", cloudcli_key, "cloudcli-main"))
 
+        return [
+            (provider, secret, key_id)
+            for provider, secret, key_id in candidates
+            if secret and not secret.startswith("Gemini API Key")
+        ]
+
+    def load_keys(self):
+        """Loads API keys from env file, environment variables, and local key files."""
+        self.keys_by_provider = {}
+        for provider, secret_value, key_id in self._collect_keys_from_sources():
+            self.add_key(provider, secret_value, key_id)
         logger.info(f"Loaded key pools for providers: {list(self.keys_by_provider.keys())}")
+
+    def reload(self):
+        """Hot-reload keys from all sources, preserving runtime stats for persistent keys.
+
+        Key rotation typically swaps secret values while keeping the same key_id
+        (e.g. gemini-1). Reconcile by key_id so cooldowns, failure counts, and usage
+        counters survive the reload; only brand-new keys get fresh state. Runs under
+        self._lock so get_key/mark_* never observe a half-built pool.
+        """
+        with self._lock:
+            existing = {
+                key.key_id: key
+                for keys in self.keys_by_provider.values()
+                for key in keys
+            }
+            new_pools: dict[str, list[APIKeyInfo]] = {}
+            added = 0
+            preserved = 0
+            for provider, secret_value, key_id in self._collect_keys_from_sources():
+                prev = existing.get(key_id)
+                if prev is not None:
+                    prev.secret_value = secret_value
+                    new_pools.setdefault(provider, []).append(prev)
+                    preserved += 1
+                else:
+                    key_info = APIKeyInfo(key_id=key_id, provider=provider, secret_value=secret_value)
+                    new_pools.setdefault(provider, []).append(key_info)
+                    added += 1
+            self.keys_by_provider = new_pools
+            logger.info(
+                f"Reloaded key pools: {added} new, {preserved} preserved across "
+                f"{list(self.keys_by_provider.keys())}"
+            )
 
     def add_key(self, provider: str, secret_value: str, key_id: str):
         if not secret_value or secret_value.startswith("Gemini API Key"):
@@ -222,10 +272,20 @@ class KeyPoolManager:
         summary = {}
         now = time.time()
         for provider, keys in self.keys_by_provider.items():
+            cooling = [k for k in keys if k.status == KeyStatus.COOLDOWN and now < k.cooldown_until]
+            latencies = [k.avg_latency_ms for k in keys if k.avg_latency_ms > 0]
             summary[provider] = {
                 "total_keys": len(keys),
-                "active_keys": sum(1 for k in keys if k.status == KeyStatus.ACTIVE or now >= k.cooldown_until),
-                "cooldown_keys": sum(1 for k in keys if k.status == KeyStatus.COOLDOWN and now < k.cooldown_until),
+                "active_keys": sum(
+                    1
+                    for k in keys
+                    if k.status == KeyStatus.ACTIVE
+                    or (k.status == KeyStatus.COOLDOWN and now >= k.cooldown_until)
+                ),
+                "cooldown_keys": len(cooling),
+                "exhausted_keys": sum(1 for k in keys if k.status == KeyStatus.EXHAUSTED),
+                "next_cooldown_until": min((k.cooldown_until for k in cooling), default=None),
+                "avg_latency_ms": round(sum(latencies) / len(latencies), 2) if latencies else 0.0,
                 "total_requests": sum(k.total_requests for k in keys),
                 "total_tokens": sum(k.total_tokens for k in keys),
             }

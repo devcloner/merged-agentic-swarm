@@ -82,7 +82,13 @@ class WaveGateController:
                 break
 
         if ownership_map is None:
-            return ["Ownership map not found (checked .opencode/ and docs/agentic/registry/)"]
+            # Optional gate: when no ownership map exists (e.g. an external
+            # SWARM_TARGET_REPO), warn and pass rather than hard-failing waves.
+            logger.warning(
+                "Ownership map not found (checked .opencode/ and docs/agentic/registry/); "
+                f"skipping ownership gate for pool '{pool_id}'"
+            )
+            return []
 
         # Find the pool config
         pool_config = None

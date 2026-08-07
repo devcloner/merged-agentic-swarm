@@ -325,6 +325,25 @@ class TestDurableAgentRouter:
         assert router.get_stats()["total_agents"] == 1
         assert "python" in router.get_stats()["categories"]
 
+    def test_default_router_discovers_config_path_agent(self, tmp_path, monkeypatch):
+        """#31: a cold agent at the user-config path must be routed by a default
+        DurableAgentRouter (the shared registry resolver now points there)."""
+        registry = tmp_path / "agents.jsonl"
+        entry = {
+            "id": "agent-cold-durable-config-path",
+            "name": "Cold Config Agent",
+            "category": "testing",
+            "system_prompt": "You are a test agent.",
+            "ttl_sec": None,
+            "promoted_at": 0,
+        }
+        registry.write_text(json.dumps(entry) + "\n", encoding="utf-8")
+        # Default construction resolves through the shared agents_registry_path.
+        monkeypatch.setattr(mod, "agents_registry_path", lambda explicit=None: str(registry))
+        router = DurableAgentRouter()
+        router.load()
+        assert any(a.get("id") == "agent-cold-durable-config-path" for a in router._agents)
+
     def test_load_from_markdown_frontmatter(self, tmp_path):
         adir = tmp_path / "agents"
         adir.mkdir()

@@ -36,6 +36,7 @@ from typing import Any
 import httpx
 
 DEFAULT_PROMPT = "Reply with the single word: OK"
+_USE_COLOR = sys.stdout.isatty() and not os.environ.get("NO_COLOR")
 
 
 # ── Configuration ─────────────────────────────────────────────────────────
@@ -128,17 +129,18 @@ class ProxyChainHealth:
             meta: dict[str, Any] = {}
             try:
                 data = resp.json()
-                meta["service"] = data.get("service")
-                meta["version"] = data.get("version")
-                meta["router_status"] = data.get("status")
-                breakers = data.get("circuit_breakers") or {}
-                meta["circuit_breakers"] = breakers
-                meta["models"] = list((data.get("models") or {}).keys())
-                metrics = data.get("metrics") or {}
-                meta["p95_latency_ms"] = metrics.get("p95_latency_ms")
-                meta["requests_success"] = metrics.get("requests_success")
-                meta["requests_failed"] = metrics.get("requests_failed")
-            except ValueError, AttributeError:
+                if isinstance(data, dict):
+                    meta["service"] = data.get("service")
+                    meta["version"] = data.get("version")
+                    meta["router_status"] = data.get("status")
+                    breakers = data.get("circuit_breakers") or {}
+                    meta["circuit_breakers"] = breakers
+                    meta["models"] = list((data.get("models") or {}).keys())
+                    metrics = data.get("metrics") or {}
+                    meta["p95_latency_ms"] = metrics.get("p95_latency_ms")
+                    meta["requests_success"] = metrics.get("requests_success")
+                    meta["requests_failed"] = metrics.get("requests_failed")
+            except ValueError:
                 pass
             detail = _truncate(resp.text)
             return HopResult("routatic", ok, round(elapsed_ms, 2), resp.status_code, detail, meta)
@@ -153,7 +155,16 @@ class ProxyChainHealth:
             async with httpx.AsyncClient(timeout=self.cfg.timeout) as client:
                 resp = await client.get(url)
             elapsed_ms = (time.monotonic() - start) * 1000
-            ok = resp.status_code < 400 and "healthy" in resp.text
+            ok = resp.status_code < 400
+            if ok:
+                try:
+                    data = resp.json()
+                    status = data.get("status") if isinstance(data, dict) else None
+                    if isinstance(status, str):
+                        ok = status.lower() in ("ok", "healthy")
+                except ValueError:
+                    # Non-JSON body: fall back to the substring probe.
+                    ok = resp.text.strip().lower() in ("healthy", "ok")
             detail = _truncate(resp.text, 120)
             return HopResult("fcc", ok, round(elapsed_ms, 2), resp.status_code, detail)
         except httpx.HTTPError as exc:
@@ -253,7 +264,7 @@ class ProxyChainHealth:
                     model_count = len(data)
                 elif isinstance(data, dict) and isinstance(data.get("data"), list):
                     model_count = len(data["data"])
-            except ValueError, AttributeError:
+            except ValueError:
                 pass
             detail = f"models={model_count}" if model_count is not None else _truncate(resp.text, 120)
             meta = {"models_served": model_count} if model_count is not None else {}
@@ -286,7 +297,10 @@ def _print_header(cfg: HealthConfig) -> None:
 
 def _print_human(results: list[HopResult]) -> None:
     for result in results:
-        marker = "\033[0;32mPASS\033[0m" if result.ok else "\033[0;31mFAIL\033[0m"
+        if _USE_COLOR:
+            marker = "\033[0;32mPASS\033[0m" if result.ok else "\033[0;31mFAIL\033[0m"
+        else:
+            marker = "PASS" if result.ok else "FAIL"
         latency = f"{result.latency_ms}ms" if result.latency_ms is not None else "n/a"
         http = f"HTTP {result.http_code}" if result.http_code is not None else "HTTP ?"
         line = f"  {marker} {result.name} ({http}, {latency})"
@@ -319,9 +333,15 @@ def _report(results: list[HopResult], as_json: bool) -> int:
     print()
     print("============================================================")
     if failed:
-        print(f" RESULT: \033[0;31mDEGRADED\033[0m — {len(failed)} check(s) failed")
+        if _USE_COLOR:
+            print(f" RESULT: \033[0;31mDEGRADED\033[0m — {len(failed)} check(s) failed")
+        else:
+            print(f" RESULT: DEGRADED — {len(failed)} check(s) failed")
         return 1
-    print(" RESULT: \033[0;32mHEALTHY\033[0m — all checks passed")
+    if _USE_COLOR:
+        print(" RESULT: \033[0;32mHEALTHY\033[0m — all checks passed")
+    else:
+        print(" RESULT: HEALTHY — all checks passed")
     return 0
 
 

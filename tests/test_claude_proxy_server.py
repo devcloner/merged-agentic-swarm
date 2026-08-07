@@ -177,6 +177,19 @@ class TestClaudeProxyHandler:
         assert data["status"] == "active"
         assert "key_pools" in data
 
+    def test_status_endpoint_includes_per_key_metrics(self):
+        """#42: /status surfaces exhausted/cooldown/latency per provider."""
+        import urllib.request
+
+        resp = urllib.request.urlopen(f"{self.base_url}/status", timeout=5)
+        data = json.loads(resp.read().decode("utf-8"))
+        pools = data["key_pools"]
+        assert pools, "expected at least one provider pool"
+        for info in pools.values():
+            assert "exhausted_keys" in info
+            assert "next_cooldown_until" in info
+            assert "avg_latency_ms" in info
+
     def test_get_unknown_endpoint_returns_404(self):
         import urllib.request
         from urllib.error import HTTPError
@@ -184,6 +197,63 @@ class TestClaudeProxyHandler:
         with pytest.raises(HTTPError) as exc:
             urllib.request.urlopen(f"{self.base_url}/unknown", timeout=5)
         assert exc.value.code == 404
+
+    def test_post_oversized_json_body_rejected_413(self, monkeypatch):
+        """#35: a body over the JSON cap must be rejected before buffering."""
+        import urllib.request
+        from urllib.error import HTTPError
+
+        import merged_agentic_swarm.proxy.claude_proxy_server as proxy_mod
+
+        monkeypatch.setattr(proxy_mod, "MAX_JSON_BODY_BYTES", 1024)
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/chat/completions",
+            data=b"x" * 2048,
+            headers={"Content-Type": "application/json", "x-api-key": "freecc"},
+            method="POST",
+        )
+        with pytest.raises(HTTPError) as exc:
+            urllib.request.urlopen(req, timeout=5)
+        assert exc.value.code == 413
+
+    def test_post_json_body_within_limit_not_413(self, monkeypatch):
+        """#35: a body under the cap still reaches normal processing (400 here)."""
+        import urllib.request
+        from urllib.error import HTTPError
+
+        import merged_agentic_swarm.proxy.claude_proxy_server as proxy_mod
+
+        monkeypatch.setattr(proxy_mod, "MAX_JSON_BODY_BYTES", 1024)
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/chat/completions",
+            data=b"x" * 500,  # under the cap → JSON parse fails → 400, not 413
+            headers={"Content-Type": "application/json", "x-api-key": "freecc"},
+            method="POST",
+        )
+        with pytest.raises(HTTPError) as exc:
+            urllib.request.urlopen(req, timeout=5)
+        assert exc.value.code == 400
+
+    def test_post_oversized_audio_body_rejected_413(self, monkeypatch):
+        """#35: audio multipart bodies have their own (higher) cap."""
+        import urllib.request
+        from urllib.error import HTTPError
+
+        import merged_agentic_swarm.proxy.claude_proxy_server as proxy_mod
+
+        monkeypatch.setattr(proxy_mod, "MAX_AUDIO_BODY_BYTES", 1024)
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/audio/transcriptions",
+            data=b"x" * 2048,
+            headers={
+                "Content-Type": "multipart/form-data; boundary=abc",
+                "x-api-key": "freecc",
+            },
+            method="POST",
+        )
+        with pytest.raises(HTTPError) as exc:
+            urllib.request.urlopen(req, timeout=5)
+        assert exc.value.code == 413
 
     def test_post_chat_completions_with_invalid_json(self):
         import urllib.request

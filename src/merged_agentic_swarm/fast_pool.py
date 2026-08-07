@@ -69,34 +69,44 @@ _default_config = FastPoolConfig()
 
 
 class _DNSCache:
-    """Lightweight TTL-bounded DNS cache to avoid repeated gethostbyname calls."""
+    """Lightweight TTL-bounded DNS cache to avoid repeated gethostbyname calls.
+
+    All cache access is guarded by a ``threading.Lock`` so that a fresh entry
+    set by one thread is never dropped by a concurrent expired-entry delete
+    from another thread.
+    """
 
     def __init__(self, ttl: float = 300.0):
         self._ttl = ttl
         self._cache: dict[str, tuple[str, float]] = {}  # hostname -> (ip, expiry)
+        self._lock = threading.Lock()
 
     def get(self, hostname: str) -> str | None:
         if not self._ttl:
             return None
-        entry = self._cache.get(hostname)
-        if entry is None:
-            return None
-        ip, expiry = entry
-        if time.time() > expiry:
-            del self._cache[hostname]
-            return None
-        return ip
+        with self._lock:
+            entry = self._cache.get(hostname)
+            if entry is None:
+                return None
+            ip, expiry = entry
+            if time.time() > expiry:
+                del self._cache[hostname]
+                return None
+            return ip
 
     def set(self, hostname: str, ip: str) -> None:
         if self._ttl:
-            self._cache[hostname] = (ip, time.time() + self._ttl)
+            with self._lock:
+                self._cache[hostname] = (ip, time.time() + self._ttl)
 
     def delete(self, hostname: str) -> None:
         """Drop one entry (used to invalidate a stale cached IP)."""
-        self._cache.pop(hostname, None)
+        with self._lock:
+            self._cache.pop(hostname, None)
 
     def clear(self) -> None:
-        self._cache.clear()
+        with self._lock:
+            self._cache.clear()
 
 
 _dns_cache = _DNSCache(ttl=_default_config.dns_cache_ttl)
@@ -277,29 +287,19 @@ def dispatch(
     """
     client = get_client(config)
     cfg = config or _default_config
-    # For localhost targets, use a shorter connect timeout if the pool
-    # default is longer.
+    # Localhost targets get a shorter connect timeout; remote providers keep
+    # the configured default. Build a per-request timeout instead of mutating
+    # the shared thread-local client, so one dispatch never leaks its connect
+    # timeout into the next (issue #27).
     is_local = "localhost" in target_url or "127.0.0.1" in target_url
-    if is_local and client.timeout.connect > cfg.local_connect_timeout:
-        # Override per-request; the pool-wide default stays unchanged.
-        client.timeout = httpx.Timeout(
-            connect=cfg.local_connect_timeout,
-            read=timeout,
-            write=timeout,
-            pool=timeout,
-        )
-    else:
-        client.timeout = httpx.Timeout(
-            connect=client.timeout.connect,
-            read=timeout,
-            write=timeout,
-            pool=timeout,
-        )
+    connect = cfg.local_connect_timeout if is_local else cfg.connect_timeout
+    request_timeout = httpx.Timeout(connect=connect, read=timeout, write=timeout, pool=timeout)
 
     response = client.post(
         target_url,
         content=req_data,
         headers=headers,
+        timeout=request_timeout,
     )
     # Raise on 4xx/5xx so callers' ``httpx.HTTPStatusError`` handling
     # (fabric fallback cascade, circuit breaker) actually triggers instead
@@ -326,7 +326,8 @@ def prewarm_hosts(hosts: list[str], config: FastPoolConfig | None = None) -> dic
         try:
             client = get_client(config)
             # Send an HTTP HEAD to warm the connection without transferring a body.
-            resp = client.head(url, timeout=5.0)
+            timeout = (config or _default_config).connect_timeout
+            resp = client.head(url, timeout=timeout)
             resp.read()
             results[host] = True
             logger.debug(f"Pool warmed for {host} (HTTP {resp.status_code})")

@@ -19,6 +19,7 @@ from typing import Any
 
 from merged_agentic_swarm.models.agent_models import AgentSpec, AgentType, WorkerPoolConfig, WorkerPoolState, WorkerRole
 from merged_agentic_swarm.models.prd_models import SubTask, TaskStatus
+from merged_agentic_swarm.services.agent_factory_service import agents_registry_path
 from merged_agentic_swarm.services.agentic_worker_loop import default_agentic_worker_loop
 from merged_agentic_swarm.services.model_routing import resolve_litellm_model_for_role
 
@@ -41,9 +42,11 @@ class DurableAgentRouter:
     W_KEYWORD = 1.0  # per keyword hit in title+description
 
     def __init__(self, agents_jsonl: str | None = None, agents_dir: str | None = None):
-        self._repo_root = Path(__file__).resolve().parent.parent
-        self._agents_jsonl = agents_jsonl or str(self._repo_root / "docs/agentic/registry/agents.jsonl")
-        self._agents_dir = agents_dir or str(self._repo_root / ".claude/agents")
+        self._repo_root = Path(__file__).resolve().parents[3]
+        # Share the agents-registry resolver with DurableAgentFactory so a cold
+        # agent persisted to the user-config path is also routed (see #31).
+        self._agents_jsonl = agents_jsonl or agents_registry_path()
+        self._agents_dir = agents_dir or str(self._repo_root / ".claude" / "agents")
         self._agents: list[dict[str, Any]] = []
         self._category_index: dict[str, list[dict[str, Any]]] = defaultdict(list)
         self._loaded = False

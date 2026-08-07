@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import re
+import tempfile
 import threading
 import time
 from typing import Any
@@ -114,11 +115,20 @@ class ProgressLedgerService:
                 if default_task_master.current_analysis
                 else {},
             }
-            # Atomic write: temp file → rename to avoid corruption on concurrent writes
-            tmp = self.ledger_file + ".tmp"
-            with open(tmp, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2)
-            os.replace(tmp, self.ledger_file)
+            # Atomic write: unique temp file → rename to avoid corruption on
+            # concurrent saves (a fixed <file>.tmp would be clobbered mid-write).
+            dirname = os.path.dirname(self.ledger_file)
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=dirname,
+                prefix=".progress_ledger_",
+                suffix=".tmp",
+                delete=False,
+            ) as tf:
+                json.dump(data, tf, indent=2)
+                tmp_name = tf.name
+            os.replace(tmp_name, self.ledger_file)
         except Exception as e:
             logger.error(f"Failed saving progress ledger: {e}")
 

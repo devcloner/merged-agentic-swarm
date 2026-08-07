@@ -5,6 +5,8 @@ Routes requests across providers with priority fallbacks, format normalization, 
 
 import json
 import logging
+import os
+import tempfile
 import threading
 import time
 from pathlib import Path
@@ -27,6 +29,52 @@ CIRCUIT_BREAKER_COOLDOWN = 120.0
 PERMA_BAN_DURATION = 86400.0  # 24h — don't re-try auth-failed providers for a day
 _fabric_lock = threading.Lock()
 
+# Bans persist across restarts so a 401-perma-banned provider is not retried on
+# every fresh process (wasting a request before re-banning).
+_BANS_STATE_PATH = (
+    Path(__file__).resolve().parents[3] / "docs" / "agentic" / "registry" / "provider-bans.json"
+)
+
+
+def _persist_bans() -> None:
+    """Atomically write the perma-ban map to disk. Caller must hold _fabric_lock."""
+    try:
+        _BANS_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=str(_BANS_STATE_PATH.parent),
+            prefix=".provider_bans_",
+            suffix=".tmp",
+            delete=False,
+        ) as tf:
+            json.dump(_permanently_dead, tf, indent=2)
+            tmp_name = tf.name
+        os.replace(tmp_name, _BANS_STATE_PATH)
+    except Exception as exc:
+        logger.warning(f"Failed to persist provider bans: {exc}")
+
+
+def _load_bans() -> None:
+    """Load persisted perma-bans into _permanently_dead, dropping expired entries."""
+    with _fabric_lock:
+        try:
+            if not _BANS_STATE_PATH.exists():
+                return
+            with open(_BANS_STATE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            now = time.time()
+            for provider, expiry in data.items():
+                if isinstance(expiry, (int, float)) and expiry > now:
+                    _permanently_dead[provider] = expiry
+                else:
+                    logger.info(f"Dropped expired provider ban for {provider}")
+        except Exception as exc:
+            logger.warning(f"Failed to load provider bans: {exc}")
+
+
+_load_bans()
+
 
 def _record_failure(provider: str, http_code: int | None = None):
     """Record a provider failure — perma-ban on 401 auth errors, circuit-break on others."""
@@ -34,6 +82,7 @@ def _record_failure(provider: str, http_code: int | None = None):
         if http_code == 401:
             _permanently_dead[provider] = time.time() + PERMA_BAN_DURATION
             logger.warning(f"Provider {provider} permanently blacklisted (HTTP {http_code}).")
+            _persist_bans()
             return
         _circuit_breaker[provider] = _circuit_breaker.get(provider, 0) + 1
         if _circuit_breaker[provider] >= CIRCUIT_BREAKER_THRESHOLD:
@@ -649,9 +698,14 @@ def _load_fabric_routes_overlay() -> dict[str, list[dict[str, Any]]]:
         routes = data.get("routes") if isinstance(data, dict) else None
         if isinstance(routes, dict):
             _fabric_routes_overlay = {
-                alias: [dict(route) for route in routes_list]
+                alias: [
+                    dict(route)
+                    for route in routes_list
+                    if isinstance(route, dict)
+                    and all(isinstance(route.get(key), str) and route.get(key) for key in ("provider", "model", "url"))
+                ]
                 for alias, routes_list in routes.items()
-                if isinstance(alias, str) and isinstance(routes_list, list) and routes_list
+                if isinstance(alias, str) and isinstance(routes_list, list)
             }
         else:
             _fabric_routes_overlay = {}
@@ -880,7 +934,7 @@ class MultiProviderFabric:
             routes = list(MODEL_FABRIC_ROUTES.get(model_alias, MODEL_FABRIC_ROUTES["claude-3-7-sonnet"]))
         last_provider = _last_successful_provider.get(model_alias)
         if last_provider:
-            idx = next((i for i, r in enumerate(routes) if r["provider"] == last_provider), None)
+            idx = next((i for i, r in enumerate(routes) if r.get("provider") == last_provider), None)
             if idx is not None and idx > 0:
                 routes.insert(0, routes.pop(idx))
         return routes
@@ -923,9 +977,15 @@ class MultiProviderFabric:
 
         last_error = None
         for route in routes:
-            provider = route["provider"]
-            target_model = route["model"]
-            target_url = route["url"]
+            try:
+                provider = route["provider"]
+                target_model = route["model"]
+                target_url = route["url"]
+            except KeyError:
+                # A malformed overlay route must not fail the whole request —
+                # log and cascade to the next provider.
+                logger.warning("Skipping malformed fabric route: %s", route)
+                continue
 
             # Skip permanently-dead providers (401/403)
             if provider in _permanently_dead:

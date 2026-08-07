@@ -27,6 +27,7 @@ Usage::
 
 from __future__ import annotations
 
+import math
 import statistics
 import threading
 import time
@@ -42,7 +43,7 @@ def percentile(sorted_values: list[float], pct: float) -> float:
     """
     if not sorted_values:
         return 0.0
-    rank = int((pct / 100.0) * len(sorted_values))
+    rank = math.ceil((pct / 100.0) * len(sorted_values))
     rank = min(max(rank, 1), len(sorted_values))
     return sorted_values[rank - 1]
 
@@ -144,12 +145,16 @@ class LatencyTracker:
         self,
         slow_provider_threshold_ms: float = 2000.0,
         max_records: int = 10_000,
+        active_stale_seconds: float = 300.0,
     ) -> None:
         self.slow_provider_threshold_ms = slow_provider_threshold_ms
         """p95 total time (ms) at/above which a provider is flagged slow."""
 
         self.max_records = max_records
         """Maximum finished records retained; oldest are evicted when exceeded."""
+
+        self.active_stale_seconds = active_stale_seconds
+        """In-flight records older than this (seconds) are pruned as abandoned."""
 
         self._lock = threading.RLock()
         self._records: list[RequestTiming] = []
@@ -206,6 +211,37 @@ class LatencyTracker:
             self._records.clear()
             self._active.clear()
 
+    def prune_stale_active(self, now: float | None = None) -> int:
+        """Drop in-flight records abandoned before :meth:`finish`.
+
+        A caller that raises after :meth:`start_request` leaves the record in
+        ``_active`` forever, so ``in_flight_count`` drifts upward. Records older
+        than ``active_stale_seconds`` are finalized as failures and moved into
+        the retained history. Returns the number pruned.
+        """
+        if not self.active_stale_seconds:
+            return 0
+        with self._lock:
+            if not self._active:
+                return 0
+            now = now if now is not None else time.monotonic()
+            cutoff = now - self.active_stale_seconds
+            stale_ids = [rid for rid, t in self._active.items() if t.started_at < cutoff]
+            pruned = 0
+            for rid in stale_ids:
+                t = self._active.pop(rid, None)
+                if t is None:
+                    continue
+                t.ended_at = now
+                t.error = t.error or "pruned: abandoned before finish"
+                t.completed = False
+                self._records.append(t)
+                over = len(self._records) - self.max_records
+                if over > 0:
+                    del self._records[:over]
+                pruned += 1
+        return pruned
+
     @property
     def record_count(self) -> int:
         """Number of finished records currently retained."""
@@ -214,9 +250,12 @@ class LatencyTracker:
 
     @property
     def in_flight_count(self) -> int:
-        """Number of requests currently being tracked."""
+        """Number of requests currently being tracked (stale ones excluded)."""
         with self._lock:
-            return len(self._active)
+            if not self.active_stale_seconds or not self._active:
+                return len(self._active)
+            cutoff = time.monotonic() - self.active_stale_seconds
+            return sum(1 for t in self._active.values() if t.started_at >= cutoff)
 
     # ── Reporting ─────────────────────────────────────────────────────
 
@@ -232,6 +271,7 @@ class LatencyTracker:
             ``slow_providers`` (sorted slowest first).
         """
         with self._lock:
+            self.prune_stale_active()
             records = self._records
             if since_seconds is not None:
                 cutoff = time.monotonic() - since_seconds

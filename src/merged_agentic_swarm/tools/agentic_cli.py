@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import sys
+import time
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(message)s")
@@ -235,9 +236,12 @@ def cmd_config(args):
     summary = default_key_pool.get_summary()
     print(f"Key Pool ({len(summary)} providers):")
     for provider, info in summary.items():
+        cooldown = info.get("next_cooldown_until")
+        cooldown_str = time.strftime("%H:%M:%S", time.localtime(cooldown)) if cooldown else "-"
         print(
             f"  {provider}: {info.get('active_keys', '?')}/{info.get('total_keys', '?')} active, "
-            f"{info.get('total_requests', 0)} requests"
+            f"{info.get('exhausted_keys', 0)} exhausted, next cooldown {cooldown_str}, "
+            f"avg latency {info.get('avg_latency_ms', 0)}ms, {info.get('total_requests', 0)} requests"
         )
 
     from merged_agentic_swarm.providers.multi_provider_fabric import MODEL_FABRIC_ROUTES
@@ -267,8 +271,13 @@ def cmd_providers(args):
     if summary:
         for provider, info in summary.items():
             key_names = ", ".join(k.key_id for k in default_key_pool.keys_by_provider.get(provider, []))
+            cooldown = info.get("next_cooldown_until")
+            cooldown_str = time.strftime("%H:%M:%S", time.localtime(cooldown)) if cooldown else "-"
             print(
                 f"  {provider:18s} {info.get('active_keys', '?')!s:>3}/{info.get('total_keys', '?')!s:<3} active"
+                f"  {info.get('exhausted_keys', 0)!s:>3} exhausted"
+                f"  next-cooldown={cooldown_str}"
+                f"  avg={info.get('avg_latency_ms', 0)}ms"
                 f"  keys=[{key_names}]"
             )
     else:
