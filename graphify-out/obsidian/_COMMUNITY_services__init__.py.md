@@ -57,23 +57,20 @@ SORT file.name ASC
 
 ## Connections to other communities
 - 7 edges to [[_COMMUNITY_webapp.py]]
+- 6 edges to [[_COMMUNITY_WorkerRole]]
 - 6 edges to [[_COMMUNITY_report_service.py]]
 - 5 edges to [[_COMMUNITY__load_registry]]
-- 4 edges to [[_COMMUNITY_WorkerRole]]
 - 4 edges to [[_COMMUNITY_CloudCLIClient]]
-- 3 edges to [[_COMMUNITY_SubTask]]
-- 3 edges to [[_COMMUNITY_test_agentic_cli.py]]
+- 4 edges to [[_COMMUNITY_PRDAnalysisResult]]
 - 3 edges to [[_COMMUNITY_cmd_config]]
 - 3 edges to [[_COMMUNITY_MultiLayeredAgenticOrchestrator]]
-- 2 edges to [[_COMMUNITY_OpenCodeSwarmManager]]
 - 2 edges to [[_COMMUNITY_test_webapp.py]]
 - 2 edges to [[_COMMUNITY_handle_run]]
 - 2 edges to [[_COMMUNITY_TestCLIStringFunctions]]
-- 1 edge to [[_COMMUNITY_WorkerPoolConfig]]
 - 1 edge to [[_COMMUNITY_ChainRegistry]]
 - 1 edge to [[_COMMUNITY_DurableAgentFactory]]
 - 1 edge to [[_COMMUNITY_CodebaseMapService]]
-- 1 edge to [[_COMMUNITY_ProgressLogEntry]]
+- 1 edge to [[_COMMUNITY_OpenCodeSwarmManager]]
 - 1 edge to [[_COMMUNITY_ObstaclePlaybookEngine]]
 - 1 edge to [[_COMMUNITY_ProgressLedgerService]]
 - 1 edge to [[_COMMUNITY_TaskMasterService]]
@@ -82,9 +79,12 @@ SORT file.name ASC
 - 1 edge to [[_COMMUNITY_TestResolveLitellmModelForRole]]
 - 1 edge to [[_COMMUNITY_DurableAgentRouter]]
 - 1 edge to [[_COMMUNITY_test_swarm_profiles.py]]
+- 1 edge to [[_COMMUNITY__args]]
+- 1 edge to [[_COMMUNITY_test_agentic_cli.py]]
+- 1 edge to [[_COMMUNITY__main_with_args]]
 
 ## Top bridge nodes
-- [[services__init__.py]] - degree 32, connects to 16 communities
+- [[services__init__.py]] - degree 32, connects to 15 communities
 - [[agentic_cli.py]] - degree 21, connects to 5 communities
 - [[model_routing.py]] - degree 11, connects to 5 communities
 - [[resolve_model_alias_for_profile()]] - degree 11, connects to 3 communities

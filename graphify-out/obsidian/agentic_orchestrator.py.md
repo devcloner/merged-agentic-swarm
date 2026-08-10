@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/tools/agentic_orchestrator.py"
 type: "code"
-community: "WorkerRole"
+community: "PRDAnalysisResult"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerRole
+  - community/PRDAnalysisResult
 ---
 
 # agentic_orchestrator.py
@@ -34,4 +34,4 @@ tags:
 - [[verify_learning_loop.py]] - `imports_from` [EXTRACTED]
 - [[wave_gate_service.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerRole
+#graphify/code #graphify/EXTRACTED #community/PRDAnalysisResult

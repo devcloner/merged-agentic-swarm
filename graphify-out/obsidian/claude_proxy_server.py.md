@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/proxy/claude_proxy_server.py"
 type: "code"
-community: "claude_proxy_server.py"
+community: "multi_provider_fabric.py"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/claude_proxy_serverpy
+  - community/multi_provider_fabricpy
 ---
 
 # claude_proxy_server.py
@@ -28,4 +28,4 @@ tags:
 - [[test_claude_proxy_server.py]] - `imports_from` [EXTRACTED]
 - [[warm_all()]] - `imports` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/claude_proxy_serverpy
+#graphify/code #graphify/EXTRACTED #community/multi_provider_fabricpy

@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/__init__.py"
 type: "code"
-community: "SubTask"
+community: "PRDAnalysisResult"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SubTask
+  - community/PRDAnalysisResult
 ---
 
 # models/__init__.py
@@ -39,4 +39,4 @@ tags:
 - [[prd_models.py]] - `re_exports` [EXTRACTED]
 - [[wave_models.py]] - `re_exports` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SubTask
+#graphify/code #graphify/EXTRACTED #community/PRDAnalysisResult

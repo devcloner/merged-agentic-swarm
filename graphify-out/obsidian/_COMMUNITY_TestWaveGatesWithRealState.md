@@ -43,15 +43,16 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 12 edges to [[_COMMUNITY_SubTask]]
+- 6 edges to [[_COMMUNITY_PRDAnalysisResult]]
+- 6 edges to [[_COMMUNITY_SubTask]]
 - 2 edges to [[_COMMUNITY_CodebaseMapService]]
 - 2 edges to [[_COMMUNITY_TaskMasterService]]
 - 2 edges to [[_COMMUNITY_WaveGateController]]
 - 1 edge to [[_COMMUNITY_TestWaveGateController]]
 
 ## Top bridge nodes
-- [[TestWaveGatesWithRealState]] - degree 25, connects to 4 communities
+- [[TestWaveGatesWithRealState]] - degree 25, connects to 5 communities
 - [[dot-_controller()]] - degree 16, connects to 3 communities
+- [[dot-_with_epics()]] - degree 13, connects to 2 communities
+- [[dot-_with_wave3_epics()]] - degree 9, connects to 2 communities
 - [[test_wave_gate_service.py]] - degree 5, connects to 2 communities
-- [[dot-_with_epics()]] - degree 13, connects to 1 community
-- [[dot-_with_wave3_epics()]] - degree 9, connects to 1 community

@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_opencode_swarm_service.py"
 type: "rationale"
-community: "OpenCodeSwarmManager"
+community: "TestExecuteSubtaskDecisionLogic"
 location: "L119"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/OpenCodeSwarmManager
+  - community/TestExecuteSubtaskDecisionLogic
 ---
 
 # A worker subtask goes through the agentic tool loop and reports honestly. A…
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[dot-test_execute_subtask_with_worker_fabric()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/OpenCodeSwarmManager
+#graphify/rationale #graphify/EXTRACTED #community/TestExecuteSubtaskDecisionLogic

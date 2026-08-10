@@ -12,7 +12,7 @@ tags:
 # make_epic()
 
 ## Connections
-- [[Factory fixture that returns a function to create EpicTask instances.]] - `rationale_for` [EXTRACTED]
+- [[Factory fixture that returns a function to create SubTask instances.]] - `rationale_for` [EXTRACTED]
 - [[conftest.py]] - `contains` [EXTRACTED]
 - [[fixture]] - `references` [EXTRACTED]
 

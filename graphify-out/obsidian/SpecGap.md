@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/prd_models.py"
 type: "code"
-community: "SubTask"
+community: "PRDAnalysisResult"
 location: "L72"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SubTask
+  - community/PRDAnalysisResult
 ---
 
 # SpecGap
@@ -35,4 +35,4 @@ tags:
 - [[prd_models.py]] - `contains` [EXTRACTED]
 - [[task_master_service.py]] - `imports` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SubTask
+#graphify/code #graphify/EXTRACTED #community/PRDAnalysisResult

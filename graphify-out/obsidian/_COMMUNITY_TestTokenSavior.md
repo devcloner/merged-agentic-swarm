@@ -43,10 +43,10 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 1 edge to [[_COMMUNITY_WorkerRole]]
+- 1 edge to [[_COMMUNITY_knowledge_cache.py]]
 - 1 edge to [[_COMMUNITY_KnowledgeCache]]
 - 1 edge to [[_COMMUNITY_test_agentic_cli.py]]
-- 1 edge to [[_COMMUNITY_MultiLayeredAgenticOrchestrator]]
+- 1 edge to [[_COMMUNITY_SubTask]]
 
 ## Top bridge nodes
 - [[tools__init__.py]] - degree 7, connects to 4 communities

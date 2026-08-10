@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/services/opencode_swarm_service.py"
 type: "rationale"
-community: ".get_available_worker"
+community: "OpenCodeSwarmManager"
 location: "L350"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/get_available_worker
+  - community/OpenCodeSwarmManager
 ---
 
 # Gets an available worker matching the specified role using round-robin…
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[dot-get_available_worker()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/get_available_worker
+#graphify/rationale #graphify/EXTRACTED #community/OpenCodeSwarmManager

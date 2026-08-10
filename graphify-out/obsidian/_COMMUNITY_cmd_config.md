@@ -29,7 +29,7 @@ SORT file.name ASC
 
 ## Connections to other communities
 - 3 edges to [[_COMMUNITY_services__init__.py]]
-- 1 edge to [[_COMMUNITY_WorkerPoolConfig]]
+- 1 edge to [[_COMMUNITY_WorkerRole]]
 - 1 edge to [[_COMMUNITY_KeyPoolManager]]
 - 1 edge to [[_COMMUNITY_test_agentic_cli.py]]
 

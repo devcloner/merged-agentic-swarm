@@ -52,15 +52,16 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 20 edges to [[_COMMUNITY_SubTask]]
+- 15 edges to [[_COMMUNITY_PRDAnalysisResult]]
+- 5 edges to [[_COMMUNITY_SubTask]]
 - 2 edges to [[_COMMUNITY_TestWaveGatesWithRealState]]
 - 1 edge to [[_COMMUNITY_services__init__.py]]
 - 1 edge to [[_COMMUNITY_conftest.py]]
 - 1 edge to [[_COMMUNITY_TestWaveGateController]]
 
 ## Top bridge nodes
-- [[TaskMasterService]] - degree 38, connects to 5 communities
+- [[TaskMasterService]] - degree 38, connects to 6 communities
+- [[dot-optimize_and_parse_prd()]] - degree 8, connects to 2 communities
 - [[TestTaskMasterService]] - degree 21, connects to 1 community
-- [[dot-optimize_and_parse_prd()]] - degree 8, connects to 1 community
 - [[dot-update_task_status()]] - degree 4, connects to 1 community
 - [[dot-test_concurrent_saves_produce_complete_json()]] - degree 4, connects to 1 community

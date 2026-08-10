@@ -1,16 +1,15 @@
 ---
 type: community
 cohesion: 0.08
-members: 48
+members: 46
 ---
 
 # AgentSpec
 
 **Cohesion:** 0.08 - loosely connected
-**Members:** 48 nodes
+**Members:** 46 nodes
 
 ## Members
-- [[dot-_get_opencode_bin()]] - code - src/merged_agentic_swarm/services/worker_runtime_adapter.py
 - [[dot-_launch_via_fabric()]] - code - src/merged_agentic_swarm/services/worker_runtime_adapter.py
 - [[dot-_launch_via_native()]] - code - src/merged_agentic_swarm/services/worker_runtime_adapter.py
 - [[dot-_launch_via_opencode()]] - code - src/merged_agentic_swarm/services/worker_runtime_adapter.py
@@ -48,7 +47,6 @@ members: 48
 - [[Launch a task via the OpenCode CLI. Spawns `opencode serve --port N` as a…]] - rationale - src/merged_agentic_swarm/services/worker_runtime_adapter.py
 - [[Return (or create) the global WorkerRuntimeAdapter singleton.]] - rationale - src/merged_agentic_swarm/services/worker_runtime_adapter.py
 - [[Return True if this agent has a TTL and has exceeded it.]] - rationale - src/merged_agentic_swarm/models/agent_models.py
-- [[Return the resolved opencode binary, or None if unavailable.]] - rationale - src/merged_agentic_swarm/services/worker_runtime_adapter.py
 - [[Terminate all opencode worker processes.]] - rationale - src/merged_agentic_swarm/services/worker_runtime_adapter.py
 - [[TestAdapterConstruction]] - code - tests/test_worker_runtime_adapter.py
 - [[TestAgentSpec]] - code - tests/test_agent_models.py
@@ -67,18 +65,17 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 29 edges to [[_COMMUNITY_WorkerRole]]
-- 11 edges to [[_COMMUNITY_WorkerPoolConfig]]
+- 37 edges to [[_COMMUNITY_WorkerRole]]
 - 6 edges to [[_COMMUNITY_DurableAgentFactory]]
+- 4 edges to [[_COMMUNITY_OpenCodeSwarmManager]]
+- 3 edges to [[_COMMUNITY_WorkerPoolState]]
 - 3 edges to [[_COMMUNITY_DurableAgentRouter]]
 - 2 edges to [[_COMMUNITY_ChainRegistry]]
-- 2 edges to [[_COMMUNITY_dot-get_available_worker]]
-- 1 edge to [[_COMMUNITY_SubTask]]
+- 1 edge to [[_COMMUNITY_PRDAnalysisResult]]
 - 1 edge to [[_COMMUNITY_ConcurrencyRampController]]
-- 1 edge to [[_COMMUNITY_OpenCodeSwarmManager]]
 
 ## Top bridge nodes
-- [[AgentSpec]] - degree 46, connects to 9 communities
+- [[AgentSpec]] - degree 46, connects to 8 communities
 - [[TestAgentSpec]] - degree 13, connects to 2 communities
 - [[get_runtime_adapter()]] - degree 6, connects to 2 communities
 - [[WorkerRuntimeAdapter]] - degree 32, connects to 1 community

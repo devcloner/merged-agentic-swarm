@@ -37,15 +37,17 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 5 edges to [[_COMMUNITY_WorkerRole]]
-- 5 edges to [[_COMMUNITY_SubTask]]
-- 5 edges to [[_COMMUNITY_OpenCodeSwarmManager]]
-- 4 edges to [[_COMMUNITY_WorkerPoolConfig]]
+- 8 edges to [[_COMMUNITY_WorkerRole]]
+- 4 edges to [[_COMMUNITY_OpenCodeSwarmManager]]
+- 3 edges to [[_COMMUNITY_SubTask]]
 - 3 edges to [[_COMMUNITY_DurableAgentRouter]]
+- 2 edges to [[_COMMUNITY_PRDAnalysisResult]]
 - 1 edge to [[_COMMUNITY_AgentSpec]]
+- 1 edge to [[_COMMUNITY_WorkerPoolState]]
+- 1 edge to [[_COMMUNITY_TestExecuteSubtaskDecisionLogic]]
 - 1 edge to [[_COMMUNITY_TestTargetRepoRoot]]
 
 ## Top bridge nodes
-- [[ConcurrencyRampController]] - degree 18, connects to 7 communities
+- [[ConcurrencyRampController]] - degree 18, connects to 9 communities
 - [[TestConcurrencyRampController]] - degree 17, connects to 5 communities
 - [[dot-execute_subtask_batch_parallel()]] - degree 6, connects to 4 communities

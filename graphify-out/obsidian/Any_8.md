@@ -1,11 +1,11 @@
 ---
 source_file: ""
 type: "code"
-community: "KeyPoolManager"
+community: ".get_summary"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/KeyPoolManager
+  - community/get_summary
 ---
 
 # Any
@@ -14,4 +14,4 @@ tags:
 - [[dot-_get_summary_unlocked()]] - `references` [EXTRACTED]
 - [[dot-get_summary()]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/KeyPoolManager
+#graphify/code #graphify/EXTRACTED #community/get_summary

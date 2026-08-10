@@ -41,17 +41,17 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 15 edges to [[_COMMUNITY_KeyPoolManager]]
-- 6 edges to [[_COMMUNITY_FastFallbackRouter]]
-- 2 edges to [[_COMMUNITY_multi_provider_fabric.py]]
+- 13 edges to [[_COMMUNITY_KeyPoolManager]]
+- 5 edges to [[_COMMUNITY_multi_provider_fabric.py]]
+- 4 edges to [[_COMMUNITY_FastFallbackRouter]]
 - 2 edges to [[_COMMUNITY_webapp.py]]
+- 2 edges to [[_COMMUNITY_dot-load_keys]]
 - 1 edge to [[_COMMUNITY_FastFallbackConfig]]
 - 1 edge to [[_COMMUNITY_MultiProviderFabric]]
-- 1 edge to [[_COMMUNITY_claude_proxy_server.py]]
 
 ## Top bridge nodes
-- [[key_pool.py]] - degree 11, connects to 5 communities
+- [[APIKeyInfo]] - degree 21, connects to 5 communities
 - [[providers__init__.py]] - degree 8, connects to 4 communities
-- [[APIKeyInfo]] - degree 21, connects to 3 communities
+- [[key_pool.py]] - degree 11, connects to 3 communities
 - [[KeyStatus]] - degree 7, connects to 1 community
 - [[TestAPIKeyInfo]] - degree 7, connects to 1 community

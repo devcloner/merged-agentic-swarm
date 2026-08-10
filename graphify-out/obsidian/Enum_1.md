@@ -1,11 +1,11 @@
 ---
 source_file: ""
 type: "code"
-community: "SubTask"
+community: "PRDAnalysisResult"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SubTask
+  - community/PRDAnalysisResult
 ---
 
 # Enum
@@ -15,4 +15,4 @@ tags:
 - [[TaskStatus]] - `inherits` [EXTRACTED]
 - [[prd_models.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SubTask
+#graphify/code #graphify/EXTRACTED #community/PRDAnalysisResult

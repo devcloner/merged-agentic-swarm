@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agentic_orchestrator.py"
 type: "code"
-community: "MultiLayeredAgenticOrchestrator"
+community: "SubTask"
 location: "L402"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/MultiLayeredAgenticOrchestrator
+  - community/SubTask
 ---
 
 # TestPromoteColdPathAgentFileExists
@@ -20,4 +20,4 @@ tags:
 - [[TaskPriority]] - `uses` [INFERRED]
 - [[test_agentic_orchestrator.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/MultiLayeredAgenticOrchestrator
+#graphify/code #graphify/INFERRED #community/SubTask

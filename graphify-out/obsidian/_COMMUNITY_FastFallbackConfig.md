@@ -38,8 +38,9 @@ SORT file.name ASC
 
 ## Connections to other communities
 - 15 edges to [[_COMMUNITY__router_with_keys]]
-- 5 edges to [[_COMMUNITY_FastFallbackRouter]]
 - 4 edges to [[_COMMUNITY_MultiProviderFabric]]
+- 4 edges to [[_COMMUNITY_FastFallbackRouter]]
+- 1 edge to [[_COMMUNITY_multi_provider_fabric.py]]
 - 1 edge to [[_COMMUNITY_APIKeyInfo]]
 
 ## Top bridge nodes

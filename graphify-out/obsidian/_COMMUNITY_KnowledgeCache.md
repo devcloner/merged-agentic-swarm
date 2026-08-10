@@ -1,13 +1,13 @@
 ---
 type: community
-cohesion: 0.11
-members: 30
+cohesion: 0.12
+members: 28
 ---
 
 # KnowledgeCache
 
-**Cohesion:** 0.11 - loosely connected
-**Members:** 30 nodes
+**Cohesion:** 0.12 - loosely connected
+**Members:** 28 nodes
 
 ## Members
 - [[dot-__init__()_25]] - code - src/merged_agentic_swarm/tools/knowledge_cache.py
@@ -38,8 +38,6 @@ members: 30
 - [[Step 2 RECORD — Write to hot cache (knowledge_cache.json).]] - rationale - tests/test_learning_loop.py
 - [[TestKnowledgeCache]] - code - tests/test_knowledge_cache.py
 - [[TestRecordStep]] - code - tests/test_learning_loop.py
-- [[Tests for toolsknowledge_cache.py Coverage KnowledgeCache — load_cache,…]] - rationale - tests/test_knowledge_cache.py
-- [[test_knowledge_cache.py]] - code - tests/test_knowledge_cache.py
 
 ## Live Query (requires Dataview plugin)
 
@@ -49,17 +47,15 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 2 edges to [[_COMMUNITY_WorkerRole]]
+- 3 edges to [[_COMMUNITY_test_learning_loop.py]]
+- 3 edges to [[_COMMUNITY__read_jsonl]]
+- 2 edges to [[_COMMUNITY_knowledge_cache.py]]
 - 2 edges to [[_COMMUNITY__make_learning_entry]]
-- 2 edges to [[_COMMUNITY__read_jsonl]]
-- 2 edges to [[_COMMUNITY_test_learning_loop.py]]
 - 1 edge to [[_COMMUNITY_TestTokenSavior]]
 - 1 edge to [[_COMMUNITY_conftest.py]]
 - 1 edge to [[_COMMUNITY_TestCaptureStep]]
-- 1 edge to [[_COMMUNITY__evaluate_promotion_criteria]]
-- 1 edge to [[_COMMUNITY__simulate_reuse]]
 
 ## Top bridge nodes
-- [[KnowledgeCache]] - degree 34, connects to 9 communities
+- [[KnowledgeCache]] - degree 34, connects to 7 communities
+- [[TestKnowledgeCache]] - degree 15, connects to 1 community
 - [[TestRecordStep]] - degree 5, connects to 1 community
-- [[test_knowledge_cache.py]] - degree 3, connects to 1 community

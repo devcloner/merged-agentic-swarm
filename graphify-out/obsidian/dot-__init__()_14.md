@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/services/opencode_swarm_service.py"
 type: "code"
-community: "WorkerPoolConfig"
+community: "OpenCodeSwarmManager"
 location: "L319"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/OpenCodeSwarmManager
 ---
 
 # .__init__()
@@ -18,4 +18,4 @@ tags:
 - [[WorkerPoolConfig]] - `references` [EXTRACTED]
 - [[WorkerPoolState]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/code #graphify/EXTRACTED #community/OpenCodeSwarmManager

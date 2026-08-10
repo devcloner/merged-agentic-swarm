@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_opencode_swarm_service.py"
 type: "code"
-community: "OpenCodeSwarmManager"
+community: "TestExecuteSubtaskDecisionLogic"
 location: "L296"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/OpenCodeSwarmManager
+  - community/TestExecuteSubtaskDecisionLogic
 ---
 
 # _router()
@@ -26,4 +26,4 @@ tags:
 - [[DurableAgentRouter]] - `calls` [EXTRACTED]
 - [[test_opencode_swarm_service.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/OpenCodeSwarmManager
+#graphify/code #graphify/EXTRACTED #community/TestExecuteSubtaskDecisionLogic

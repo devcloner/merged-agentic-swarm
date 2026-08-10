@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/services/worker_runtime_adapter.py"
 type: "rationale"
-community: "AgentSpec"
+community: "WorkerRole"
 location: "L113"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/AgentSpec
+  - community/WorkerRole
 ---
 
 # Return the resolved opencode binary, or None if unavailable.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[dot-_get_opencode_bin()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/AgentSpec
+#graphify/rationale #graphify/EXTRACTED #community/WorkerRole

@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_opencode_swarm_service.py"
 type: "rationale"
-community: "OpenCodeSwarmManager"
+community: "WorkerRole"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/OpenCodeSwarmManager
+  - community/WorkerRole
 ---
 
 # Tests for services/opencode_swarm_service.py Coverage:…
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[test_opencode_swarm_service.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/OpenCodeSwarmManager
+#graphify/rationale #graphify/EXTRACTED #community/WorkerRole

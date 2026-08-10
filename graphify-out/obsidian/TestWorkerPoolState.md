@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agent_models.py"
 type: "code"
-community: "WorkerPoolConfig"
+community: "WorkerPoolState"
 location: "L172"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerPoolState
 ---
 
 # TestWorkerPoolState
@@ -26,4 +26,4 @@ tags:
 - [[WorkerRole]] - `uses` [INFERRED]
 - [[test_agent_models.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/code #graphify/EXTRACTED #community/WorkerPoolState

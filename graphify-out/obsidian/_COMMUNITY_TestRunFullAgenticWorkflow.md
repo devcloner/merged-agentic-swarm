@@ -39,10 +39,11 @@ SORT file.name ASC
 
 ## Connections to other communities
 - 4 edges to [[_COMMUNITY_SubTask]]
-- 4 edges to [[_COMMUNITY_MultiLayeredAgenticOrchestrator]]
+- 2 edges to [[_COMMUNITY_PRDAnalysisResult]]
+- 2 edges to [[_COMMUNITY_MultiLayeredAgenticOrchestrator]]
 - 1 edge to [[_COMMUNITY_AgenticWorkerLoop]]
 
 ## Top bridge nodes
-- [[TestRunFullAgenticWorkflow]] - degree 17, connects to 2 communities
-- [[dot-_stub_workflow()]] - degree 14, connects to 1 community
+- [[TestRunFullAgenticWorkflow]] - degree 17, connects to 3 communities
+- [[dot-_stub_workflow()]] - degree 14, connects to 2 communities
 - [[dot-test_workflow_batch_exception_remediated()]] - degree 3, connects to 1 community

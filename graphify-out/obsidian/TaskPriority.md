@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/prd_models.py"
 type: "code"
-community: "SubTask"
+community: "PRDAnalysisResult"
 location: "L21"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/SubTask
+  - community/PRDAnalysisResult
 ---
 
 # TaskPriority
@@ -38,4 +38,4 @@ tags:
 - [[str_1]] - `inherits` [EXTRACTED]
 - [[task_master_service.py]] - `imports` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/SubTask
+#graphify/code #graphify/INFERRED #community/PRDAnalysisResult

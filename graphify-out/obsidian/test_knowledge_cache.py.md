@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_knowledge_cache.py"
 type: "code"
-community: "KnowledgeCache"
+community: "knowledge_cache.py"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/KnowledgeCache
+  - community/knowledge_cachepy
 ---
 
 # test_knowledge_cache.py
@@ -16,4 +16,4 @@ tags:
 - [[Tests for toolsknowledge_cache.py Coverage KnowledgeCache — load_cache,…]] - `rationale_for` [EXTRACTED]
 - [[knowledge_cache.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/KnowledgeCache
+#graphify/code #graphify/EXTRACTED #community/knowledge_cachepy

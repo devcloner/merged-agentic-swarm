@@ -67,13 +67,13 @@ SORT file.name ASC
 
 ## Connections to other communities
 - 15 edges to [[_COMMUNITY_FastFallbackConfig]]
-- 9 edges to [[_COMMUNITY_FastFallbackRouter]]
+- 8 edges to [[_COMMUNITY_FastFallbackRouter]]
 - 7 edges to [[_COMMUNITY_MultiProviderFabric]]
-- 1 edge to [[_COMMUNITY_multi_provider_fabric.py]]
+- 2 edges to [[_COMMUNITY_multi_provider_fabric.py]]
 
 ## Top bridge nodes
 - [[_router_with_keys()]] - degree 20, connects to 3 communities
-- [[test_fast_fallback.py]] - degree 14, connects to 3 communities
 - [[TestDispatchBehavior]] - degree 10, connects to 3 communities
 - [[TestCircuitBreaker]] - degree 9, connects to 3 communities
 - [[dot-test_dispatch_fast_uses_default_router()]] - degree 9, connects to 3 communities
+- [[TestParallelProbe]] - degree 9, connects to 3 communities

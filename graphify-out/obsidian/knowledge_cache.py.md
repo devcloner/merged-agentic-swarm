@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/tools/knowledge_cache.py"
 type: "code"
-community: "WorkerRole"
+community: "knowledge_cache.py"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerRole
+  - community/knowledge_cachepy
 ---
 
 # knowledge_cache.py
@@ -21,4 +21,4 @@ tags:
 - [[tools__init__.py]] - `re_exports` [EXTRACTED]
 - [[verify_learning_loop.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerRole
+#graphify/code #graphify/EXTRACTED #community/knowledge_cachepy

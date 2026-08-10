@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/services/agent_factory_service.py"
 type: "code"
-community: "WorkerRole"
+community: "DurableAgentFactory"
 location: "L20"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerRole
+  - community/DurableAgentFactory
 ---
 
 # agents_registry_path()
@@ -18,4 +18,4 @@ tags:
 - [[agent_factory_service.py]] - `contains` [EXTRACTED]
 - [[opencode_swarm_service.py]] - `imports` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerRole
+#graphify/code #graphify/EXTRACTED #community/DurableAgentFactory

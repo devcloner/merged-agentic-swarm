@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agent_models.py"
 type: "code"
-community: "WorkerPoolConfig"
+community: "WorkerPoolState"
 location: "L196"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerPoolState
 ---
 
 # .test_get_pool_summary_returns_copy()
@@ -15,4 +15,4 @@ tags:
 - [[TestWorkerPoolState]] - `method` [EXTRACTED]
 - [[WorkerPoolState]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/code #graphify/EXTRACTED #community/WorkerPoolState

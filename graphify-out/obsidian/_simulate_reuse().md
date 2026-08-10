@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_learning_loop.py"
 type: "code"
-community: "_simulate_reuse"
+community: "_read_jsonl"
 location: "L337"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/_simulate_reuse
+  - community/_read_jsonl
 ---
 
 # _simulate_reuse()
@@ -18,4 +18,4 @@ tags:
 - [[Simulate routing a task to a promoted agent and getting a response.]] - `rationale_for` [EXTRACTED]
 - [[test_learning_loop.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/_simulate_reuse
+#graphify/code #graphify/EXTRACTED #community/_read_jsonl

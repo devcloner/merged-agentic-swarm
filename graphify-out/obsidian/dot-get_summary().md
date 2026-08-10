@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/providers/key_pool.py"
 type: "code"
-community: "KeyPoolManager"
+community: ".get_summary"
 location: "L262"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/KeyPoolManager
+  - community/get_summary
 ---
 
 # .get_summary()
@@ -16,4 +16,4 @@ tags:
 - [[Any_8]] - `references` [EXTRACTED]
 - [[KeyPoolManager]] - `method` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/KeyPoolManager
+#graphify/code #graphify/EXTRACTED #community/get_summary

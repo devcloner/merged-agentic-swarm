@@ -1,19 +1,18 @@
 ---
 type: community
-cohesion: 0.08
-members: 40
+cohesion: 0.09
+members: 38
 ---
 
 # DurableAgentRouter
 
-**Cohesion:** 0.08 - loosely connected
-**Members:** 40 nodes
+**Cohesion:** 0.09 - loosely connected
+**Members:** 38 nodes
 
 ## Members
 - [[31 a cold agent at the user-config path must be routed by a default…]] - rationale - tests/test_opencode_swarm_service.py
 - [[dot-__init__()_13]] - code - src/merged_agentic_swarm/services/opencode_swarm_service.py
 - [[dot-_extract_keywords()]] - code - src/merged_agentic_swarm/services/opencode_swarm_service.py
-- [[dot-_get_pool_id()]] - code - src/merged_agentic_swarm/services/opencode_swarm_service.py
 - [[dot-_parse_frontmatter()]] - code - src/merged_agentic_swarm/services/opencode_swarm_service.py
 - [[dot-_read_body()]] - code - src/merged_agentic_swarm/services/opencode_swarm_service.py
 - [[dot-_run_opencode_worker()]] - code - src/merged_agentic_swarm/services/opencode_swarm_service.py
@@ -43,7 +42,6 @@ members: 40
 - [[Lazy-initialised singleton for the durable agent router.]] - rationale - src/merged_agentic_swarm/services/opencode_swarm_service.py
 - [[Load all durable agents from agents.jsonl and .claudeagents.md. Returns the…]] - rationale - src/merged_agentic_swarm/services/opencode_swarm_service.py
 - [[Loads promoted durable agents from registry and disk, then matches incoming…]] - rationale - src/merged_agentic_swarm/services/opencode_swarm_service.py
-- [[Map a WorkerRole to a pool-health bucket key.]] - rationale - src/merged_agentic_swarm/services/opencode_swarm_service.py
 - [[Path_1]] - code
 - [[Read the body content after frontmatter.]] - rationale - src/merged_agentic_swarm/services/opencode_swarm_service.py
 - [[Return router statistics for reporting.]] - rationale - src/merged_agentic_swarm/services/opencode_swarm_service.py
@@ -59,19 +57,21 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 11 edges to [[_COMMUNITY_OpenCodeSwarmManager]]
-- 9 edges to [[_COMMUNITY_WorkerRole]]
-- 8 edges to [[_COMMUNITY_SubTask]]
+- 10 edges to [[_COMMUNITY_WorkerRole]]
+- 6 edges to [[_COMMUNITY_SubTask]]
+- 6 edges to [[_COMMUNITY_OpenCodeSwarmManager]]
+- 5 edges to [[_COMMUNITY_TestExecuteSubtaskDecisionLogic]]
 - 3 edges to [[_COMMUNITY_AgentSpec]]
-- 3 edges to [[_COMMUNITY_WorkerPoolConfig]]
 - 3 edges to [[_COMMUNITY_ConcurrencyRampController]]
+- 2 edges to [[_COMMUNITY_PRDAnalysisResult]]
 - 2 edges to [[_COMMUNITY_TestTargetRepoRoot]]
+- 1 edge to [[_COMMUNITY_WorkerPoolState]]
+- 1 edge to [[_COMMUNITY_DurableAgentFactory]]
 - 1 edge to [[_COMMUNITY_services__init__.py]]
-- 1 edge to [[_COMMUNITY_dot-get_available_worker]]
 
 ## Top bridge nodes
-- [[DurableAgentRouter]] - degree 30, connects to 7 communities
-- [[dot-execute_subtask_with_worker()]] - degree 12, connects to 6 communities
+- [[DurableAgentRouter]] - degree 30, connects to 9 communities
 - [[TestDurableAgentRouter]] - degree 19, connects to 5 communities
+- [[dot-execute_subtask_with_worker()]] - degree 12, connects to 5 communities
 - [[dot-_run_opencode_worker()]] - degree 7, connects to 3 communities
-- [[dot-_get_pool_id()]] - degree 4, connects to 2 communities
+- [[dot-test_find_matching_agent_by_category_and_keywords()]] - degree 3, connects to 2 communities

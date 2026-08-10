@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_opencode_swarm_service.py"
 type: "code"
-community: "OpenCodeSwarmManager"
+community: "TestExecuteSubtaskDecisionLogic"
 location: "L140"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/OpenCodeSwarmManager
+  - community/TestExecuteSubtaskDecisionLogic
 ---
 
 # .test_execute_subtask_batch_parallel()
@@ -16,4 +16,4 @@ tags:
 - [[live]] - `references` [EXTRACTED]
 - [[make_subtask()]] - `calls` [INFERRED]
 
-#graphify/code #graphify/EXTRACTED #community/OpenCodeSwarmManager
+#graphify/code #graphify/EXTRACTED #community/TestExecuteSubtaskDecisionLogic

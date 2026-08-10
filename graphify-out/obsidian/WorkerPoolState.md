@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/agent_models.py"
 type: "code"
-community: "WorkerPoolConfig"
+community: "WorkerPoolState"
 location: "L92"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerPoolState
 ---
 
 # WorkerPoolState
@@ -36,4 +36,4 @@ tags:
 - [[models__init__.py]] - `imports` [EXTRACTED]
 - [[opencode_swarm_service.py]] - `imports` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/code #graphify/EXTRACTED #community/WorkerPoolState

@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agent_models.py"
 type: "rationale"
-community: "WorkerPoolConfig"
+community: "WorkerRole"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerRole
 ---
 
 # Tests for models/agent_models.py Coverage: AgentSpec, WorkerPoolConfig,…
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[test_agent_models.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/rationale #graphify/EXTRACTED #community/WorkerRole

@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/tools/agentic_orchestrator.py"
 type: "rationale"
-community: "WorkerRole"
+community: "PRDAnalysisResult"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/WorkerRole
+  - community/PRDAnalysisResult
 ---
 
 # Agentic Multi-Layered Workflow Master Orchestrator Integrates Task Master AI,…
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[agentic_orchestrator.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/WorkerRole
+#graphify/rationale #graphify/EXTRACTED #community/PRDAnalysisResult

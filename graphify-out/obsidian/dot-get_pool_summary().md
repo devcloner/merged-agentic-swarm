@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/agent_models.py"
 type: "code"
-community: "WorkerPoolConfig"
+community: "WorkerPoolState"
 location: "L115"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerPoolState
 ---
 
 # .get_pool_summary()
@@ -15,4 +15,4 @@ tags:
 - [[Return a copy of the pool_health dict.]] - `rationale_for` [EXTRACTED]
 - [[WorkerPoolState]] - `method` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/code #graphify/EXTRACTED #community/WorkerPoolState

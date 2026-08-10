@@ -33,15 +33,14 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
+- 5 edges to [[_COMMUNITY_multi_provider_fabric.py]]
 - 4 edges to [[_COMMUNITY_MultiProviderFabric]]
-- 3 edges to [[_COMMUNITY_multi_provider_fabric.py]]
-- 2 edges to [[_COMMUNITY_FastFallbackRouter]]
 - 1 edge to [[_COMMUNITY_KeyPoolManager]]
 - 1 edge to [[_COMMUNITY_test_multi_provider_fabric.py]]
 
 ## Top bridge nodes
-- [[_record_failure()]] - degree 9, connects to 3 communities
 - [[TestCircuitBreaker_1]] - degree 9, connects to 3 communities
-- [[_record_success()]] - degree 5, connects to 3 communities
+- [[_record_failure()]] - degree 9, connects to 2 communities
+- [[_record_success()]] - degree 5, connects to 2 communities
 - [[_persist_bans()]] - degree 3, connects to 1 community
 - [[dot-test_perma_ban_expiry_clears()]] - degree 3, connects to 1 community

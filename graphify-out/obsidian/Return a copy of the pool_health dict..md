@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/agent_models.py"
 type: "rationale"
-community: "WorkerPoolConfig"
+community: "WorkerPoolState"
 location: "L116"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerPoolState
 ---
 
 # Return a copy of the pool_health dict.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[dot-get_pool_summary()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/rationale #graphify/EXTRACTED #community/WorkerPoolState

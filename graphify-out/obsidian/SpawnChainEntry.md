@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/agent_models.py"
 type: "code"
-community: "WorkerPoolConfig"
+community: "WorkerRole"
 location: "L76"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerRole
 ---
 
 # SpawnChainEntry
@@ -29,4 +29,4 @@ tags:
 - [[agent_models.py]] - `contains` [EXTRACTED]
 - [[models__init__.py]] - `imports` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/code #graphify/EXTRACTED #community/WorkerRole

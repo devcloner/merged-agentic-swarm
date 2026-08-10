@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agentic_cli.py"
 type: "code"
-community: "test_agentic_cli.py"
+community: "_args"
 location: "L46"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/test_agentic_clipy
+  - community/_args
 ---
 
 # _fake_saved()
@@ -17,4 +17,4 @@ tags:
 - [[_patch_auto_save()]] - `calls` [EXTRACTED]
 - [[test_agentic_cli.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/test_agentic_clipy
+#graphify/code #graphify/EXTRACTED #community/_args

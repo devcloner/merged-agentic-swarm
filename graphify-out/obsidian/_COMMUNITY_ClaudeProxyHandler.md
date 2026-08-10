@@ -34,11 +34,13 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 4 edges to [[_COMMUNITY_claude_proxy_server.py]]
+- 2 edges to [[_COMMUNITY_multi_provider_fabric.py]]
 - 2 edges to [[_COMMUNITY__forward_transcription]]
+- 1 edge to [[_COMMUNITY_test_claude_proxy_server.py]]
+- 1 edge to [[_COMMUNITY__parse_multipart]]
 
 ## Top bridge nodes
+- [[ClaudeProxyHandler]] - degree 11, connects to 2 communities
 - [[dot-_handle_audio_transcription()]] - degree 5, connects to 2 communities
-- [[ClaudeProxyHandler]] - degree 11, connects to 1 community
 - [[_proxy_dispatch()]] - degree 4, connects to 1 community
 - [[Any_10]] - degree 3, connects to 1 community

@@ -36,15 +36,16 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 5 edges to [[_COMMUNITY_claude_proxy_server.py]]
+- 3 edges to [[_COMMUNITY_multi_provider_fabric.py]]
+- 2 edges to [[_COMMUNITY_test_claude_proxy_server.py]]
 - 2 edges to [[_COMMUNITY_MultiLayeredAgenticOrchestrator]]
 - 2 edges to [[_COMMUNITY__forward_transcription]]
 - 2 edges to [[_COMMUNITY_TestClaudeProxyHandler]]
-- 1 edge to [[_COMMUNITY_multi_provider_fabric.py]]
-- 1 edge to [[_COMMUNITY_WorkerRole]]
+- 1 edge to [[_COMMUNITY_PRDAnalysisResult]]
+- 1 edge to [[_COMMUNITY__parse_multipart]]
 
 ## Top bridge nodes
-- [[ProxyServerDaemon]] - degree 17, connects to 5 communities
+- [[ProxyServerDaemon]] - degree 17, connects to 7 communities
 - [[ThreadedHTTPServer]] - degree 5, connects to 1 community
 - [[dot-setup_server()]] - degree 4, connects to 1 community
 - [[TestProxyServerDaemon]] - degree 4, connects to 1 community

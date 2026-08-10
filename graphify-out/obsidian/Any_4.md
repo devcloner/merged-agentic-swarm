@@ -1,11 +1,11 @@
 ---
 source_file: ""
 type: "code"
-community: "WorkerPoolConfig"
+community: "WorkerPoolState"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerPoolState
 ---
 
 # Any
@@ -15,4 +15,4 @@ tags:
 - [[dot-to_dict()_1]] - `references` [EXTRACTED]
 - [[dot-to_dict()_2]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/code #graphify/EXTRACTED #community/WorkerPoolState

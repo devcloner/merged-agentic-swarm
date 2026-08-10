@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_claude_proxy_server.py"
 type: "code"
-community: "claude_proxy_server.py"
+community: "_parse_multipart"
 location: "L46"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/claude_proxy_serverpy
+  - community/_parse_multipart
 ---
 
 # TestParseMultipart
@@ -19,4 +19,4 @@ tags:
 - [[ProxyServerDaemon]] - `uses` [INFERRED]
 - [[test_claude_proxy_server.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/claude_proxy_serverpy
+#graphify/code #graphify/EXTRACTED #community/_parse_multipart

@@ -41,16 +41,15 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 8 edges to [[_COMMUNITY_WorkerRole]]
+- 11 edges to [[_COMMUNITY_WorkerRole]]
 - 5 edges to [[_COMMUNITY_DurableAgentFactory]]
-- 3 edges to [[_COMMUNITY_WorkerPoolConfig]]
 - 2 edges to [[_COMMUNITY_AgentSpec]]
 - 1 edge to [[_COMMUNITY_services__init__.py]]
 - 1 edge to [[_COMMUNITY_conftest.py]]
 
 ## Top bridge nodes
-- [[ChainRegistry]] - degree 22, connects to 6 communities
+- [[ChainRegistry]] - degree 22, connects to 5 communities
 - [[TestChainRegistry]] - degree 13, connects to 3 communities
-- [[dot-register_spawn()]] - degree 6, connects to 3 communities
+- [[dot-register_spawn()]] - degree 6, connects to 2 communities
 - [[test_agent_factory_service.py]] - degree 5, connects to 2 communities
-- [[dot-load_registry()]] - degree 4, connects to 2 communities
+- [[dot-load_registry()]] - degree 4, connects to 1 community

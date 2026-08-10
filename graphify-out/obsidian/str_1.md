@@ -1,11 +1,11 @@
 ---
 source_file: ""
 type: "code"
-community: "SubTask"
+community: "PRDAnalysisResult"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SubTask
+  - community/PRDAnalysisResult
 ---
 
 # str
@@ -14,4 +14,4 @@ tags:
 - [[TaskPriority]] - `inherits` [EXTRACTED]
 - [[TaskStatus]] - `inherits` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SubTask
+#graphify/code #graphify/EXTRACTED #community/PRDAnalysisResult

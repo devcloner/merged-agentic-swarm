@@ -44,14 +44,15 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 8 edges to [[_COMMUNITY_SubTask]]
+- 5 edges to [[_COMMUNITY_SubTask]]
+- 3 edges to [[_COMMUNITY_PRDAnalysisResult]]
 - 2 edges to [[_COMMUNITY_WaveGateController]]
 - 1 edge to [[_COMMUNITY_CodebaseMapService]]
 - 1 edge to [[_COMMUNITY_TaskMasterService]]
 - 1 edge to [[_COMMUNITY_TestWaveGatesWithRealState]]
 
 ## Top bridge nodes
-- [[TestWaveGateController]] - degree 24, connects to 5 communities
+- [[TestWaveGateController]] - degree 24, connects to 6 communities
 - [[dot-test_check_ownership_map_absent_passes()]] - degree 3, connects to 1 community
 - [[dot-test_check_ownership_pool_missing_hard_fails()]] - degree 3, connects to 1 community
 - [[dot-test_check_ownership_valid()]] - degree 3, connects to 1 community

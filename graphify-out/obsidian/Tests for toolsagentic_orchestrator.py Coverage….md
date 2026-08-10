@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agentic_orchestrator.py"
 type: "rationale"
-community: "MultiLayeredAgenticOrchestrator"
+community: "SubTask"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/MultiLayeredAgenticOrchestrator
+  - community/SubTask
 ---
 
 # Tests for tools/agentic_orchestrator.py Coverage:…
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[test_agentic_orchestrator.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/MultiLayeredAgenticOrchestrator
+#graphify/rationale #graphify/EXTRACTED #community/SubTask

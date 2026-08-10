@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_opencode_swarm_service.py"
 type: "code"
-community: "OpenCodeSwarmManager"
+community: "WorkerRole"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/OpenCodeSwarmManager
+  - community/WorkerRole
 ---
 
 # test_opencode_swarm_service.py
@@ -24,4 +24,4 @@ tags:
 - [[prd_models.py]] - `imports_from` [EXTRACTED]
 - [[services__init__.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/OpenCodeSwarmManager
+#graphify/code #graphify/EXTRACTED #community/WorkerRole

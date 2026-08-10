@@ -24,7 +24,8 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 4 edges to [[_COMMUNITY_SubTask]]
+- 2 edges to [[_COMMUNITY_SubTask]]
+- 2 edges to [[_COMMUNITY_PRDAnalysisResult]]
 
 ## Top bridge nodes
 - [[dot-to_dict()_8]] - degree 3, connects to 1 community

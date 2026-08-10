@@ -32,13 +32,14 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 5 edges to [[_COMMUNITY_ProgressLogEntry]]
+- 4 edges to [[_COMMUNITY_ProgressLogEntry]]
 - 4 edges to [[_COMMUNITY_ProgressLedgerService]]
 - 1 edge to [[_COMMUNITY_services__init__.py]]
+- 1 edge to [[_COMMUNITY_PRDAnalysisResult]]
 - 1 edge to [[_COMMUNITY_dot-handle_task_failure]]
 
 ## Top bridge nodes
-- [[ObstaclePlaybookEngine]] - degree 11, connects to 4 communities
+- [[ObstaclePlaybookEngine]] - degree 11, connects to 5 communities
 - [[TestObstaclePlaybookEngine]] - degree 11, connects to 1 community
 - [[test_progress_ledger_service.py]] - degree 3, connects to 1 community
 - [[dot-__init__()_15]] - degree 2, connects to 1 community

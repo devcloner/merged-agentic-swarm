@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_opencode_swarm_service.py"
 type: "code"
-community: "OpenCodeSwarmManager"
+community: "TestExecuteSubtaskDecisionLogic"
 location: "L452"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/OpenCodeSwarmManager
+  - community/TestExecuteSubtaskDecisionLogic
 ---
 
 # ._manager()
@@ -24,4 +24,4 @@ tags:
 - [[OpenCodeSwarmManager]] - `calls` [EXTRACTED]
 - [[TestExecuteSubtaskDecisionLogic]] - `method` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/OpenCodeSwarmManager
+#graphify/code #graphify/EXTRACTED #community/TestExecuteSubtaskDecisionLogic

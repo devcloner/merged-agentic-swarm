@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agentic_cli.py"
 type: "rationale"
-community: "test_agentic_cli.py"
+community: "_args"
 location: "L184"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/test_agentic_clipy
+  - community/_args
 ---
 
 # `run --profile review` resolves the profile's waves as the ramp and the tier-…
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[dot-test_run_profile_resolves_and_passes_ramp_and_model()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/test_agentic_clipy
+#graphify/rationale #graphify/EXTRACTED #community/_args

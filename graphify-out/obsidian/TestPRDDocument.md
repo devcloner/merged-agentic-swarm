@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_prd_models.py"
 type: "code"
-community: "SubTask"
+community: "PRDAnalysisResult"
 location: "L131"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/SubTask
+  - community/PRDAnalysisResult
 ---
 
 # TestPRDDocument
@@ -23,4 +23,4 @@ tags:
 - [[TaskStatus]] - `uses` [INFERRED]
 - [[test_prd_models.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/SubTask
+#graphify/code #graphify/INFERRED #community/PRDAnalysisResult

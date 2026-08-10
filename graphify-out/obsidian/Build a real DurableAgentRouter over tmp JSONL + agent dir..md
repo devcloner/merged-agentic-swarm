@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_opencode_swarm_service.py"
 type: "rationale"
-community: "OpenCodeSwarmManager"
+community: "TestExecuteSubtaskDecisionLogic"
 location: "L297"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/OpenCodeSwarmManager
+  - community/TestExecuteSubtaskDecisionLogic
 ---
 
 # Build a real DurableAgentRouter over tmp JSONL + agent dir.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[_router()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/OpenCodeSwarmManager
+#graphify/rationale #graphify/EXTRACTED #community/TestExecuteSubtaskDecisionLogic

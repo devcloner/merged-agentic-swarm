@@ -26,11 +26,11 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 3 edges to [[_COMMUNITY_OpenCodeSwarmManager]]
-- 2 edges to [[_COMMUNITY_SubTask]]
+- 3 edges to [[_COMMUNITY_WorkerRole]]
 - 2 edges to [[_COMMUNITY_DurableAgentRouter]]
-- 1 edge to [[_COMMUNITY_WorkerRole]]
-- 1 edge to [[_COMMUNITY_WorkerPoolConfig]]
+- 2 edges to [[_COMMUNITY_OpenCodeSwarmManager]]
+- 1 edge to [[_COMMUNITY_PRDAnalysisResult]]
+- 1 edge to [[_COMMUNITY_SubTask]]
 - 1 edge to [[_COMMUNITY_ConcurrencyRampController]]
 
 ## Top bridge nodes

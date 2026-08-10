@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agentic_orchestrator.py"
 type: "code"
-community: "MultiLayeredAgenticOrchestrator"
+community: "SubTask"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/MultiLayeredAgenticOrchestrator
+  - community/SubTask
 ---
 
 # test_agentic_orchestrator.py
@@ -27,4 +27,4 @@ tags:
 - [[agentic_orchestrator.py]] - `imports_from` [EXTRACTED]
 - [[tools__init__.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/MultiLayeredAgenticOrchestrator
+#graphify/code #graphify/EXTRACTED #community/SubTask

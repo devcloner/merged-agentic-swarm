@@ -1,13 +1,13 @@
 ---
 type: community
 cohesion: 0.08
-members: 38
+members: 39
 ---
 
 # DurableAgentFactory
 
 **Cohesion:** 0.08 - loosely connected
-**Members:** 38 nodes
+**Members:** 39 nodes
 
 ## Members
 - [[17 COLD_DURABLE spawns must be written to the durable agents.jsonl registry.]] - rationale - tests/test_agent_factory_service.py
@@ -44,9 +44,10 @@ members: 38
 - [[Load durable agents from the cold-path agents.jsonl registry. Called once at…]] - rationale - src/merged_agentic_swarm/services/agent_factory_service.py
 - [[Read agents.jsonl and write spec files for every entry. Returns the count of…]] - rationale - src/merged_agentic_swarm/services/agent_factory_service.py
 - [[Remove and return count of expired HOT micro-specialists (FIX-09).]] - rationale - src/merged_agentic_swarm/services/agent_factory_service.py
-- [[Resolve the durable cold-path agents registry (agents.jsonl). Prefers an…_1]] - rationale - src/merged_agentic_swarm/services/agent_factory_service.py
+- [[Resolve the durable cold-path agents registry (agents.jsonl). Prefers an…]] - rationale - src/merged_agentic_swarm/services/agent_factory_service.py
 - [[TestDurableAgentFactory]] - code - tests/test_agent_factory_service.py
 - [[Write an agent spec .md file from a JSONL entry. Returns the file path, or None…]] - rationale - src/merged_agentic_swarm/services/agent_factory_service.py
+- [[agents_registry_path()]] - code - src/merged_agentic_swarm/services/agent_factory_service.py
 - [[sync_agent_specs should handle missing agents.jsonl gracefully.]] - rationale - tests/test_agent_factory_service.py
 
 ## Live Query (requires Dataview plugin)
@@ -57,16 +58,16 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 8 edges to [[_COMMUNITY_WorkerRole]]
+- 10 edges to [[_COMMUNITY_WorkerRole]]
 - 6 edges to [[_COMMUNITY_AgentSpec]]
 - 5 edges to [[_COMMUNITY_ChainRegistry]]
-- 1 edge to [[_COMMUNITY_WorkerPoolConfig]]
 - 1 edge to [[_COMMUNITY_services__init__.py]]
+- 1 edge to [[_COMMUNITY_DurableAgentRouter]]
 - 1 edge to [[_COMMUNITY_conftest.py]]
 
 ## Top bridge nodes
-- [[DurableAgentFactory]] - degree 31, connects to 6 communities
+- [[DurableAgentFactory]] - degree 31, connects to 5 communities
 - [[TestDurableAgentFactory]] - degree 20, connects to 3 communities
 - [[dot-spawn_from_learning()]] - degree 7, connects to 3 communities
 - [[dot-_load_cold_agents_from_registry()]] - degree 6, connects to 2 communities
-- [[dot-_agents_registry_path()]] - degree 6, connects to 1 community
+- [[agents_registry_path()]] - degree 5, connects to 2 communities

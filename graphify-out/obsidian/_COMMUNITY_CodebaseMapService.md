@@ -59,7 +59,7 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 6 edges to [[_COMMUNITY_SubTask]]
+- 6 edges to [[_COMMUNITY_PRDAnalysisResult]]
 - 2 edges to [[_COMMUNITY_TestWaveGatesWithRealState]]
 - 1 edge to [[_COMMUNITY_services__init__.py]]
 - 1 edge to [[_COMMUNITY_conftest.py]]

@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/services/worker_runtime_adapter.py"
 type: "code"
-community: "AgentSpec"
+community: "WorkerRole"
 location: "L112"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/AgentSpec
+  - community/WorkerRole
 ---
 
 # ._get_opencode_bin()
@@ -17,4 +17,4 @@ tags:
 - [[WorkerRuntimeAdapter]] - `method` [EXTRACTED]
 - [[_resolve_opencode_bin()]] - `calls` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/AgentSpec
+#graphify/code #graphify/EXTRACTED #community/WorkerRole

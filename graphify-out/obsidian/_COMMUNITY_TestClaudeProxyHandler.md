@@ -53,8 +53,9 @@ SORT file.name ASC
 
 ## Connections to other communities
 - 2 edges to [[_COMMUNITY_ProxyServerDaemon]]
-- 2 edges to [[_COMMUNITY_claude_proxy_server.py]]
-- 2 edges to [[_COMMUNITY__forward_transcription]]
+- 2 edges to [[_COMMUNITY__parse_multipart]]
+- 1 edge to [[_COMMUNITY_test_claude_proxy_server.py]]
+- 1 edge to [[_COMMUNITY__forward_transcription]]
 
 ## Top bridge nodes
-- [[TestClaudeProxyHandler]] - degree 24, connects to 3 communities
+- [[TestClaudeProxyHandler]] - degree 24, connects to 4 communities

@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agentic_cli.py"
 type: "code"
-community: "test_agentic_cli.py"
+community: "_args"
 location: "L216"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/test_agentic_clipy
+  - community/_args
 ---
 
 # .test_run_profile_through_main()
@@ -18,4 +18,4 @@ tags:
 - [[_write()]] - `calls` [EXTRACTED]
 - [[argparse wires `run --profile patch` into cmd_run with profile resolved.]] - `rationale_for` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/test_agentic_clipy
+#graphify/code #graphify/EXTRACTED #community/_args

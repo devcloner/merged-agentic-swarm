@@ -44,11 +44,11 @@ SORT file.name ASC
 ## Connections to other communities
 - 9 edges to [[_COMMUNITY_TestDispatchRequest]]
 - 7 edges to [[_COMMUNITY__router_with_keys]]
-- 4 edges to [[_COMMUNITY_FastFallbackRouter]]
 - 4 edges to [[_COMMUNITY_FastFallbackConfig]]
 - 4 edges to [[_COMMUNITY__record_failure]]
+- 3 edges to [[_COMMUNITY_multi_provider_fabric.py]]
+- 3 edges to [[_COMMUNITY_FastFallbackRouter]]
 - 3 edges to [[_COMMUNITY_test_multi_provider_fabric.py]]
-- 2 edges to [[_COMMUNITY_multi_provider_fabric.py]]
 - 2 edges to [[_COMMUNITY_TestFormatConversion]]
 - 1 edge to [[_COMMUNITY_APIKeyInfo]]
 - 1 edge to [[_COMMUNITY_conftest.py]]

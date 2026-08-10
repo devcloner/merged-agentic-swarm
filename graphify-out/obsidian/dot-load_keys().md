@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/providers/key_pool.py"
 type: "code"
-community: "KeyPoolManager"
+community: ".load_keys"
 location: "L165"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/KeyPoolManager
+  - community/load_keys
 ---
 
 # .load_keys()
@@ -18,4 +18,4 @@ tags:
 - [[KeyPoolManager]] - `method` [EXTRACTED]
 - [[Loads API keys from env file, environment variables, and local key files.]] - `rationale_for` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/KeyPoolManager
+#graphify/code #graphify/EXTRACTED #community/load_keys

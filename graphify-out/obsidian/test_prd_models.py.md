@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_prd_models.py"
 type: "code"
-community: "SubTask"
+community: "PRDAnalysisResult"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SubTask
+  - community/PRDAnalysisResult
 ---
 
 # test_prd_models.py
@@ -22,4 +22,4 @@ tags:
 - [[Tests for modelsprd_models.py Coverage TaskStatus, TaskPriority, SubTask,…]] - `rationale_for` [EXTRACTED]
 - [[prd_models.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SubTask
+#graphify/code #graphify/EXTRACTED #community/PRDAnalysisResult

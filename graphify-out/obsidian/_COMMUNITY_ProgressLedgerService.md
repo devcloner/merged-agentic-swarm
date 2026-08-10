@@ -39,15 +39,16 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 6 edges to [[_COMMUNITY_ProgressLogEntry]]
+- 5 edges to [[_COMMUNITY_ProgressLogEntry]]
 - 4 edges to [[_COMMUNITY_ObstaclePlaybookEngine]]
 - 4 edges to [[_COMMUNITY_dot-handle_task_failure]]
 - 4 edges to [[_COMMUNITY_test_report_service.py]]
 - 1 edge to [[_COMMUNITY_services__init__.py]]
+- 1 edge to [[_COMMUNITY_PRDAnalysisResult]]
 - 1 edge to [[_COMMUNITY_conftest.py]]
 
 ## Top bridge nodes
-- [[ProgressLedgerService]] - degree 31, connects to 6 communities
+- [[ProgressLedgerService]] - degree 31, connects to 7 communities
 - [[TestProgressLedgerService]] - degree 13, connects to 1 community
 - [[TestLogProgressModelArg]] - degree 5, connects to 1 community
 - [[dot-load_ledger()]] - degree 4, connects to 1 community

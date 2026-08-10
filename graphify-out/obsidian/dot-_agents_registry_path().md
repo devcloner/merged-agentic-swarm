@@ -16,7 +16,7 @@ tags:
 - [[dot-_persist_cold_agent()]] - `calls` [EXTRACTED]
 - [[dot-sync_agent_specs()]] - `calls` [EXTRACTED]
 - [[DurableAgentFactory]] - `method` [EXTRACTED]
-- [[Resolve the durable cold-path agents registry (agents.jsonl). Prefers an…_1]] - `rationale_for` [EXTRACTED]
+- [[Resolve the durable cold-path agents registry (agents.jsonl). Prefers an…]] - `rationale_for` [EXTRACTED]
 - [[agents_registry_path()]] - `calls` [EXTRACTED]
 
 #graphify/code #graphify/EXTRACTED #community/DurableAgentFactory

@@ -1,13 +1,13 @@
 ---
 type: community
-cohesion: 0.16
-members: 27
+cohesion: 0.18
+members: 23
 ---
 
 # ProgressLogEntry
 
-**Cohesion:** 0.16 - loosely connected
-**Members:** 27 nodes
+**Cohesion:** 0.18 - loosely connected
+**Members:** 23 nodes
 
 ## Members
 - [[dot-test_default_creation()_4]] - code - tests/test_ledger_models.py
@@ -24,8 +24,6 @@ members: 27
 - [[dot-to_dict()_6]] - code - src/merged_agentic_swarm/models/ledger_models.py
 - [[Any_5]] - code
 - [[ObstaclePlaybookEntry]] - code - src/merged_agentic_swarm/models/ledger_models.py
-- [[Progress Ledger, Success Markers, and Obstacle Playbooks Models]] - rationale - src/merged_agentic_swarm/models/ledger_models.py
-- [[Progress Ledger, Success Markers, and Self-Healing Obstacle Playbook Engine…]] - rationale - src/merged_agentic_swarm/services/progress_ledger_service.py
 - [[ProgressLogEntry]] - code - src/merged_agentic_swarm/models/ledger_models.py
 - [[SuccessMarker]] - code - src/merged_agentic_swarm/models/ledger_models.py
 - [[TaskMasterStateSnapshot]] - code - src/merged_agentic_swarm/models/ledger_models.py
@@ -34,8 +32,6 @@ members: 27
 - [[TestSuccessMarker]] - code - tests/test_ledger_models.py
 - [[TestTaskMasterStateSnapshot]] - code - tests/test_ledger_models.py
 - [[Tests for modelsledger_models.py Coverage SuccessMarker,…]] - rationale - tests/test_ledger_models.py
-- [[ledger_models.py]] - code - src/merged_agentic_swarm/models/ledger_models.py
-- [[progress_ledger_service.py]] - code - src/merged_agentic_swarm/services/progress_ledger_service.py
 - [[test_ledger_models.py]] - code - tests/test_ledger_models.py
 
 ## Live Query (requires Dataview plugin)
@@ -46,16 +42,14 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 6 edges to [[_COMMUNITY_SubTask]]
-- 6 edges to [[_COMMUNITY_ProgressLedgerService]]
-- 5 edges to [[_COMMUNITY_ObstaclePlaybookEngine]]
+- 12 edges to [[_COMMUNITY_PRDAnalysisResult]]
+- 5 edges to [[_COMMUNITY_ProgressLedgerService]]
+- 4 edges to [[_COMMUNITY_ObstaclePlaybookEngine]]
 - 2 edges to [[_COMMUNITY_dot-handle_task_failure]]
-- 1 edge to [[_COMMUNITY_services__init__.py]]
-- 1 edge to [[_COMMUNITY_WorkerRole]]
 
 ## Top bridge nodes
-- [[progress_ledger_service.py]] - degree 10, connects to 5 communities
 - [[ProgressLogEntry]] - degree 14, connects to 4 communities
 - [[SuccessMarker]] - degree 14, connects to 4 communities
 - [[ObstaclePlaybookEntry]] - degree 13, connects to 3 communities
 - [[TaskMasterStateSnapshot]] - degree 9, connects to 1 community
+- [[test_ledger_models.py]] - degree 6, connects to 1 community

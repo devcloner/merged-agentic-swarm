@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/prd_models.py"
 type: "code"
-community: "SubTask"
+community: "PRDAnalysisResult"
 location: "L86"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/SubTask
+  - community/PRDAnalysisResult
 ---
 
 # PRDDocument
@@ -24,4 +24,4 @@ tags:
 - [[models__init__.py]] - `imports` [EXTRACTED]
 - [[prd_models.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/SubTask
+#graphify/code #graphify/INFERRED #community/PRDAnalysisResult

@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/agent_models.py"
 type: "code"
-community: "WorkerPoolConfig"
+community: "WorkerPoolState"
 location: "L51"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerPoolState
 ---
 
 # .to_dict()
@@ -15,4 +15,4 @@ tags:
 - [[AgentSpec]] - `method` [EXTRACTED]
 - [[Any_4]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/code #graphify/EXTRACTED #community/WorkerPoolState

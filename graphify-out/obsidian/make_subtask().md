@@ -1,12 +1,12 @@
 ---
 source_file: "tests/conftest.py"
 type: "code"
-community: "OpenCodeSwarmManager"
+community: "TestExecuteSubtaskDecisionLogic"
 location: "L166"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/OpenCodeSwarmManager
+  - community/TestExecuteSubtaskDecisionLogic
 ---
 
 # make_subtask()
@@ -30,4 +30,4 @@ tags:
 - [[conftest.py]] - `contains` [EXTRACTED]
 - [[fixture]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/OpenCodeSwarmManager
+#graphify/code #graphify/INFERRED #community/TestExecuteSubtaskDecisionLogic

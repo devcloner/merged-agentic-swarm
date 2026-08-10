@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agent_models.py"
 type: "code"
-community: "WorkerPoolConfig"
+community: "WorkerRole"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerRole
 ---
 
 # test_agent_models.py
@@ -21,4 +21,4 @@ tags:
 - [[Tests for modelsagent_models.py Coverage AgentSpec, WorkerPoolConfig,…]] - `rationale_for` [EXTRACTED]
 - [[agent_models.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/code #graphify/EXTRACTED #community/WorkerRole

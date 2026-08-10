@@ -12,7 +12,7 @@ members: 31
 ## Members
 - [[Create a minimal env.txt with one key for testing.]] - rationale - tests/conftest.py
 - [[Create a minimal ownership-map.json and return its path.]] - rationale - tests/conftest.py
-- [[Factory fixture that returns a function to create EpicTask instances.]] - rationale - tests/conftest.py
+- [[Factory fixture that returns a function to create SubTask instances.]] - rationale - tests/conftest.py
 - [[Provide a temporary directory that is cleaned up after the test.]] - rationale - tests/conftest.py
 - [[Return a ChainRegistry that writes to a temp file.]] - rationale - tests/conftest.py
 - [[Return a CodebaseMapService pointed at an isolated repo root.]] - rationale - tests/conftest.py
@@ -50,12 +50,13 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 3 edges to [[_COMMUNITY_OpenCodeSwarmManager]]
+- 3 edges to [[_COMMUNITY_TestExecuteSubtaskDecisionLogic]]
 - 1 edge to [[_COMMUNITY_KeyPoolManager]]
 - 1 edge to [[_COMMUNITY_MultiProviderFabric]]
 - 1 edge to [[_COMMUNITY_ChainRegistry]]
 - 1 edge to [[_COMMUNITY_DurableAgentFactory]]
 - 1 edge to [[_COMMUNITY_CodebaseMapService]]
+- 1 edge to [[_COMMUNITY_OpenCodeSwarmManager]]
 - 1 edge to [[_COMMUNITY_ProgressLedgerService]]
 - 1 edge to [[_COMMUNITY_TaskMasterService]]
 - 1 edge to [[_COMMUNITY_WaveGateController]]

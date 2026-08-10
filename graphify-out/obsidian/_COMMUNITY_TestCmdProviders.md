@@ -25,7 +25,8 @@ SORT file.name ASC
 
 ## Connections to other communities
 - 2 edges to [[_COMMUNITY_KeyPoolManager]]
-- 2 edges to [[_COMMUNITY_test_agentic_cli.py]]
+- 1 edge to [[_COMMUNITY_test_agentic_cli.py]]
+- 1 edge to [[_COMMUNITY__main_with_args]]
 
 ## Top bridge nodes
 - [[TestCmdProviders]] - degree 6, connects to 2 communities

@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_opencode_swarm_service.py"
 type: "code"
-community: "OpenCodeSwarmManager"
+community: "TestExecuteSubtaskDecisionLogic"
 location: "L481"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/OpenCodeSwarmManager
+  - community/TestExecuteSubtaskDecisionLogic
 ---
 
 # .test_no_worker_returns_error()
@@ -17,4 +17,4 @@ tags:
 - [[_router()]] - `calls` [EXTRACTED]
 - [[make_subtask()]] - `calls` [INFERRED]
 
-#graphify/code #graphify/EXTRACTED #community/OpenCodeSwarmManager
+#graphify/code #graphify/EXTRACTED #community/TestExecuteSubtaskDecisionLogic

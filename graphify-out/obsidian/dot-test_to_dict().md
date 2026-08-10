@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agent_models.py"
 type: "code"
-community: "WorkerPoolConfig"
+community: "WorkerRole"
 location: "L158"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerRole
 ---
 
 # .test_to_dict()
@@ -15,4 +15,4 @@ tags:
 - [[SpawnChainEntry]] - `calls` [EXTRACTED]
 - [[TestSpawnChainEntry]] - `method` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/code #graphify/EXTRACTED #community/WorkerRole

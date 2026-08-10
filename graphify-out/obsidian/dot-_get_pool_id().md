@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/services/opencode_swarm_service.py"
 type: "code"
-community: "DurableAgentRouter"
+community: "OpenCodeSwarmManager"
 location: "L372"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/DurableAgentRouter
+  - community/OpenCodeSwarmManager
 ---
 
 # ._get_pool_id()
@@ -17,4 +17,4 @@ tags:
 - [[OpenCodeSwarmManager]] - `method` [EXTRACTED]
 - [[WorkerRole]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/DurableAgentRouter
+#graphify/code #graphify/EXTRACTED #community/OpenCodeSwarmManager

@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_claude_proxy_server.py"
 type: "code"
-community: "claude_proxy_server.py"
+community: "test_claude_proxy_server.py"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/claude_proxy_serverpy
+  - community/test_claude_proxy_serverpy
 ---
 
 # test_claude_proxy_server.py
@@ -22,4 +22,4 @@ tags:
 - [[claude_proxy_server.py]] - `imports_from` [EXTRACTED]
 - [[proxy__init__.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/claude_proxy_serverpy
+#graphify/code #graphify/EXTRACTED #community/test_claude_proxy_serverpy

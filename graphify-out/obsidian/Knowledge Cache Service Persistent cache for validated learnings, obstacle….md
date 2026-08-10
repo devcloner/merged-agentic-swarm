@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/tools/knowledge_cache.py"
 type: "rationale"
-community: "WorkerRole"
+community: "knowledge_cache.py"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/WorkerRole
+  - community/knowledge_cachepy
 ---
 
 # Knowledge Cache Service Persistent cache for validated learnings, obstacle…
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[knowledge_cache.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/WorkerRole
+#graphify/rationale #graphify/EXTRACTED #community/knowledge_cachepy

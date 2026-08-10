@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agentic_orchestrator.py"
 type: "code"
-community: "MultiLayeredAgenticOrchestrator"
+community: "SubTask"
 location: "L355"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/MultiLayeredAgenticOrchestrator
+  - community/SubTask
 ---
 
 # .test_secondary_text_from_response_dict()
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[TestApplyWorkerOutputsPaths]] - `method` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/MultiLayeredAgenticOrchestrator
+#graphify/code #graphify/EXTRACTED #community/SubTask

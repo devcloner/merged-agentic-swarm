@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/__init__.py"
 type: "rationale"
-community: "SubTask"
+community: "PRDAnalysisResult"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/SubTask
+  - community/PRDAnalysisResult
 ---
 
 # Models Package Initialization
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[models__init__.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/SubTask
+#graphify/rationale #graphify/EXTRACTED #community/PRDAnalysisResult

@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/services/task_master_service.py"
 type: "rationale"
-community: "SubTask"
+community: "PRDAnalysisResult"
 location: "L47"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/SubTask
+  - community/PRDAnalysisResult
 ---
 
 # Loads persistent Task Master state from JSON file if present.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[dot-load_state()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/SubTask
+#graphify/rationale #graphify/EXTRACTED #community/PRDAnalysisResult

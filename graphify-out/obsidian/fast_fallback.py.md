@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/fast_fallback.py"
 type: "code"
-community: "FastFallbackRouter"
+community: "multi_provider_fabric.py"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/FastFallbackRouter
+  - community/multi_provider_fabricpy
 ---
 
 # fast_fallback.py
@@ -29,4 +29,4 @@ tags:
 - [[multi_provider_fabric.py]] - `imports_from` [EXTRACTED]
 - [[test_fast_fallback.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/FastFallbackRouter
+#graphify/code #graphify/EXTRACTED #community/multi_provider_fabricpy

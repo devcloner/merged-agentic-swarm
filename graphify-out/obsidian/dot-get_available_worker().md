@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/services/opencode_swarm_service.py"
 type: "code"
-community: ".get_available_worker"
+community: "OpenCodeSwarmManager"
 location: "L349"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/get_available_worker
+  - community/OpenCodeSwarmManager
 ---
 
 # .get_available_worker()
@@ -19,4 +19,4 @@ tags:
 - [[OpenCodeSwarmManager]] - `method` [EXTRACTED]
 - [[WorkerRole]] - `references` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/get_available_worker
+#graphify/code #graphify/EXTRACTED #community/OpenCodeSwarmManager

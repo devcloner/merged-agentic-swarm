@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/proxy/claude_proxy_server.py"
 type: "code"
-community: "claude_proxy_server.py"
+community: "_parse_multipart"
 location: "L76"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/claude_proxy_serverpy
+  - community/_parse_multipart
 ---
 
 # _parse_multipart()
@@ -20,4 +20,4 @@ tags:
 - [[Return (file_bytes, file_name, model_name) from a multipart body.]] - `rationale_for` [EXTRACTED]
 - [[claude_proxy_server.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/claude_proxy_serverpy
+#graphify/code #graphify/EXTRACTED #community/_parse_multipart

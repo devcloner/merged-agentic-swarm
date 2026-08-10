@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/services/progress_ledger_service.py"
 type: "rationale"
-community: "ProgressLogEntry"
+community: "PRDAnalysisResult"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/ProgressLogEntry
+  - community/PRDAnalysisResult
 ---
 
 # Progress Ledger, Success Markers, and Self-Healing Obstacle Playbook Engine…
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[progress_ledger_service.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/ProgressLogEntry
+#graphify/rationale #graphify/EXTRACTED #community/PRDAnalysisResult

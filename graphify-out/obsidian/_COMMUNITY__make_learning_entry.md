@@ -40,16 +40,14 @@ SORT file.name ASC
 ```
 
 ## Connections to other communities
-- 9 edges to [[_COMMUNITY_test_learning_loop.py]]
-- 9 edges to [[_COMMUNITY__read_jsonl]]
-- 7 edges to [[_COMMUNITY__evaluate_promotion_criteria]]
-- 4 edges to [[_COMMUNITY__simulate_reuse]]
+- 16 edges to [[_COMMUNITY_test_learning_loop.py]]
+- 13 edges to [[_COMMUNITY__read_jsonl]]
 - 2 edges to [[_COMMUNITY_KnowledgeCache]]
 - 2 edges to [[_COMMUNITY_TestCaptureStep]]
 
 ## Top bridge nodes
-- [[_make_learning_entry()]] - degree 22, connects to 5 communities
-- [[_promote_learning()]] - degree 21, connects to 4 communities
+- [[_make_learning_entry()]] - degree 22, connects to 3 communities
+- [[_promote_learning()]] - degree 21, connects to 2 communities
 - [[TestPromoteStep]] - degree 9, connects to 2 communities
 - [[TestDedup]] - degree 6, connects to 2 communities
 - [[dot-test_fresh_load_finds_promoted_agent()]] - degree 4, connects to 2 communities

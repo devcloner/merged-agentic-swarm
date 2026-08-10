@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_agentic_cli.py"
 type: "code"
-community: "test_agentic_cli.py"
+community: "_main_with_args"
 location: "L58"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/test_agentic_clipy
+  - community/_main_with_args
 ---
 
 # _main_with_args()
@@ -26,4 +26,4 @@ tags:
 - [[main()_6]] - `calls` [EXTRACTED]
 - [[test_agentic_cli.py]] - `contains` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/test_agentic_clipy
+#graphify/code #graphify/EXTRACTED #community/_main_with_args

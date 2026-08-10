@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/agent_models.py"
 type: "code"
-community: "WorkerPoolConfig"
+community: "WorkerRole"
 location: "L59"
 tags:
   - graphify/code
   - graphify/INFERRED
-  - community/WorkerPoolConfig
+  - community/WorkerRole
 ---
 
 # WorkerPoolConfig
@@ -37,4 +37,4 @@ tags:
 - [[models__init__.py]] - `imports` [EXTRACTED]
 - [[opencode_swarm_service.py]] - `imports` [EXTRACTED]
 
-#graphify/code #graphify/INFERRED #community/WorkerPoolConfig
+#graphify/code #graphify/INFERRED #community/WorkerRole

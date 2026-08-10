@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_knowledge_cache.py"
 type: "rationale"
-community: "KnowledgeCache"
+community: "knowledge_cache.py"
 location: "L1"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/KnowledgeCache
+  - community/knowledge_cachepy
 ---
 
 # Tests for tools/knowledge_cache.py Coverage: KnowledgeCache — load_cache,…
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[test_knowledge_cache.py]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/KnowledgeCache
+#graphify/rationale #graphify/EXTRACTED #community/knowledge_cachepy

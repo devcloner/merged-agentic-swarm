@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/services/progress_ledger_service.py"
 type: "code"
-community: "ProgressLogEntry"
+community: "PRDAnalysisResult"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/ProgressLogEntry
+  - community/PRDAnalysisResult
 ---
 
 # progress_ledger_service.py
@@ -23,4 +23,4 @@ tags:
 - [[services__init__.py]] - `re_exports` [EXTRACTED]
 - [[task_master_service.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/ProgressLogEntry
+#graphify/code #graphify/EXTRACTED #community/PRDAnalysisResult

@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/prd_models.py"
 type: "code"
-community: "SubTask"
+community: "PRDAnalysisResult"
 location: "L1"
 tags:
   - graphify/code
   - graphify/EXTRACTED
-  - community/SubTask
+  - community/PRDAnalysisResult
 ---
 
 # prd_models.py
@@ -33,4 +33,4 @@ tags:
 - [[test_wave_gate_service.py]] - `imports_from` [EXTRACTED]
 - [[wave_gate_service.py]] - `imports_from` [EXTRACTED]
 
-#graphify/code #graphify/EXTRACTED #community/SubTask
+#graphify/code #graphify/EXTRACTED #community/PRDAnalysisResult

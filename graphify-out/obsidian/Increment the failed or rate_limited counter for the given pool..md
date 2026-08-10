@@ -1,12 +1,12 @@
 ---
 source_file: "src/merged_agentic_swarm/models/agent_models.py"
 type: "rationale"
-community: "WorkerPoolConfig"
+community: "WorkerPoolState"
 location: "L107"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/WorkerPoolConfig
+  - community/WorkerPoolState
 ---
 
 # Increment the failed or rate_limited counter for the given pool.
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[dot-record_pool_failure()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/WorkerPoolConfig
+#graphify/rationale #graphify/EXTRACTED #community/WorkerPoolState

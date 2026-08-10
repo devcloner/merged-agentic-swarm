@@ -1,12 +1,12 @@
 ---
 source_file: "tests/test_learning_loop.py"
 type: "rationale"
-community: "_evaluate_promotion_criteria"
+community: "test_learning_loop.py"
 location: "L95"
 tags:
   - graphify/rationale
   - graphify/EXTRACTED
-  - community/_evaluate_promotion_criteria
+  - community/test_learning_looppy
 ---
 
 # Evaluate whether a learning entry meets cold-path promotion criteria. Returns…
@@ -14,4 +14,4 @@ tags:
 ## Connections
 - [[_evaluate_promotion_criteria()]] - `rationale_for` [EXTRACTED]
 
-#graphify/rationale #graphify/EXTRACTED #community/_evaluate_promotion_criteria
+#graphify/rationale #graphify/EXTRACTED #community/test_learning_looppy

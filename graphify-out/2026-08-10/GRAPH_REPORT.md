@@ -1,27 +1,28 @@
 # Graph Report - merged-agentic-swarm  (2026-08-10)
 
 ## Corpus Check
-- cluster-only mode — file stats not available
+- 205 files · ~196,844 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2619 nodes · 4769 edges · 195 communities (142 shown, 53 thin omitted)
+- 2810 nodes · 4927 edges · 222 communities (157 shown, 65 thin omitted)
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 622 edges (avg confidence: 0.58)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `180ae966`
+- Built from commit: `2394907f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - TaskSpineStore
 - test_agentic_cli.py
-- fast_pool.py
+- multi_provider_fabric.py
 - LatencyTracker
 - CloudCLIClient
 - webapp.py
 - _router_with_keys
-- models/__init__.py
+- WaveGateController
 - AgentSpec
 - WorkerRole
 - CodebaseMapService
@@ -56,32 +57,32 @@
 - run_smoke_workflow.sh
 - test_health_check.py
 - ChainRegistry
-- test_learning_loop.py
+- _evaluate_promotion_criteria
 - _make_learning_entry
 - TestDispatchRequest
-- TestExecuteSubtaskDecisionLogic
+- What You Must Do When Invoked
 - PassthroughStreamingProxy
 - ProgressLedgerService
 - TestRunFullAgenticWorkflow
 - test_multi_provider_fabric.py
 - FastFallbackConfig
-- test_agentic_worker_loop.py
+- AgenticWorkerLoop
 - generate_progress_report.sh
 - verify_component.sh
-- WorkerPoolState
+- WorkerPoolConfig
 - ConcurrencyRampController
 - _read_jsonl
 - test_report_service.py
 - graphify-out/graph.json
 - Task Spine CLI
 - ClaudeProxyHandler
-- multi_provider_fabric.py
+- What You Must Do When Invoked
 - TestFormatConversion
 - task_spine_cli.py
 - _record_failure
-- _parse_multipart
+- claude_proxy_server.py
 - ProxyServerDaemon
-- _command_safety_error
+- What You Must Do When Invoked
 - CircuitBreaker
 - .run_all
 - APIKeyInfo
@@ -89,8 +90,8 @@
 - ObstaclePlaybookEngine
 - DurableAgentRouter
 - Real task-master CLI
-- AgenticWorkerLoop
-- ._run_tool
+- _DNSCache
+- _FakeClient
 - TestRun
 - test_webapp.py
 - StreamingProxyConfig
@@ -103,7 +104,7 @@
 - Incremental Update Flow
 - dynamic_learning_loop
 - project
-- knowledge_cache.py
+- test_learning_loop.py
 - start_task_spine.sh
 - _load_registry
 - cmd_config
@@ -115,11 +116,11 @@
 - run_learning_loop_test.sh
 - start_proxy.sh
 - verify_task_spine.sh
-- .load_keys
-- agentic_worker_loop.py
+- graphify reference: extra exports and benchmark
+- graphify reference: extra exports and benchmark
 - .handle_task_failure
 - test_check_streaming_fcc_happy_path
-- TestKeyPoolReload
+- graphify reference: extra exports and benchmark
 - query, path, and explain reference
 - knowledge.jsonl
 - CI Script
@@ -147,7 +148,7 @@
 - stop_agentic_services.sh
 - Any
 - TestCmdProviders
-- test_claude_proxy_server.py
+- graphify reference: query, path, explain
 - _Stream
 - TestRunPlan
 - graphify extract
@@ -170,7 +171,7 @@
 - setup-and-run.sh Script
 - ci.sh
 - setup-and-run.sh
-- .get_summary
+- graphify reference: query, path, explain
 - detect
 - transcribe video and audio reference
 - graphify benchmark
@@ -208,6 +209,33 @@
 - Team Onboarding Guide
 - merged-agentic-swarm
 - Setup and Run Script
+- graphify reference: query, path, explain
+- _simulate_reuse
+- TestLitellmPresenceInRoutes
+- TestMalformedOverlayRoutes
+- graphify reference: add a URL and watch a folder
+- graphify reference: commit hook and native CLAUDE.md integration
+- graphify reference: incremental update and cluster-only
+- graphify reference: add a URL and watch a folder
+- graphify reference: commit hook and native CLAUDE.md integration
+- graphify reference: incremental update and cluster-only
+- graphify reference: add a URL and watch a folder
+- graphify reference: commit hook and native CLAUDE.md integration
+- graphify reference: incremental update and cluster-only
+- .get_available_worker
+- graphify reference: GitHub clone and cross-repo merge
+- graphify reference: transcribe video and audio
+- graphify reference: GitHub clone and cross-repo merge
+- graphify reference: transcribe video and audio
+- graphify.js
+- graphify reference: GitHub clone and cross-repo merge
+- graphify reference: transcribe video and audio
+- rules/graphify.md
+- workflows/graphify.md
+- .copilot/skills/graphify/references/extraction-spec.md
+- GEMINI.md
+- .gemini/skills/graphify/references/extraction-spec.md
+- .opencode/skills/graphify/references/extraction-spec.md
 
 ## God Nodes (most connected - your core abstractions)
 1. `KeyPoolManager` - 61 edges
@@ -285,7 +313,7 @@
 - **Task Management Flow** — docs_agentic_registry_state_path_notes_task_master_service, docs_agentic_registry_state_path_notes_model_fabric, docs_agentic_registry_state_path_notes_python_proxy [EXTRACTED 1.00]
 - **Graph Query Flow** — _agents_skills_graphify_references_query_traversal, _agents_skills_graphify_references_query_queryexpansion, _agents_skills_graphify_references_query_saveresult [EXTRACTED 1.00]
 
-## Communities (195 total, 53 thin omitted)
+## Communities (222 total, 65 thin omitted)
 
 ### Community 0 - "TaskSpineStore"
 Cohesion: 0.06
@@ -295,9 +323,9 @@ Nodes (23): _LockedScope, main(), _make_parser(), Any, ArgumentParser, Manages t
 Cohesion: 0.07
 Nodes (21): _args(), _fake_saved(), _ledger_json(), _ledger_log(), _main_with_args(), _patch_auto_save(), Tests for tools/agentic_cli.py Coverage: cmd_config, basic CLI parsing, cmd_run…, `run --profile review` resolves the profile's waves as the ramp and the tier-… (+13 more)
 
-### Community 2 - "fast_pool.py"
-Cohesion: 0.06
-Nodes (41): Client, HTTPTransport, Limits, NetworkStream, _build_transport(), _CachedDNSBackend, close_thread_client(), _create_client() (+33 more)
+### Community 2 - "multi_provider_fabric.py"
+Cohesion: 0.10
+Nodes (29): Client, HTTPTransport, Limits, _build_transport(), close_thread_client(), _create_client(), dispatch(), FastPoolConfig (+21 more)
 
 ### Community 3 - "LatencyTracker"
 Cohesion: 0.05
@@ -315,33 +343,33 @@ Nodes (47): HTMLResponse, JSONResponse, create_app(), _fabric_chains(), _fabric_
 Cohesion: 0.09
 Nodes (28): _anthropic_response(), _mock_response(), patch, Tests for merged_agentic_swarm/fast_fallback.py Coverage: parallel probe first-…, Both wave probes fire concurrently; the first 2xx is returned., A failing primary overlaps the fallback's latency instead of serializing it., A losing in-flight probe (2xx after another probe won) must not corrupt state., With probe_stagger_ms, the primary's head-start lets it win even if slower. (+20 more)
 
-### Community 7 - "models/__init__.py"
-Cohesion: 0.08
-Nodes (23): int, Models Package Initialization, Progress Ledger, Success Markers, and Obstacle Playbooks Models, Any, Enum, str, Wave Gates Data Models, WaveExecutionState (+15 more)
+### Community 7 - "WaveGateController"
+Cohesion: 0.09
+Nodes (21): int, Any, Enum, str, Wave Gates Data Models, WaveExecutionState, WaveGateCriteria, WavePhase (+13 more)
 
 ### Community 8 - "AgentSpec"
 Cohesion: 0.08
-Nodes (19): AgentSpec, Return True if this agent has a TTL and has exceeded it., get_runtime_adapter(), Any, Unified adapter that launches workers in the selected execution mode. Modes:…, Launch a single worker with a task and return a result dict. Result keys:…, Launch a batch of tasks for a given role, up to max_concurrency., Launch a task via the OpenCode CLI. Spawns `opencode serve --port <N>` as a… (+11 more)
+Nodes (20): AgentSpec, Return True if this agent has a TTL and has exceeded it., get_runtime_adapter(), Any, Unified adapter that launches workers in the selected execution mode. Modes:…, Return the resolved opencode binary, or None if unavailable., Launch a single worker with a task and return a result dict. Result keys:…, Launch a batch of tasks for a given role, up to max_concurrency. (+12 more)
 
 ### Community 9 - "WorkerRole"
-Cohesion: 0.09
-Nodes (26): AgentType, Enum, str, Agent, Worker Pool, and Spawn Chain Data Models, SpawnChainEntry, WorkerPoolConfig, WorkerRole, Durable Agent Factory & Knowledge-Box -> Spawn Chain Registry Turns validated… (+18 more)
+Cohesion: 0.10
+Nodes (23): Run the agentic swarm orchestrator against spotify-ai project. Produces an…, Phase 5: Durable Learning Loop End-to-End Verification, AgentType, Enum, str, Agent, Worker Pool, and Spawn Chain Data Models, WorkerRole, agents_registry_path() (+15 more)
 
 ### Community 10 - "CodebaseMapService"
 Cohesion: 0.08
 Nodes (14): CodebaseMapService, Any, Scans workspace repository files and parses AST definitions., Parses Python file to extract top-level functions, classes, and imports., Cross-references required components against mapped codebase to find spec gaps.…, Load persisted codebase map state from disk., Persist codebase map state so restart doesn't require re-scan., Closes a specific spec gap after verifying fixes. (+6 more)
 
 ### Community 11 - "PRDAnalysisResult"
-Cohesion: 0.12
-Nodes (20): PRDAnalysisResult, PRDDocument, Enum, str, PRD and Task Master Data Models, SpecGap, TaskPriority, TaskStatus (+12 more)
+Cohesion: 0.13
+Nodes (19): Models Package Initialization, PRDAnalysisResult, PRDDocument, Enum, str, PRD and Task Master Data Models, SpecGap, TaskPriority (+11 more)
 
 ### Community 12 - "DurableAgentFactory"
 Cohesion: 0.08
-Nodes (17): agents_registry_path(), DurableAgentFactory, Any, Remove and return count of expired HOT micro-specialists (FIX-09)., Load durable agents from the cold-path agents.jsonl registry. Called once at…, Append a COLD_DURABLE agent record to the durable agents.jsonl registry.…, Write an agent spec .md file from a JSONL entry. Returns the file path, or None…, Resolve the durable cold-path agents registry (agents.jsonl). Prefers an… (+9 more)
+Nodes (16): DurableAgentFactory, Any, Remove and return count of expired HOT micro-specialists (FIX-09)., Resolve the durable cold-path agents registry (agents.jsonl). Prefers an…, Load durable agents from the cold-path agents.jsonl registry. Called once at…, Append a COLD_DURABLE agent record to the durable agents.jsonl registry.…, Write an agent spec .md file from a JSONL entry. Returns the file path, or None…, Read agents.jsonl and write spec files for every entry. Returns the count of… (+8 more)
 
 ### Community 13 - "MultiLayeredAgenticOrchestrator"
 Cohesion: 0.09
-Nodes (19): _cancellation_check(), MultiLayeredAgenticOrchestrator, Any, Event, Deduplicate cold-path registries by content hash (knowledge) and ID…, Apply worker outputs to disk and count files written. Primary path: agentic-…, Append a JSON line to a JSONL registry., Cold-path: normalize hot cache entries → knowledge.jsonl → validated →… (+11 more)
+Nodes (18): _cancellation_check(), MultiLayeredAgenticOrchestrator, Any, Event, Deduplicate cold-path registries by content hash (knowledge) and ID…, Apply worker outputs to disk and count files written. Primary path: agentic-…, Append a JSON line to a JSONL registry., Cold-path: normalize hot cache entries → knowledge.jsonl → validated →… (+10 more)
 
 ### Community 14 - "LiteLLM Gateway"
 Cohesion: 0.07
@@ -352,8 +380,8 @@ Cohesion: 0.10
 Nodes (38): HealthConfig, ProxyChainHealth, Runs reachability, streaming, and provider-status checks., Endpoints and request tuning for the health checks. Each field falls back to…, _patch_client(), check_opencode reports failure on HTTP 500 from upstream., check_opencode reports failure on connection errors., check_streaming reports unhealthy when no content_block_delta arrives. (+30 more)
 
 ### Community 16 - "DurableAgentRouter"
-Cohesion: 0.09
-Nodes (17): DurableAgentRouter, get_durable_router(), Any, Path, Extract YAML-style frontmatter between --- markers., Read the body content after frontmatter., Extract lowercase alphanumeric tokens, dropping very short/common words., Collect trigger keywords from an agent's body (Trigger section) + system_prompt. (+9 more)
+Cohesion: 0.08
+Nodes (18): DurableAgentRouter, get_durable_router(), Any, Path, Extract YAML-style frontmatter between --- markers., Read the body content after frontmatter., Extract lowercase alphanumeric tokens, dropping very short/common words., Collect trigger keywords from an agent's body (Trigger section) + system_prompt. (+10 more)
 
 ### Community 17 - "services/__init__.py"
 Cohesion: 0.09
@@ -381,7 +409,7 @@ Nodes (30): asyncio, make_proxy(), make_request(), post(), Tests for ``merged_ag
 
 ### Community 23 - "OpenCodeSwarmManager"
 Cohesion: 0.08
-Nodes (12): OpenCodeSwarmManager, Initializes the 40 worker specs across role allocations., Gets an available worker matching the specified role using round-robin…, Internal: must be called while holding self._worker_lock., Map a WorkerRole to a pool-health bucket key., Wave N batch executes at ramp[N] concurrency, not the 4-worker default., A provided ramp_sequence overrides the default wave_gate_level mapping., A custom ramp past the configured cap is clamped to max_total_workers; levels… (+4 more)
+Nodes (18): live, OpenCodeSwarmManager, make_subtask(), Factory fixture that returns a function to create SubTask instances., Tests for services/opencode_swarm_service.py Coverage:…, A worker subtask goes through the agentic tool loop and reports honestly. A…, Wave N batch executes at ramp[N] concurrency, not the 4-worker default., A provided ramp_sequence overrides the default wave_gate_level mapping. (+10 more)
 
 ### Community 24 - "conftest.py"
 Cohesion: 0.09
@@ -396,24 +424,24 @@ Cohesion: 0.11
 Nodes (28): Namespace, _build_parser(), HopResult, main(), _print_header(), _print_human(), Any, ArgumentParser (+20 more)
 
 ### Community 27 - "SubTask"
-Cohesion: 0.12
-Nodes (14): EpicTask, SubTask, _analysis(), _epic(), Tests for tools/agentic_orchestrator.py Coverage:…, A relative # file: path that resolves to a directory triggers the write-failure…, When _write_agent_spec_file returns None (already exists), the skip branch logs…, Two categories promoted in one batch must produce distinct chain entry_ids… (+6 more)
+Cohesion: 0.11
+Nodes (15): EpicTask, SubTask, _analysis(), _epic(), Tests for tools/agentic_orchestrator.py Coverage:…, A relative # file: path that resolves to a directory triggers the write-failure…, When _write_agent_spec_file returns None (already exists), the skip branch logs…, Two categories promoted in one batch must produce distinct chain entry_ids… (+7 more)
 
 ### Community 28 - "TestResolveLitellmModelForRole"
 Cohesion: 0.07
 Nodes (8): Tests for services/model_routing.py Coverage: role -> litellm alias resolution,…, The on-disk registry must parse and carry a consistent role_routing section., Live resolution should match the tier aliases in the registry file., reload_registry() clears the cache so an updated registry file is seen., TestLitellmModelForFabricRoute, TestRegistryFile, TestReloadRegistry, TestResolveLitellmModelForRole
 
 ### Community 29 - "MultiProviderFabric"
-Cohesion: 0.12
-Nodes (14): _load_fabric_routes_overlay(), MultiProviderFabric, Any, Load the per-alias route overlay (cached); {} when missing or unreadable., Flatten Anthropic content blocks (or plain text) into a single text string., Convert normalized messages (Anthropic-shaped) to OpenAI Chat Completions…, Normalize a content value into a list of Anthropic content blocks., Convert normalized messages to Anthropic Messages API format. Used for… (+6 more)
+Cohesion: 0.15
+Nodes (13): _load_fabric_routes_overlay(), MultiProviderFabric, Any, Load the per-alias route overlay (cached); {} when missing or unreadable., Flatten Anthropic content blocks (or plain text) into a single text string., Convert normalized messages (Anthropic-shaped) to OpenAI Chat Completions…, Normalize a content value into a list of Anthropic content blocks., Convert normalized messages to Anthropic Messages API format. Used for… (+5 more)
 
 ### Community 30 - "KnowledgeCache"
-Cohesion: 0.12
-Nodes (7): KnowledgeCache, Any, Learning with TTL should be expired and not returned., Pre-populate cache file with duplicate entries, verify compaction on load., TestKnowledgeCache, Step 2: RECORD — Write to hot cache (knowledge_cache.json)., TestRecordStep
+Cohesion: 0.11
+Nodes (8): KnowledgeCache, Any, Tests for tools/knowledge_cache.py Coverage: KnowledgeCache — load_cache,…, Learning with TTL should be expired and not returned., Pre-populate cache file with duplicate entries, verify compaction on load., TestKnowledgeCache, Step 2: RECORD — Write to hot cache (knowledge_cache.json)., TestRecordStep
 
 ### Community 31 - "KeyPoolManager"
-Cohesion: 0.14
-Nodes (7): KeyPoolManager, When every key is still cooling down, get_key returns None so the fabric…, Even with many keys, none may be reused while every one is cooling down., A key still cooling down must not be picked while another is active., #42: summary reports exhausted count, next cooldown expiry, avg latency., Getting a key from a provider that doesn't exist should not raise., TestKeyPoolManager
+Cohesion: 0.08
+Nodes (12): KeyPoolManager, Any, Loads API keys from env file, environment variables, and local key files., Hot-reload keys from all sources, preserving runtime stats for persistent keys.…, Gather (provider, secret_value, key_id) candidates from all key sources.…, When every key is still cooling down, get_key returns None so the fabric…, Even with many keys, none may be reused while every one is cooling down., A key still cooling down must not be picked while another is active. (+4 more)
 
 ### Community 32 - "test_swarm_profiles.py"
 Cohesion: 0.08
@@ -432,8 +460,8 @@ Cohesion: 0.20
 Nodes (7): _ownership_map(), Tests for services/wave_gate_service.py Coverage: WaveGateController —…, Attach real epics (wave 1) with subtasks carrying output artifacts., Attach real wave-3 epics whose subtasks output src/ artifacts., Wave 3 must not pass on statuses alone — verification must have run., Inline syntax fallback (no tests_ran) must not satisfy tests_passing., TestWaveGatesWithRealState
 
 ### Community 36 - "ProgressLogEntry"
-Cohesion: 0.18
-Nodes (10): ObstaclePlaybookEntry, ProgressLogEntry, Any, SuccessMarker, TaskMasterStateSnapshot, Tests for models/ledger_models.py Coverage: SuccessMarker,…, TestObstaclePlaybookEntry, TestProgressLogEntry (+2 more)
+Cohesion: 0.16
+Nodes (12): ObstaclePlaybookEntry, ProgressLogEntry, Any, Progress Ledger, Success Markers, and Obstacle Playbooks Models, SuccessMarker, TaskMasterStateSnapshot, Progress Ledger, Success Markers, and Self-Healing Obstacle Playbook Engine…, Tests for models/ledger_models.py Coverage: SuccessMarker,… (+4 more)
 
 ### Community 37 - "report_service.py"
 Cohesion: 0.17
@@ -455,9 +483,9 @@ Nodes (19): _make_sse_response(), Response, Return a 200 httpx.Response whose .s
 Cohesion: 0.13
 Nodes (9): ChainRegistry, Generate a collision-proof spawn-chain entry_id (sequence + timestamp suffix).…, isolated_agents_registry(), fixture, Tests for services/agent_factory_service.py Coverage: ChainRegistry (load,…, Return a temp path for the durable cold-path agents.jsonl registry., #18: entry_ids in one promotion batch must never collide., #18: separate registry instances sharing a file must not reuse entry_ids. (+1 more)
 
-### Community 42 - "test_learning_loop.py"
-Cohesion: 0.11
-Nodes (18): _append_jsonl(), _evaluate_promotion_criteria(), _make_agent_jsonl_entry(), _make_chain_jsonl_entry(), _make_knowledge_jsonl_entry(), Tests for the full learning loop lifecycle: capture -> evaluate -> promote ->…, Create a cold-path knowledge.jsonl entry., Step 3: EVALUATE — Score learning against promotion criteria. (+10 more)
+### Community 42 - "_evaluate_promotion_criteria"
+Cohesion: 0.20
+Nodes (9): _append_jsonl(), _evaluate_promotion_criteria(), Step 3: EVALUATE — Score learning against promotion criteria., A strong, substantive entry should pass all promotion criteria., A weak entry should fail promotion criteria., Should detect when an entry already exists in cold knowledge., Append a single JSON entry as a line to a JSONL file., Evaluate whether a learning entry meets cold-path promotion criteria. Returns… (+1 more)
 
 ### Community 43 - "_make_learning_entry"
 Cohesion: 0.18
@@ -467,9 +495,9 @@ Nodes (10): _make_learning_entry(), _promote_learning(), Execute cold-path promo
 Cohesion: 0.13
 Nodes (11): patch, Block all real providers so dispatch falls to simulation., Without any working providers, should fall through to simulation., Test that content blocks (list) are flattened correctly before dispatch., Test a successful API call returns formatted Anthropic response., A 2xx with a non-dict JSON body must cascade, not crash on .get()., A 2xx with an empty/non-JSON body must cascade, not raise JSONDecodeError., 4xx/5xx from dispatch() must be caught by HTTPStatusError handling. (+3 more)
 
-### Community 45 - "TestExecuteSubtaskDecisionLogic"
-Cohesion: 0.22
-Nodes (8): live, make_subtask(), A worker subtask goes through the agentic tool loop and reports honestly. A…, Build a real DurableAgentRouter over tmp JSONL + agent dir., model_alias=None resolves the role's litellm alias and feeds it to the worker…, An explicit model_alias is passed through untouched (no re-resolution)., _router(), TestExecuteSubtaskDecisionLogic
+### Community 45 - "What You Must Do When Invoked"
+Cohesion: 0.08
+Nodes (24): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+16 more)
 
 ### Community 46 - "PassthroughStreamingProxy"
 Cohesion: 0.15
@@ -484,16 +512,16 @@ Cohesion: 0.16
 Nodes (8): gates=False keeps advance_wave() running (state advances) but a non-passing…, A run emits proxy_deployed (after init) and run_deployed (pre-wave)…, Each wave threads its wave number as wave_gate_level so the swarm executes at…, A provided ramp_sequence reaches every swarm batch, default_model is recorded…, Without a profile, the swarm batch gets no ramp_sequence kwarg and the ledger…, #32: a set cancel_event makes the workflow return an aborted result., Wire the orchestrator singletons for a deterministic workflow run., TestRunFullAgenticWorkflow
 
 ### Community 49 - "test_multi_provider_fabric.py"
-Cohesion: 0.12
-Nodes (10): _isolated_bans_path(), fixture, Tests for providers/multi_provider_fabric.py Coverage:…, Redirect the persisted-bans path so tests never write into the repo., Role routing maps worker roles to litellm aliases, so every fabric tier must…, Worker-tier aliases route through the litellm gateway FIRST (42-key Gemini…, Malformed overlay routes are dropped at load, never crashing dispatch (issue…, TestFabricRouteOverlay (+2 more)
+Cohesion: 0.15
+Nodes (6): _isolated_bans_path(), fixture, Tests for providers/multi_provider_fabric.py Coverage:…, Redirect the persisted-bans path so tests never write into the repo., TestFabricRouteOverlay, TestRouteBuilding
 
 ### Community 50 - "FastFallbackConfig"
 Cohesion: 0.14
 Nodes (9): dict, FastFallbackConfig, Build a config from ``FAST_FALLBACK_*`` environment variables., Tunables for the fast-fallback router (dataclass defaults + env overrides)., A fallback with strong latency history outranks a slow primary., No latency history → static verified-first order is untouched., A perma-banned provider does not appear in the candidate list., TestAdaptiveSelection (+1 more)
 
-### Community 51 - "test_agentic_worker_loop.py"
-Cohesion: 0.16
-Nodes (10): RuntimeError, _FakeFabric, Tests for services/agentic_worker_loop.py Coverage: real tool execution…, Scripted fabric: serves a queue of responses, records requests., No tool_calls in the response → completed with the model's summary., Tool call is executed for real, result fed back, then completes., Hitting max_iterations completes with real partial work kept., TestLoopControlFlow (+2 more)
+### Community 51 - "AgenticWorkerLoop"
+Cohesion: 0.06
+Nodes (26): RuntimeError, AgenticWorkerLoop, _command_safety_error(), _extract_text(), Any, Agentic Worker Tool Loop Runs a real agentic loop over the multi-provider…, Return a refusal reason if ``command`` is unsafe, else None., Extract the assistant's text content from an Anthropic-shaped response. (+18 more)
 
 ### Community 52 - "generate_progress_report.sh"
 Cohesion: 0.12
@@ -503,17 +531,17 @@ Nodes (5): count_files(), durable_agent_count(), generate_evidence_table(), gene
 Cohesion: 0.22
 Nodes (15): CHECK_COMMANDS, CHECK_DETAILS, CHECK_EXIT_CODES, check_git(), CHECK_NAMES, check_node(), check_opencode(), check_proxy() (+7 more)
 
-### Community 54 - "WorkerPoolState"
-Cohesion: 0.15
-Nodes (6): Any, Increment the completed counter for the given pool., Increment the failed or rate_limited counter for the given pool., Return a copy of the pool_health dict., WorkerPoolState, TestWorkerPoolState
+### Community 54 - "WorkerPoolConfig"
+Cohesion: 0.10
+Nodes (14): Any, Increment the completed counter for the given pool., Increment the failed or rate_limited counter for the given pool., Return a copy of the pool_health dict., SpawnChainEntry, WorkerPoolConfig, WorkerPoolState, Initializes the 40 worker specs across role allocations. (+6 more)
 
 ### Community 55 - "ConcurrencyRampController"
 Cohesion: 0.12
 Nodes (6): ConcurrencyRampController, Controls worker concurrency ramp-up across wave gates., Map wave gate level to max workers. Gate 0 -> 4, gate 1 -> 8, gate 2 -> 16,…, Return the full ramp sequence., Executes a batch of subtasks in parallel using ThreadPoolExecutor up to max…, TestConcurrencyRampController
 
 ### Community 56 - "_read_jsonl"
-Cohesion: 0.16
-Nodes (14): _load_agents_from_registry(), Verify all 5 cold-path artifacts exist and are valid. Returns list of failures., Simulate loading agents after restart: read agents.jsonl and .md files., Simulate routing a task to a promoted agent and getting a response., Step: ROUTE & REUSE — Routing tasks to promoted agents., End-to-end: capture -> record -> evaluate -> promote -> verify -> load -> route…, Run the complete lifecycle and verify every step., Read all JSONL entries from a file, returning a list of dicts. (+6 more)
+Cohesion: 0.24
+Nodes (10): _load_agents_from_registry(), Verify all 5 cold-path artifacts exist and are valid. Returns list of failures., Simulate loading agents after restart: read agents.jsonl and .md files., End-to-end: capture -> record -> evaluate -> promote -> verify -> load -> route…, Run the complete lifecycle and verify every step., Read all JSONL entries from a file, returning a list of dicts., Promote multiple different learnings and verify they are all loadable., _read_jsonl() (+2 more)
 
 ### Community 57 - "test_report_service.py"
 Cohesion: 0.26
@@ -531,9 +559,9 @@ Nodes (16): Check Proxy Health Script, Claude Proxy Server, Claude Proxy Systemd
 Cohesion: 0.21
 Nodes (7): BaseHTTPRequestHandler, ClaudeProxyHandler, _proxy_dispatch(), Any, Reject an oversized body. Close the connection since the unread bytes would…, Enforce the inbound proxy token (ANTHROPIC_AUTH_TOKEN, default 'freecc').…, Route a request through the hedged fast-fallback router when enabled. Both…
 
-### Community 61 - "multi_provider_fabric.py"
-Cohesion: 0.17
-Nodes (11): Providers Package Initialization, KeyStatus, Enum, str, API Key Pool Manager & Key Rotator Supports multi-provider key rotation, quota…, _load_bans(), Multi-Backend Model Fabric Routes requests across providers with priority…, Load persisted perma-bans into _permanently_dead, dropping expired entries. (+3 more)
+### Community 61 - "What You Must Do When Invoked"
+Cohesion: 0.08
+Nodes (24): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+16 more)
 
 ### Community 62 - "TestFormatConversion"
 Cohesion: 0.13
@@ -547,17 +575,17 @@ Nodes (13): cmd_attach_evidence(), cmd_block(), cmd_claim(), cmd_create(), cmd_i
 Cohesion: 0.18
 Nodes (8): _persist_bans(), Atomically write the perma-ban map to disk. Caller must hold _fabric_lock., Record a provider failure — perma-ban on 401 auth errors, circuit-break on…, Record a provider success — reset circuit breaker and update last-working cache., _record_failure(), _record_success(), Provider should be retried after perma-ban duration expires., TestCircuitBreaker
 
-### Community 65 - "_parse_multipart"
-Cohesion: 0.23
-Nodes (6): _parse_multipart(), Return (file_bytes, file_name, model_name) from a multipart body., _multipart_body(), Multipart POST without a file field → 400., Backend connection failure → 503 with unavailable message., TestParseMultipart
+### Community 65 - "claude_proxy_server.py"
+Cohesion: 0.18
+Nodes (8): _parse_multipart(), Claude API Key Pool Proxy Server Exposes Anthropic-compatible, OpenAI-…, Return (file_bytes, file_name, model_name) from a multipart body., Proxy Package Initialization, _multipart_body(), Tests for proxy/claude_proxy_server.py Coverage: ClaudeProxyHandler (do_GET,…, Backend connection failure → 503 with unavailable message., TestParseMultipart
 
 ### Community 66 - "ProxyServerDaemon"
 Cohesion: 0.13
 Nodes (10): HTTPServer, ProxyServerDaemon, Threaded HTTP server to handle concurrent requests., ThreadedHTTPServer, fixture, ProxyServerDaemon should start and stop without error., Calling start() twice should not create a second server., Start a server on random port for each test. (+2 more)
 
-### Community 67 - "_command_safety_error"
-Cohesion: 0.23
-Nodes (4): _command_safety_error(), Return a refusal reason if ``command`` is unsafe, else None., The run_command schema must steer models to the uv toolchain — bare ``python``…, TestCommandSafety
+### Community 67 - "What You Must Do When Invoked"
+Cohesion: 0.08
+Nodes (24): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+16 more)
 
 ### Community 68 - "CircuitBreaker"
 Cohesion: 0.14
@@ -568,12 +596,12 @@ Cohesion: 0.21
 Nodes (7): Probe routatic-proxy /health and surface circuit-breaker metrics., Probe the FCC gateway /health endpoint., Check upstream OpenCode API reachability (models endpoint)., Stream a tiny /v1/messages request and time first token + total. ``endpoint``…, Monitor provider/circuit-breaker status via routatic + FCC models list., Run every check; returns results in a stable order., _truncate()
 
 ### Community 70 - "APIKeyInfo"
-Cohesion: 0.21
-Nodes (5): APIKeyInfo, Gets an active API key using round-robin / least-used strategy., Internal: must be called while holding self._lock., Avoid leaking the secret value in logs/debug output., TestAPIKeyInfo
+Cohesion: 0.13
+Nodes (11): Providers Package Initialization, APIKeyInfo, KeyStatus, Enum, str, API Key Pool Manager & Key Rotator Supports multi-provider key rotation, quota…, Gets an active API key using round-robin / least-used strategy., Internal: must be called while holding self._lock. (+3 more)
 
 ### Community 71 - "_forward_transcription"
-Cohesion: 0.22
-Nodes (5): _forward_transcription(), Forward a transcription request to the configured Whisper backend., _FakeResp, Multipart audio POST → forwarded to Whisper backend → JSON response., TestForwardTranscription
+Cohesion: 0.18
+Nodes (6): _forward_transcription(), Forward a transcription request to the configured Whisper backend., _FakeResp, Multipart audio POST → forwarded to Whisper backend → JSON response., Multipart POST without a file field → 400., TestForwardTranscription
 
 ### Community 72 - "ObstaclePlaybookEngine"
 Cohesion: 0.17
@@ -587,13 +615,13 @@ Nodes (11): DurableAgentRouter, Durable Regex Validation Specialist, _extract_ke
 Cohesion: 0.20
 Nodes (12): Anthropic Messages API, Blueprint expectation, .env TASKMASTER_STATE_FILE, EpicTask/SubTask schema, fcc-server proxy, Model fabric (multi_provider_fabric.py), PERPLEXITY_API_KEY, Python proxy (port 8085) (+4 more)
 
-### Community 75 - "AgenticWorkerLoop"
-Cohesion: 0.29
-Nodes (4): AgenticWorkerLoop, Executes a subtask with real tools through the multi-provider fabric., Tools execute for real against a tmp workdir., TestRealToolExecution
+### Community 75 - "_DNSCache"
+Cohesion: 0.13
+Nodes (10): NetworkStream, _CachedDNSBackend, _DNSCache, Any, Drop one entry (used to invalidate a stale cached IP)., Resolve hostname to IP, consulting the in-process DNS cache first. Returns the…, httpcore sync backend that connects to a cached IP for each hostname.…, Lightweight TTL-bounded DNS cache to avoid repeated gethostbyname calls. All… (+2 more)
 
-### Community 76 - "._run_tool"
-Cohesion: 0.27
-Nodes (4): Any, Run the agentic loop for one subtask and return a result dict. Result keys:…, Execute one tool call for real. Returns (result_text, error_or_None)., Resolve a repo-relative path, refusing escapes outside ``workdir``.
+### Community 76 - "_FakeClient"
+Cohesion: 0.21
+Nodes (7): _FakeClient, _install_fake(), Response, Records the per-request timeout passed to post() without network I/O., test_dispatch_localhost_uses_local_connect_timeout(), test_dispatch_remote_keeps_configured_connect_timeout(), Timeout
 
 ### Community 77 - "TestRun"
 Cohesion: 0.17
@@ -643,9 +671,9 @@ Nodes (9): dynamic_learning_loop, agent_registry, chain_registry, cold_registry,
 Cohesion: 0.22
 Nodes (9): project, description, knowledge_graph_path, name, ownership_map, progress_report, provider_registry, root_dir (+1 more)
 
-### Community 89 - "knowledge_cache.py"
-Cohesion: 0.22
-Nodes (4): Run the agentic swarm orchestrator against spotify-ai project. Produces an…, Phase 5: Durable Learning Loop End-to-End Verification, Knowledge Cache Service Persistent cache for validated learnings, obstacle…, Tests for tools/knowledge_cache.py Coverage: KnowledgeCache — load_cache,…
+### Community 89 - "test_learning_loop.py"
+Cohesion: 0.20
+Nodes (9): _make_agent_jsonl_entry(), _make_chain_jsonl_entry(), _make_knowledge_jsonl_entry(), Tests for the full learning loop lifecycle: capture -> evaluate -> promote ->…, Create a cold-path knowledge.jsonl entry., Create a cold-path agents.jsonl entry., Step: LOAD — Simulate loading agents after a restart., Create a cold-path chain.jsonl entry. (+1 more)
 
 ### Community 90 - "start_task_spine.sh"
 Cohesion: 0.36
@@ -691,13 +719,13 @@ Nodes (7): check_proxy(), FCC_PORT, FCC_PROCESS_NAME, ROUTATIC_PORT, ROUTATIC_PR
 Cohesion: 0.39
 Nodes (5): banner(), die(), verify_task_spine.sh script, step_fail(), step_ok()
 
-### Community 101 - ".load_keys"
-Cohesion: 0.25
-Nodes (3): Loads API keys from env file, environment variables, and local key files., Hot-reload keys from all sources, preserving runtime stats for persistent keys.…, Gather (provider, secret_value, key_id) candidates from all key sources.…
+### Community 101 - "graphify reference: extra exports and benchmark"
+Cohesion: 0.22
+Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7a - FalkorDB export (only if --falkordb or --falkordb-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
 
-### Community 102 - "agentic_worker_loop.py"
-Cohesion: 0.32
-Nodes (4): _extract_text(), Agentic Worker Tool Loop Runs a real agentic loop over the multi-provider…, Extract the assistant's text content from an Anthropic-shaped response., TestExtractText
+### Community 102 - "graphify reference: extra exports and benchmark"
+Cohesion: 0.22
+Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7a - FalkorDB export (only if --falkordb or --falkordb-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
 
 ### Community 103 - ".handle_task_failure"
 Cohesion: 0.32
@@ -706,6 +734,10 @@ Nodes (3): Any, Processes a task failure through self-healing playbooks., Matche
 ### Community 104 - "test_check_streaming_fcc_happy_path"
 Cohesion: 0.25
 Nodes (8): Build a single SSE data line for an Anthropic streaming content-block-delta., check_streaming through FCC endpoint measures TTFB and total latency., check_streaming targets routatic-proxy when endpoint='routatic'., stream' subcommand runs only the streaming check., _sse_event(), test_check_streaming_fcc_happy_path(), test_check_streaming_routatic_endpoint(), test_main_stream_subcommand()
+
+### Community 105 - "graphify reference: extra exports and benchmark"
+Cohesion: 0.22
+Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7a - FalkorDB export (only if --falkordb or --falkordb-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
 
 ### Community 106 - "query, path, and explain reference"
 Cohesion: 0.33
@@ -791,6 +823,10 @@ Nodes (4): die(), log(), start_worker_runtime.sh script, usage()
 Cohesion: 0.70
 Nodes (4): is_protected(), kill_worker(), main(), stop_agentic_services.sh script
 
+### Community 133 - "graphify reference: query, path, explain"
+Cohesion: 0.33
+Nodes (5): For /graphify explain, For /graphify path, graphify reference: query, path, explain, Step 0 — Constrained query expansion (REQUIRED before traversal), Step 1 — Traversal
+
 ### Community 136 - "graphify extract"
 Cohesion: 0.50
 Nodes (4): graphify clone, graphify extract, graphify merge-graphs, graphify-out directory
@@ -851,6 +887,58 @@ Nodes (3): Pytest, Ruff, Windows CI Job
 Cohesion: 0.67
 Nodes (3): claude-code-proxy.json Spec, opencode-swarm.json Spec, setup-and-run.sh Script
 
+### Community 156 - "graphify reference: query, path, explain"
+Cohesion: 0.33
+Nodes (5): For /graphify explain, For /graphify path, graphify reference: query, path, explain, Step 0 — Constrained query expansion (REQUIRED before traversal), Step 1 — Traversal
+
+### Community 195 - "graphify reference: query, path, explain"
+Cohesion: 0.33
+Nodes (5): For /graphify explain, For /graphify path, graphify reference: query, path, explain, Step 0 — Constrained query expansion (REQUIRED before traversal), Step 1 — Traversal
+
+### Community 196 - "_simulate_reuse"
+Cohesion: 0.40
+Nodes (4): Simulate routing a task to a promoted agent and getting a response., Step: ROUTE & REUSE — Routing tasks to promoted agents., _simulate_reuse(), TestRouteAndReuse
+
+### Community 197 - "TestLitellmPresenceInRoutes"
+Cohesion: 0.40
+Nodes (3): Role routing maps worker roles to litellm aliases, so every fabric tier must…, Worker-tier aliases route through the litellm gateway FIRST (42-key Gemini…, TestLitellmPresenceInRoutes
+
+### Community 199 - "graphify reference: add a URL and watch a folder"
+Cohesion: 0.50
+Nodes (3): For /graphify add, For --watch, graphify reference: add a URL and watch a folder
+
+### Community 200 - "graphify reference: commit hook and native CLAUDE.md integration"
+Cohesion: 0.50
+Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify reference: commit hook and native CLAUDE.md integration
+
+### Community 201 - "graphify reference: incremental update and cluster-only"
+Cohesion: 0.50
+Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
+
+### Community 202 - "graphify reference: add a URL and watch a folder"
+Cohesion: 0.50
+Nodes (3): For /graphify add, For --watch, graphify reference: add a URL and watch a folder
+
+### Community 203 - "graphify reference: commit hook and native CLAUDE.md integration"
+Cohesion: 0.50
+Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify reference: commit hook and native CLAUDE.md integration
+
+### Community 204 - "graphify reference: incremental update and cluster-only"
+Cohesion: 0.50
+Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
+
+### Community 205 - "graphify reference: add a URL and watch a folder"
+Cohesion: 0.50
+Nodes (3): For /graphify add, For --watch, graphify reference: add a URL and watch a folder
+
+### Community 206 - "graphify reference: commit hook and native CLAUDE.md integration"
+Cohesion: 0.50
+Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify reference: commit hook and native CLAUDE.md integration
+
+### Community 207 - "graphify reference: incremental update and cluster-only"
+Cohesion: 0.50
+Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
+
 ## Ambiguous Edges - Review These
 - `graphify export neo4j` → `.graphify_python`  [AMBIGUOUS]
   .claude/skills/graphify/references/exports.md · relation: references
@@ -858,9 +946,9 @@ Nodes (3): claude-code-proxy.json Spec, opencode-swarm.json Spec, setup-and-run.
   .claude/skills/graphify/references/exports.md · relation: references
 
 ## Knowledge Gaps
-- **253 isolated node(s):** `$schema`, `version`, `name`, `description`, `root_dir` (+248 more)
+- **379 isolated node(s):** `$schema`, `version`, `name`, `description`, `root_dir` (+374 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **53 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **65 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -869,12 +957,12 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
 - **What is the exact relationship between `graphify export falkordb` and `.graphify_python`?**
   _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
-- **Why does `PassthroughStreamingProxy` connect `PassthroughStreamingProxy` to `CircuitBreaker`, `StreamingProxyConfig`, `_ChunkStream`, `_StallStream`, `test_streaming_proxy.py`?**
-  _High betweenness centrality (0.113) - this node is a cross-community bridge._
 - **Why does `create_app()` connect `webapp.py` to `handle_run`, `PassthroughStreamingProxy`, `_run_latency_test`?**
-  _High betweenness centrality (0.113) - this node is a cross-community bridge._
+  _High betweenness centrality (0.096) - this node is a cross-community bridge._
+- **Why does `PassthroughStreamingProxy` connect `PassthroughStreamingProxy` to `CircuitBreaker`, `StreamingProxyConfig`, `_ChunkStream`, `_StallStream`, `test_streaming_proxy.py`?**
+  _High betweenness centrality (0.094) - this node is a cross-community bridge._
 - **Why does `MultiLayeredAgenticOrchestrator` connect `MultiLayeredAgenticOrchestrator` to `ProxyServerDaemon`, `webapp.py`, `_Stream`, `TestRunPlan`, `WorkerRole`, `PRDAnalysisResult`, `TestRun`, `test_webapp.py`, `TestModelRoleUpdate`, `TestRunFullAgenticWorkflow`, `services/__init__.py`, `TestChains`, `TestProfiles`, `handle_run`, `TestLatencyTest`, `TestReports`, `SubTask`?**
-  _High betweenness centrality (0.093) - this node is a cross-community bridge._
+  _High betweenness centrality (0.081) - this node is a cross-community bridge._
 - **Are the 24 inferred relationships involving `KeyPoolManager` (e.g. with `isolated_key_pool()` and `TestCLIStringFunctions`) actually correct?**
   _`KeyPoolManager` has 24 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 29 inferred relationships involving `SubTask` (e.g. with `ConcurrencyRampController` and `DurableAgentRouter`) actually correct?**
