@@ -61,12 +61,64 @@ Steps: update version in `pyproject.toml` → run `uv lock` → commit together.
 
 Avoid excessive self-correction. Only correct earlier statements when the error would change the user's code, conclusions, or decisions. State corrections plainly and continue — no apologies, no rumination.
 
-## graphify
+## graphify — Codebase Knowledge Graph
 
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+This project has a knowledge graph at `graphify-out/` with god nodes, community structure, and cross-file relationships. MCP graphify tools are available via `mcp__graphify__*`. **Always query the graph first** before grepping or reading raw source files.
 
-Rules:
-- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+### Quick Start: 3 Most Common Workflows
+
+**1. "Where is X implemented?"** — semantic code search
+Use when the user asks "what does X do?", "where is Y?", "find the code for Z", "how does W work?".
+
+MCP path: `gx_find(term="X")` -> `gx_node(symbol="X")` or `query_graph(question="about X")`
+CLI path: `graphify explain "X"` or `graphify query "what does X do?"`
+
+**2. "What calls X?"** — caller/callee tracing
+Use when the user asks "who calls X?", "what depends on Y?", "how does A connect to B?".
+
+MCP path: `gx_callers(symbol="X")` / `gx_callees(symbol="X")` / `gx_trace(src="A", tgt="B")`
+CLI path: `graphify path "A" "B"` / `graphify explain "X"`
+
+**3. PR / Change Impact Analysis** — blast radius of a change
+Use when the user asks "what would this PR break?", "what's the impact of changing X?".
+
+MCP path: `gx_impact(target="X")` / `gx_file_neighbors(file="path/to/file.py")`
+CLI path: `graphify affected "X"` / `graphify query "impact of changing X"`
+
+### Decision Tree — always start here
+
+| Question pattern | MCP tool | CLI fallback |
+|---|---|---|
+| "Where is X?" / "Find symbol X" | `mcp__graphify__gx_find(term="X")` | `graphify query "X"` |
+| "What calls X?" / "Who uses X?" | `mcp__graphify__gx_callers(symbol="X")` | `graphify path "X" "caller"` |
+| "What does X depend on?" | `mcp__graphify__gx_callees(symbol="X")` | `graphify explain "X"` |
+| "How does X reach Y?" | `mcp__graphify__gx_trace(src="A", tgt="B")` | `graphify path "A" "B"` |
+| "What files relate to X?" | `mcp__graphify__gx_file_neighbors(file="X")` | `graphify query "files near X"` |
+| "Impact of changing X?" | `mcp__graphify__gx_impact(target="X")` | `graphify affected "X"` |
+| "What tests cover X?" | `mcp__graphify__gx_tests_for(target="X")` | `graphify query "tests for X"` |
+| "Find files about <concept>" | `mcp__graphify__gx_rank_files(question="concept")` | `graphify query "concept"` |
+| "What does file X import/export?" | `mcp__graphify__gx_imports_exports(file="X")` | N/A |
+| "Explain X / give context" | `mcp__graphify__query_graph(question="X")` | `graphify explain "X"` |
+
+### Full MCP Tools Reference
+All MCP tools require `repository_id="devcloner/merged-agentic-swarm"` or `repository_id="4e3cec9f-6d8c-4c83-bd9a-581243bce913"`.
+
+| MCP Tool | Purpose | Key Parameters |
+|----------|---------|---------------|
+| `query_graph` | Semantic retrieval with materialized bodies | `repository_id`, `question`, `budget` |
+| `gx_find` | Find symbols by label substring | `repository_id`, `term`, `code_only` |
+| `gx_find_seeds` | Scored seed nodes from NL question | `repository_id`, `question` |
+| `gx_node` | Symbol body + direct neighborhood | `repository_id`, `symbol` |
+| `gx_callers` | Exact directed callers of a symbol | `repository_id`, `symbol`, `strict_calls` |
+| `gx_callees` | Exact directed callees of a symbol | `repository_id`, `symbol`, `strict_calls` |
+| `gx_trace` | Resolved call paths (src -> tgt) | `repository_id`, `src`, `tgt`, `k_paths` |
+| `gx_impact` | Change-impact fanout (blast radius) | `repository_id`, `target`, `max_seeds` |
+| `gx_tests_for` | Tests linked to a symbol or file | `repository_id`, `target` |
+| `gx_rank_files` | Rank source files for a NL question | `repository_id`, `question` |
+
+### Rules
+- **Always query graphify first** before grepping or reading raw files.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+- Use `graphify-out/wiki/index.md` for broad navigation if it exists.
+- Read `graphify-out/GRAPH_REPORT.md` only for broad architecture review or when query/path/explain do not surface enough context.
+- Global graph is at `~/.graphify/global-graph.json` — use `graphify global list` to see all registered repos.

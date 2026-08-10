@@ -813,9 +813,28 @@
       "src_merged_agentic_swarm_tools_agentic_orchestrator_rationale_54",
       "src_merged_agentic_swarm_tools_agentic_orchestrator_rationale_67",
       "src_merged_agentic_swarm_tools_agentic_orchestrator_rationale_80",
+      "tests_test_agentic_orchestrator",
+      "tests_test_agentic_orchestrator_analysis",
+      "tests_test_agentic_orchestrator_epic",
+      "tests_test_agentic_orchestrator_rationale_1",
+      "tests_test_agentic_orchestrator_rationale_342",
+      "tests_test_agentic_orchestrator_rationale_404",
+      "tests_test_agentic_orchestrator_rationale_424",
+      "tests_test_agentic_orchestrator_testapplyworkeroutputs",
+      "tests_test_agentic_orchestrator_testapplyworkeroutputs_setup_method",
+      "tests_test_agentic_orchestrator_testapplyworkeroutputspaths",
+      "tests_test_agentic_orchestrator_testapplyworkeroutputspaths_setup_method",
+      "tests_test_agentic_orchestrator_testapplyworkeroutputspaths_test_relative_path_resolves_and_write_failure_logged",
+      "tests_test_agentic_orchestrator_testapplyworkeroutputspaths_test_secondary_text_from_response_dict",
       "tests_test_agentic_orchestrator_testcancellationcheck",
       "tests_test_agentic_orchestrator_testcancellationcheck_test_event_set_returns_aborted",
       "tests_test_agentic_orchestrator_testcancellationcheck_test_event_unset_or_none_returns_none",
+      "tests_test_agentic_orchestrator_testinitializesystemproxyfailure",
+      "tests_test_agentic_orchestrator_testinitializesystemproxyfailure_test_proxy_start_failure_is_nonfatal",
+      "tests_test_agentic_orchestrator_testpromotecoldpathagentfileexists",
+      "tests_test_agentic_orchestrator_testpromotecoldpathagentfileexists_test_existing_agent_file_skipped",
+      "tests_test_agentic_orchestrator_testpromotecoldpathchainentryids",
+      "tests_test_agentic_orchestrator_testpromotecoldpathchainentryids_test_chain_entry_ids_unique_within_batch",
       "tests_test_agentic_orchestrator_testpromotedidsbranches",
       "tests_test_agentic_orchestrator_testpromotedidsbranches_test_load_invalid_json_warns",
       "tests_test_agentic_orchestrator_testpromotedidsbranches_test_save_to_path_under_file_warns",
@@ -935,14 +954,12 @@
       "src_merged_agentic_swarm_fast_fallback_rationale_661"
     ],
     "20": [
-      "src_merged_agentic_swarm_services_task_master_service_rationale_119",
       "src_merged_agentic_swarm_services_task_master_service_rationale_27",
       "src_merged_agentic_swarm_services_task_master_service_rationale_374",
       "src_merged_agentic_swarm_services_task_master_service_rationale_74",
       "src_merged_agentic_swarm_services_task_master_service_rationale_94",
       "src_merged_agentic_swarm_services_task_master_service_taskmasterservice",
       "src_merged_agentic_swarm_services_task_master_service_taskmasterservice_estimate_turns",
-      "src_merged_agentic_swarm_services_task_master_service_taskmasterservice_optimize_and_parse_prd",
       "src_merged_agentic_swarm_services_task_master_service_taskmasterservice_save_state",
       "src_merged_agentic_swarm_services_task_master_service_taskmasterservice_update_task_status",
       "tests_test_task_master_service",
@@ -1073,27 +1090,15 @@
     ],
     "24": [
       "src_merged_agentic_swarm_models_prd_models_epictask",
+      "src_merged_agentic_swarm_models_prd_models_epictask_to_dict",
+      "src_merged_agentic_swarm_models_prd_models_prdanalysisresult_to_dict",
+      "src_merged_agentic_swarm_models_prd_models_py_any",
+      "src_merged_agentic_swarm_models_prd_models_specgap_to_dict",
       "src_merged_agentic_swarm_models_prd_models_subtask",
+      "src_merged_agentic_swarm_models_prd_models_subtask_to_dict",
+      "src_merged_agentic_swarm_services_task_master_service_rationale_119",
       "src_merged_agentic_swarm_services_task_master_service_taskmasterservice_get_tasks_for_wave",
-      "tests_test_agentic_orchestrator",
-      "tests_test_agentic_orchestrator_analysis",
-      "tests_test_agentic_orchestrator_epic",
-      "tests_test_agentic_orchestrator_rationale_1",
-      "tests_test_agentic_orchestrator_rationale_342",
-      "tests_test_agentic_orchestrator_rationale_404",
-      "tests_test_agentic_orchestrator_rationale_424",
-      "tests_test_agentic_orchestrator_testapplyworkeroutputs",
-      "tests_test_agentic_orchestrator_testapplyworkeroutputs_setup_method",
-      "tests_test_agentic_orchestrator_testapplyworkeroutputspaths",
-      "tests_test_agentic_orchestrator_testapplyworkeroutputspaths_setup_method",
-      "tests_test_agentic_orchestrator_testapplyworkeroutputspaths_test_relative_path_resolves_and_write_failure_logged",
-      "tests_test_agentic_orchestrator_testapplyworkeroutputspaths_test_secondary_text_from_response_dict",
-      "tests_test_agentic_orchestrator_testinitializesystemproxyfailure",
-      "tests_test_agentic_orchestrator_testinitializesystemproxyfailure_test_proxy_start_failure_is_nonfatal",
-      "tests_test_agentic_orchestrator_testpromotecoldpathagentfileexists",
-      "tests_test_agentic_orchestrator_testpromotecoldpathagentfileexists_test_existing_agent_file_skipped",
-      "tests_test_agentic_orchestrator_testpromotecoldpathchainentryids",
-      "tests_test_agentic_orchestrator_testpromotecoldpathchainentryids_test_chain_entry_ids_unique_within_batch",
+      "src_merged_agentic_swarm_services_task_master_service_taskmasterservice_optimize_and_parse_prd",
       "tests_test_prd_models_testepictask",
       "tests_test_prd_models_testepictask_test_default_creation",
       "tests_test_prd_models_testepictask_test_to_dict_serializes_nested",
@@ -2864,13 +2869,6 @@
       "scripts_agentic_stop_agentic_services_main",
       "scripts_agentic_stop_agentic_services_sh__entry"
     ],
-    "138": [
-      "src_merged_agentic_swarm_models_prd_models_epictask_to_dict",
-      "src_merged_agentic_swarm_models_prd_models_prdanalysisresult_to_dict",
-      "src_merged_agentic_swarm_models_prd_models_py_any",
-      "src_merged_agentic_swarm_models_prd_models_specgap_to_dict",
-      "src_merged_agentic_swarm_models_prd_models_subtask_to_dict"
-    ],
     "139": [
       "tests_test_agentic_cli_testcmdproviders",
       "tests_test_agentic_cli_testcmdproviders_setup",
@@ -3278,15 +3276,15 @@
     "13": 0.10384068278805121,
     "14": 0.08677098150782361,
     "15": 0.0945945945945946,
-    "16": 0.09009009009009009,
+    "16": 0.05974025974025974,
     "17": 0.09047619047619047,
     "18": 0.0659536541889483,
     "19": 0.125,
-    "20": 0.09848484848484848,
+    "20": 0.1032258064516129,
     "21": 0.06060606060606061,
     "22": 0.11088709677419355,
     "23": 0.17419354838709677,
-    "24": 0.11397849462365592,
+    "24": 0.1871345029239766,
     "25": 0.08387096774193549,
     "26": 0.09247311827956989,
     "27": 0.08045977011494253,
@@ -3400,7 +3398,6 @@
     "135": 0.5,
     "136": 0.7,
     "137": 0.7,
-    "138": 0.5,
     "139": 0.7,
     "140": 0.4,
     "141": 0.6,
@@ -3598,8 +3595,41 @@
       "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; bridges separate communities"
     }
   ],
-  "tokens": {
-    "input": 22969,
-    "output": 28672
-  }
+  "questions": [
+    {
+      "type": "ambiguous_edge",
+      "question": "What is the exact relationship between `graphify export neo4j` and `.graphify_python`?",
+      "why": "Edge tagged AMBIGUOUS (relation: references) - confidence is low."
+    },
+    {
+      "type": "ambiguous_edge",
+      "question": "What is the exact relationship between `graphify export falkordb` and `.graphify_python`?",
+      "why": "Edge tagged AMBIGUOUS (relation: references) - confidence is low."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `create_app()` connect `webapp.py` to `PassthroughStreamingProxy`, `handle_run`, `_run_latency_test`?",
+      "why": "High betweenness centrality (0.094) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `PassthroughStreamingProxy` connect `PassthroughStreamingProxy` to `CircuitBreaker`, `StreamingProxyConfig`, `_ChunkStream`, `_StallStream`, `test_streaming_proxy.py`?",
+      "why": "High betweenness centrality (0.094) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `MultiLayeredAgenticOrchestrator` connect `MultiLayeredAgenticOrchestrator` to `TestLatencyTest`, `TestModelRoleUpdate`, `TestProfiles`, `TestReports`, `webapp.py`, `WorkerRole`, `PRDAnalysisResult`, `_Stream`, `services/__init__.py`, `handle_run`, `test_webapp.py`, `TestRun`, `TestChains`, `TestRunPlan`, `TestRunFullAgenticWorkflow`, `ProxyServerDaemon`?",
+      "why": "High betweenness centrality (0.072) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 24 inferred relationships involving `KeyPoolManager` (e.g. with `isolated_key_pool()` and `TestCLIStringFunctions`) actually correct?",
+      "why": "`KeyPoolManager` has 24 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 29 inferred relationships involving `SubTask` (e.g. with `ConcurrencyRampController` and `DurableAgentRouter`) actually correct?",
+      "why": "`SubTask` has 29 INFERRED edges - model-reasoned connections that need verification."
+    }
+  ]
 }

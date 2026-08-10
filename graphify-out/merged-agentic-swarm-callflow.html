@@ -60,7 +60,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
 <div class="container">
 
 <h1>merged-agentic-swarm — Complete Call Flow &amp; Architecture Documentation</h1>
-<p class="subtitle">Generated from graphify knowledge graph: 2810 nodes, 4927 edges, 222 communities. Commit: 2394907</p>
+<p class="subtitle">Generated from graphify knowledge graph: 2810 nodes, 4927 edges, 222 communities. Commit: 6d80676</p>
 
 <div class="nav">
     <a href="#overview">Architecture Overview</a>
@@ -77,7 +77,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
     <a href="#task-spine-cli-py">task_spine_cli.py</a>
     <a href="#start-task-spine-sh">start_task_spine.sh</a>
     <a href="#load-registry">_load_registry</a>
-    <a href="#verify-task-spine-sh">verify_task_spine.sh</a>
+    <a href="#start-proxy-sh">start_proxy.sh</a>
     <a href="#other">Other</a>
 </div>
 
@@ -114,8 +114,8 @@ flowchart LR
     class START_TASK_SPINE_SH_FCA6C650 module;
     LOAD_REGISTRY_E02482A4("_load_registry<br/><small>9 nodes</small>")
     class LOAD_REGISTRY_E02482A4 module;
-    VERIFY_TASK_SPINE_SH_4E19E0AC("verify_task_spine.sh<br/><small>8 nodes</small>")
-    class VERIFY_TASK_SPINE_SH_4E19E0AC module;
+    START_PROXY_SH_F7AA322F("start_proxy.sh<br/><small>8 nodes</small>")
+    class START_PROXY_SH_F7AA322F module;
     OTHER_D0941E68("Other<br/><small>86 nodes</small>")
     class OTHER_D0941E68 module;
     CLI_SKILLS_9964CBB8 -->|contains x51| TESTS_FIXTURES_B84B1DCC
@@ -146,7 +146,7 @@ flowchart LR
     <h4>Architecture Layers</h4>
     <table style="width:100%;font-size:0.85rem;">
       <tr><th>Layer</th><th>Nodes</th><th>Communities</th></tr>
-      <tr><td>Graph Build</td><td>140</td><td><code>2, 39, 83, 88, 96, 97, 107, 115, 122, 127, 136, 139, 140, 147, 153, 209, 211, 214, 189</code></td></tr><tr><td>Analysis &amp; Clustering</td><td>86</td><td><code>17, 74, 106, 114, 133, 156, 195, 145, 159, 169</code></td></tr><tr><td>Outputs &amp; Docs</td><td>100</td><td><code>37, 52, 58, 82, 101, 102, 105, 164, 165, 173, 174, 175, 180</code></td></tr><tr><td>CLI &amp; Skill Installers</td><td>379</td><td><code>16, 14, 9, 19, 25, 45, 61, 67, 59, 60, 73, 87, 94, 108, 123, 124, 126, 128, 138, 200, 203, 206, 208, 146, 148, 213, 160, 218, 221, 167, 171, 190</code></td></tr><tr><td>Ingestion &amp; Updates</td><td>112</td><td><code>75, 81, 84, 85, 86, 93, 137, 199, 201, 202, 204, 205, 207, 150, 151, 210, 212, 215, 157, 158, 170, 183</code></td></tr><tr><td>Serving API</td><td>153</td><td><code>5, 18, 29, 46, 69, 103, 117</code></td></tr><tr><td>Security &amp; Global Graph</td><td>1</td><td><code>187</code></td></tr><tr><td>Tests &amp; Fixtures</td><td>1673</td><td><code>0, 51, 1, 3, 4, 8, 6, 23, 31, 7, 10, 12, 15, 11, 13, 54, 20, 21, 22, 24, 27, 26, 30, 28, 36, 32, 33, 34, 35, 40, 41, 70, 43, 44, 47, 48, 50, 55, 57, 66, 65, 62, 71, 64, 68, 49, 72, 42, 56, 76, 77, 78, 79, 80, 89, 92, 104, 95, 98, 109, 111, 112, 113, 118, 119, 120, 121, 125, 196, 132, 134, 135, 197, 198, 143, 144, 194</code></td></tr><tr><td>swarm_run.py</td><td>22</td><td><code>38</code></td></tr><tr><td>verify_component.sh</td><td>18</td><td><code>53</code></td></tr><tr><td>task_spine_cli.py</td><td>14</td><td><code>63</code></td></tr><tr><td>start_task_spine.sh</td><td>9</td><td><code>90</code></td></tr><tr><td>_load_registry</td><td>9</td><td><code>91</code></td></tr><tr><td>verify_task_spine.sh</td><td>8</td><td><code>100</code></td></tr><tr><td>Other</td><td>86</td><td><code>99, 110, 116, 129, 130, 131, 141, 142, 149, 152, 154, 155, 161, 162, 163, 216, 217, 219, 220, 166, 168, 172, 176, 177, 178, 179, 181, 182, 184, 185, 186, 188, 191, 192, 193</code></td></tr>
+      <tr><td>Graph Build</td><td>140</td><td><code>17, 43, 86, 94, 102, 103, 111, 122, 130, 134, 144, 156, 157, 165, 170, 172, 175, 177, 220</code></td></tr><tr><td>Analysis &amp; Clustering</td><td>86</td><td><code>15, 76, 110, 118, 119, 120, 121, 163, 186, 200</code></td></tr><tr><td>Outputs &amp; Docs</td><td>100</td><td><code>41, 55, 62, 85, 90, 91, 92, 195, 196, 204, 205, 206, 211</code></td></tr><tr><td>CLI &amp; Skill Installers</td><td>379</td><td><code>14, 12, 7, 18, 27, 33, 34, 35, 63, 65, 75, 93, 100, 112, 131, 132, 133, 135, 147, 149, 151, 154, 95, 164, 166, 176, 187, 188, 192, 198, 202, 221</code></td></tr><tr><td>Ingestion &amp; Updates</td><td>112</td><td><code>64, 84, 87, 88, 89, 99, 145, 146, 148, 150, 152, 153, 155, 168, 169, 171, 173, 178, 182, 183, 201, 214</code></td></tr><tr><td>Serving API</td><td>153</td><td><code>4, 19, 40, 51, 71, 108, 124</code></td></tr><tr><td>Security &amp; Global Graph</td><td>1</td><td><code>218</code></td></tr><tr><td>Tests &amp; Fixtures</td><td>1673</td><td><code>0, 1, 29, 2, 3, 6, 5, 25, 22, 9, 10, 11, 13, 16, 8, 57, 20, 21, 23, 24, 26, 28, 31, 30, 39, 32, 36, 37, 38, 60, 44, 45, 46, 48, 49, 52, 53, 54, 58, 61, 67, 69, 70, 72, 73, 74, 47, 59, 77, 79, 80, 81, 82, 83, 50, 98, 101, 104, 109, 113, 115, 116, 117, 125, 126, 127, 128, 129, 66, 139, 140, 141, 142, 143, 161, 162, 225</code></td></tr><tr><td>swarm_run.py</td><td>22</td><td><code>42</code></td></tr><tr><td>verify_component.sh</td><td>18</td><td><code>56</code></td></tr><tr><td>task_spine_cli.py</td><td>14</td><td><code>68</code></td></tr><tr><td>start_task_spine.sh</td><td>9</td><td><code>96</code></td></tr><tr><td>_load_registry</td><td>9</td><td><code>97</code></td></tr><tr><td>start_proxy.sh</td><td>8</td><td><code>105</code></td></tr><tr><td>Other</td><td>86</td><td><code>106, 114, 123, 136, 137, 78, 158, 159, 167, 174, 179, 180, 184, 185, 189, 190, 191, 193, 194, 197, 199, 203, 207, 208, 209, 210, 212, 213, 215, 216, 217, 219, 222, 223, 224</code></td></tr>
     </table>
   </div>
   <div class="card">
@@ -2037,7 +2037,7 @@ flowchart LR
   <td><code>webapp.py</code><br><small style="color:var(--muted)">src/merged_agentic_swarm/webapp.py</small></td>
   <td><span class="tag tag-class">Module</span></td>
   <td>External entry / no inbound edge</td>
-  <td><code>__init__.py</code><br><small style="color:var(--muted)">merged_agentic_swarm/providers/__init__.py</small><br><code>__init__.py</code><br><small style="color:var(--muted)">merged_agentic_swarm/services/__init__.py</small><br><code>key_pool.py</code><br><small style="color:var(--muted)">merged_agentic_swarm/providers/key_pool.py</small><br>+4 more</td>
+  <td><code>__init__.py</code><br><small style="color:var(--muted)">merged_agentic_swarm/services/__init__.py</small><br><code>__init__.py</code><br><small style="color:var(--muted)">merged_agentic_swarm/providers/__init__.py</small><br><code>key_pool.py</code><br><small style="color:var(--muted)">merged_agentic_swarm/providers/key_pool.py</small><br>+4 more</td>
   <td>Module file in src/merged_agentic_swarm/webapp.py.</td>
 </tr>
 <tr>
@@ -3708,202 +3708,32 @@ flowchart LR
 </div>
 <hr>
 
-<!-- ====== 15. verify_task_spine.sh ====== -->
-<h2 id="verify-task-spine-sh">15. verify_task_spine.sh</h2>
-<p>verify_task_spine.sh groups implementation around verify, task, spinesh, scripts, mostly in scripts/agentic/verify_task_spine.sh. This section covers 8 nodes and 11 internal edges; the diagram shows only representative relationships to stay readable.</p>
+<!-- ====== 15. start_proxy.sh ====== -->
+<h2 id="start-proxy-sh">15. start_proxy.sh</h2>
+<p>start_proxy.sh groups implementation around start, proxysh, scripts, agentic, mostly in scripts/agentic/start_proxy.sh. This section covers 8 nodes and 9 internal edges; the diagram shows only representative relationships to stay readable.</p>
 
 <div class="mermaid">
 %%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
 flowchart LR
-    %% Section: verify_task_spine.sh (8 nodes, 11 edges)
-    scripts_agentic_verify_task_spine_sh_entry_c19d4c5a("verify_task_spine.sh script<br/><small>scripts/agentic/verify_task_spine.sh</small>")
-    scripts_agentic_verify_task_spine_banner_08b67cbd("banner()<br/><small>scripts/agentic/verify_task_spine.sh</small>")
-    scripts_agentic_verify_task_spine_die_687a404c("die()<br/><small>scripts/agentic/verify_task_spine.sh</small>")
-    scripts_agentic_verify_task_spine_step_fail_5292391e("step_fail()<br/><small>scripts/agentic/verify_task_spine.sh</small>")
-    scripts_agentic_verify_task_spine_step_ok_7815e768("step_ok()<br/><small>scripts/agentic/verify_task_spine.sh</small>")
-    scripts_agentic_verify_task_spine_adapter_call_cb5a559c("adapter_call()<br/><small>scripts/agentic/verify_task_spine.sh</small>")
-    scripts_agentic_verify_task_spine_val_c4711a5e("val()<br/><small>scripts/agentic/verify_task_spine.sh</small>")
-    scripts_agentic_verify_task_spine_cd58eaf4("verify_task_spine.sh")
-    scripts_agentic_verify_task_spine_sh_entry_c19d4c5a -->|calls| scripts_agentic_verify_task_spine_banner_08b67cbd
-    scripts_agentic_verify_task_spine_sh_entry_c19d4c5a -->|calls| scripts_agentic_verify_task_spine_die_687a404c
-    scripts_agentic_verify_task_spine_sh_entry_c19d4c5a -->|calls| scripts_agentic_verify_task_spine_step_fail_5292391e
-    scripts_agentic_verify_task_spine_sh_entry_c19d4c5a -->|calls| scripts_agentic_verify_task_spine_step_ok_7815e768
-    class scripts_agentic_verify_task_spine_sh_entry_c19d4c5a function;
-    class scripts_agentic_verify_task_spine_banner_08b67cbd function;
-    class scripts_agentic_verify_task_spine_die_687a404c function;
-    class scripts_agentic_verify_task_spine_step_fail_5292391e function;
-    class scripts_agentic_verify_task_spine_step_ok_7815e768 function;
-    class scripts_agentic_verify_task_spine_adapter_call_cb5a559c function;
-    class scripts_agentic_verify_task_spine_val_c4711a5e function;
-    class scripts_agentic_verify_task_spine_cd58eaf4 function;
-    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
-    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
-    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
-    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
-    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
-    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
-    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
-    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
-    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
-</div>
-
-<h3>Call Details</h3>
-<table class="call-table">
-<tr>
-  <th style="width:5%">#</th>
-  <th style="width:28%">Node</th>
-  <th style="width:10%">Type</th>
-  <th style="width:17%">Caller</th>
-  <th style="width:20%">Callees</th>
-  <th style="width:20%">Description</th>
-</tr>
-<tr>
-  <td>1</td>
-  <td><code>verify_task_spine.sh</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>verify_task_spine.sh node in scripts/agentic/verify_task_spine.sh.</td>
-</tr>
-<tr>
-  <td>2</td>
-  <td><code>verify_task_spine.sh script</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td><code>banner()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small><br><code>die()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small><br><code>step_fail()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small><br>+1 more</td>
-  <td>verify_task_spine.sh script node in scripts/agentic/verify_task_spine.sh.</td>
-</tr>
-<tr>
-  <td>3</td>
-  <td><code>banner()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>verify_task_spine.sh script</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td>No direct outbound edge</td>
-  <td>banner() node in scripts/agentic/verify_task_spine.sh.</td>
-</tr>
-<tr>
-  <td>4</td>
-  <td><code>step_ok()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>verify_task_spine.sh script</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td>No direct outbound edge</td>
-  <td>step_ok() node in scripts/agentic/verify_task_spine.sh.</td>
-</tr>
-<tr>
-  <td>5</td>
-  <td><code>step_fail()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>verify_task_spine.sh script</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td>No direct outbound edge</td>
-  <td>step_fail() node in scripts/agentic/verify_task_spine.sh.</td>
-</tr>
-<tr>
-  <td>6</td>
-  <td><code>die()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td><code>verify_task_spine.sh script</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td>No direct outbound edge</td>
-  <td>die() node in scripts/agentic/verify_task_spine.sh.</td>
-</tr>
-<tr>
-  <td>7</td>
-  <td><code>adapter_call()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>adapter_call() node in scripts/agentic/verify_task_spine.sh.</td>
-</tr>
-<tr>
-  <td>8</td>
-  <td><code>val()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
-  <td><span class="tag tag-func">Function</span></td>
-  <td>External entry / no inbound edge</td>
-  <td>No direct outbound edge</td>
-  <td>val() node in scripts/agentic/verify_task_spine.sh.</td>
-</tr>
-</table>
-
-<div class="grid">
-  <div class="card">
-    <h4>Key Files</h4>
-    <table style="width:100%;font-size:0.85rem;">
-      <tr><th>File</th><th>Coverage</th></tr>
-      <tr><td><code>scripts/agentic/verify_task_spine.sh</code></td><td>8 nodes</td></tr>
-    </table>
-  </div>
-  <div class="card">
-    <h4>Design Notes</h4>
-    <p>This section comes from graphify community clustering. Relationship summary: defines x6, calls x4, contains x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
-  </div>
-</div>
-<hr>
-
-<!-- ====== 16. Other ====== -->
-<h2 id="other">16. Other</h2>
-<p>Other groups implementation around agentic, scripts, start, proxysh, mostly in scripts/agentic/start_proxy.sh, scripts/agentic/check_proxy_health.sh, scripts/agentic/verify_worker_runtime.sh. This section covers 86 nodes and 69 internal edges; the diagram shows only representative relationships to stay readable.</p>
-
-<div class="mermaid">
-%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
-flowchart LR
-    %% Section: Other (86 nodes, 69 edges)
-    subgraph other_scripts_agentic_start_worker_runtime_sh_4138ea39["scripts/agentic/start_worker_runtime.sh"]
-        scripts_agentic_start_worker_runtime_sh_entry_8fe72d4a("start_worker_runtime.sh script<br/><small>scripts/agentic/start_worker_runtime.sh</small>")
-        scripts_agentic_start_worker_runtime_die_512e1184("die()<br/><small>scripts/agentic/start_worker_runtime.sh</small>")
-        scripts_agentic_start_worker_runtime_log_85a7394b("log()<br/><small>scripts/agentic/start_worker_runtime.sh</small>")
-        scripts_agentic_start_worker_runtime_usage_278c35d2("usage()<br/><small>scripts/agentic/start_worker_runtime.sh</small>")
-    end
-    subgraph other_scripts_agentic_stop_agentic_services_sh_d7243a2f["scripts/agentic/stop_agentic_services.sh"]
-        scripts_agentic_stop_agentic_services_sh_entry_7ef050b0("stop_agentic_services.sh script<br/><small>scripts/agentic/stop_agentic_services.sh</small>")
-        scripts_agentic_stop_agentic_services_main_ec455806("main()<br/><small>scripts/agentic/stop_agentic_services.sh</small>")
-        scripts_agentic_stop_agentic_services_kill_worke_d652b82f("kill_worker()<br/><small>scripts/agentic/stop_agentic_services.sh</small>")
-        scripts_agentic_stop_agentic_services_is_protect_5b12f772("is_protected()<br/><small>scripts/agentic/stop_agentic_services.sh</small>")
-    end
-    subgraph other_scripts_agentic_discover_environment_sh_f20b7f61["scripts/agentic/discover_environment.sh"]
-        scripts_agentic_discover_environment_sh_entry_8609424d("discover_environment.sh script<br/><small>scripts/agentic/discover_environment.sh</small>")
-        scripts_agentic_discover_environment_critical_fa_f86305d4("critical_fail()<br/><small>scripts/agentic/discover_environment.sh</small>")
-        scripts_agentic_discover_environment_usage_9e22bed3("usage()<br/><small>scripts/agentic/discover_environment.sh</small>")
-    end
-    subgraph other_scripts_agentic_start_proxy_sh_89732cc7["scripts/agentic/start_proxy.sh"]
-        scripts_agentic_start_proxy_sh_entry_385a172c("start_proxy.sh script<br/><small>scripts/agentic/start_proxy.sh</small>")
-        scripts_agentic_start_proxy_check_proxy_b9fe2c49("check_proxy()<br/><small>scripts/agentic/start_proxy.sh</small>")
-        scripts_agentic_start_proxy_usage_d91d1591("usage()<br/><small>scripts/agentic/start_proxy.sh</small>")
-    end
-    subgraph other_scripts_agentic_check_proxy_health_sh_9e7b3302["scripts/agentic/check_proxy_health.sh"]
-        scripts_agentic_check_proxy_health_sh_entry_2df697a8("check_proxy_health.sh script<br/><small>scripts/agentic/check_proxy_health.sh</small>")
-        scripts_agentic_check_proxy_health_log_a579a281("log()<br/><small>scripts/agentic/check_proxy_health.sh</small>")
-    end
-    github_workflows_windows_ci_windows_job_140bdecc("Windows CI Job<br/><small>.github/workflows/windows-ci.yml</small>")
-    scripts_agentic_verify_worker_runtime_sh_entry_4d0d4f07("verify_worker_runtime.sh script<br/><small>scripts/agentic/verify_worker_runtime.sh</small>")
-    scripts_agentic_check_proxy_health_sh_entry_2df697a8 -->|calls| scripts_agentic_check_proxy_health_log_a579a281
-    scripts_agentic_discover_environment_sh_entry_8609424d -->|calls| scripts_agentic_discover_environment_critical_fa_f86305d4
-    scripts_agentic_discover_environment_sh_entry_8609424d -->|calls| scripts_agentic_discover_environment_usage_9e22bed3
+    %% Section: start_proxy.sh (8 nodes, 9 edges)
+    scripts_agentic_start_proxy_sh_entry_385a172c("start_proxy.sh script<br/><small>scripts/agentic/start_proxy.sh</small>")
+    scripts_agentic_start_proxy_check_proxy_b9fe2c49("check_proxy()<br/><small>scripts/agentic/start_proxy.sh</small>")
+    scripts_agentic_start_proxy_usage_d91d1591("usage()<br/><small>scripts/agentic/start_proxy.sh</small>")
+    scripts_agentic_start_proxy_fcc_port_f0f7492b("FCC_PORT<br/><small>scripts/agentic/start_proxy.sh</small>")
+    scripts_agentic_start_proxy_fcc_process_name_1207249f("FCC_PROCESS_NAME<br/><small>scripts/agentic/start_proxy.sh</small>")
+    scripts_agentic_start_proxy_routatic_port_c5f6af66("ROUTATIC_PORT<br/><small>scripts/agentic/start_proxy.sh</small>")
+    scripts_agentic_start_proxy_routatic_process_nam_b3015e97("ROUTATIC_PROCESS_NAME<br/><small>scripts/agentic/start_proxy.sh</small>")
+    scripts_agentic_start_proxy_9ce6dc41("start_proxy.sh")
     scripts_agentic_start_proxy_sh_entry_385a172c -->|calls| scripts_agentic_start_proxy_check_proxy_b9fe2c49
     scripts_agentic_start_proxy_sh_entry_385a172c -->|calls| scripts_agentic_start_proxy_usage_d91d1591
-    scripts_agentic_start_worker_runtime_sh_entry_8fe72d4a -->|calls| scripts_agentic_start_worker_runtime_die_512e1184
-    scripts_agentic_start_worker_runtime_sh_entry_8fe72d4a -->|calls| scripts_agentic_start_worker_runtime_log_85a7394b
-    scripts_agentic_start_worker_runtime_sh_entry_8fe72d4a -->|calls| scripts_agentic_start_worker_runtime_usage_278c35d2
-    scripts_agentic_stop_agentic_services_sh_entry_7ef050b0 -->|calls| scripts_agentic_stop_agentic_services_main_ec455806
-    scripts_agentic_stop_agentic_services_kill_worke_d652b82f -->|calls| scripts_agentic_stop_agentic_services_is_protect_5b12f772
-    scripts_agentic_stop_agentic_services_main_ec455806 -->|calls| scripts_agentic_stop_agentic_services_kill_worke_d652b82f
-    %% Omitted for readability: 68 nodes, 0 edges
-    class scripts_agentic_start_worker_runtime_sh_entry_8fe72d4a function;
-    class scripts_agentic_start_worker_runtime_die_512e1184 function;
-    class scripts_agentic_start_worker_runtime_log_85a7394b function;
-    class scripts_agentic_start_worker_runtime_usage_278c35d2 function;
-    class scripts_agentic_stop_agentic_services_sh_entry_7ef050b0 function;
-    class scripts_agentic_stop_agentic_services_main_ec455806 function;
-    class scripts_agentic_stop_agentic_services_kill_worke_d652b82f function;
-    class scripts_agentic_stop_agentic_services_is_protect_5b12f772 function;
-    class scripts_agentic_discover_environment_sh_entry_8609424d function;
-    class scripts_agentic_discover_environment_critical_fa_f86305d4 function;
-    class scripts_agentic_discover_environment_usage_9e22bed3 function;
     class scripts_agentic_start_proxy_sh_entry_385a172c function;
     class scripts_agentic_start_proxy_check_proxy_b9fe2c49 function;
     class scripts_agentic_start_proxy_usage_d91d1591 function;
-    class scripts_agentic_check_proxy_health_sh_entry_2df697a8 function;
-    class scripts_agentic_check_proxy_health_log_a579a281 function;
-    class github_workflows_windows_ci_windows_job_140bdecc klass;
-    class scripts_agentic_verify_worker_runtime_sh_entry_4d0d4f07 function;
+    class scripts_agentic_start_proxy_fcc_port_f0f7492b klass;
+    class scripts_agentic_start_proxy_fcc_process_name_1207249f klass;
+    class scripts_agentic_start_proxy_routatic_port_c5f6af66 klass;
+    class scripts_agentic_start_proxy_routatic_process_nam_b3015e97 klass;
+    class scripts_agentic_start_proxy_9ce6dc41 function;
     classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
     classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
     classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
@@ -3988,6 +3818,173 @@ flowchart LR
   <td><code>start_proxy.sh script</code><br><small style="color:var(--muted)">scripts/agentic/start_proxy.sh</small></td>
   <td>No direct outbound edge</td>
   <td>check_proxy() node in scripts/agentic/start_proxy.sh.</td>
+</tr>
+</table>
+
+<div class="grid">
+  <div class="card">
+    <h4>Key Files</h4>
+    <table style="width:100%;font-size:0.85rem;">
+      <tr><th>File</th><th>Coverage</th></tr>
+      <tr><td><code>scripts/agentic/start_proxy.sh</code></td><td>8 nodes</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Design Notes</h4>
+    <p>This section comes from graphify community clustering. Relationship summary: defines x6, calls x2, contains x1. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+  </div>
+</div>
+<hr>
+
+<!-- ====== 16. Other ====== -->
+<h2 id="other">16. Other</h2>
+<p>Other groups implementation around agentic, scripts, verify, worker, mostly in scripts/agentic/verify_task_spine.sh, scripts/agentic/check_proxy_health.sh, scripts/agentic/verify_worker_runtime.sh. This section covers 86 nodes and 71 internal edges; the diagram shows only representative relationships to stay readable.</p>
+
+<div class="mermaid">
+%%{init: {"theme": "dark", "themeVariables": {"fontSize": "15.0px", "fontFamily": "Segoe UI, system-ui, sans-serif", "primaryColor": "#1e293b", "primaryTextColor": "#e2e8f0", "primaryBorderColor": "#38bdf8", "secondaryColor": "#0f172a", "tertiaryColor": "#334155", "lineColor": "#64748b", "textColor": "#e2e8f0"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 48, "rankSpacing": 64, "padding": 14, "diagramPadding": 10, "useMaxWidth": true}}}%%
+flowchart LR
+    %% Section: Other (86 nodes, 71 edges)
+    subgraph other_scripts_agentic_start_worker_runtime_sh_4138ea39["scripts/agentic/start_worker_runtime.sh"]
+        scripts_agentic_start_worker_runtime_sh_entry_8fe72d4a("start_worker_runtime.sh script<br/><small>scripts/agentic/start_worker_runtime.sh</small>")
+        scripts_agentic_start_worker_runtime_die_512e1184("die()<br/><small>scripts/agentic/start_worker_runtime.sh</small>")
+        scripts_agentic_start_worker_runtime_log_85a7394b("log()<br/><small>scripts/agentic/start_worker_runtime.sh</small>")
+        scripts_agentic_start_worker_runtime_usage_278c35d2("usage()<br/><small>scripts/agentic/start_worker_runtime.sh</small>")
+    end
+    subgraph other_scripts_agentic_stop_agentic_services_sh_d7243a2f["scripts/agentic/stop_agentic_services.sh"]
+        scripts_agentic_stop_agentic_services_sh_entry_7ef050b0("stop_agentic_services.sh script<br/><small>scripts/agentic/stop_agentic_services.sh</small>")
+        scripts_agentic_stop_agentic_services_main_ec455806("main()<br/><small>scripts/agentic/stop_agentic_services.sh</small>")
+        scripts_agentic_stop_agentic_services_kill_worke_d652b82f("kill_worker()<br/><small>scripts/agentic/stop_agentic_services.sh</small>")
+        scripts_agentic_stop_agentic_services_is_protect_5b12f772("is_protected()<br/><small>scripts/agentic/stop_agentic_services.sh</small>")
+    end
+    subgraph other_scripts_agentic_discover_environment_sh_f20b7f61["scripts/agentic/discover_environment.sh"]
+        scripts_agentic_discover_environment_sh_entry_8609424d("discover_environment.sh script<br/><small>scripts/agentic/discover_environment.sh</small>")
+        scripts_agentic_discover_environment_critical_fa_f86305d4("critical_fail()<br/><small>scripts/agentic/discover_environment.sh</small>")
+        scripts_agentic_discover_environment_usage_9e22bed3("usage()<br/><small>scripts/agentic/discover_environment.sh</small>")
+    end
+    subgraph other_scripts_agentic_check_proxy_health_sh_9e7b3302["scripts/agentic/check_proxy_health.sh"]
+        scripts_agentic_check_proxy_health_sh_entry_2df697a8("check_proxy_health.sh script<br/><small>scripts/agentic/check_proxy_health.sh</small>")
+        scripts_agentic_check_proxy_health_log_a579a281("log()<br/><small>scripts/agentic/check_proxy_health.sh</small>")
+    end
+    subgraph other_scripts_agentic_verify_proxy_sh_155e8b54["scripts/agentic/verify_proxy.sh"]
+        scripts_agentic_verify_proxy_sh_entry_3d103e6a("verify_proxy.sh script<br/><small>scripts/agentic/verify_proxy.sh</small>")
+        scripts_agentic_verify_proxy_check_5f7af40d("check()<br/><small>scripts/agentic/verify_proxy.sh</small>")
+    end
+    github_workflows_windows_ci_windows_job_140bdecc("Windows CI Job<br/><small>.github/workflows/windows-ci.yml</small>")
+    scripts_agentic_verify_task_spine_sh_entry_c19d4c5a("verify_task_spine.sh script<br/><small>scripts/agentic/verify_task_spine.sh</small>")
+    scripts_agentic_verify_worker_runtime_sh_entry_4d0d4f07("verify_worker_runtime.sh script<br/><small>scripts/agentic/verify_worker_runtime.sh</small>")
+    scripts_agentic_check_proxy_health_sh_entry_2df697a8 -->|calls| scripts_agentic_check_proxy_health_log_a579a281
+    scripts_agentic_discover_environment_sh_entry_8609424d -->|calls| scripts_agentic_discover_environment_critical_fa_f86305d4
+    scripts_agentic_discover_environment_sh_entry_8609424d -->|calls| scripts_agentic_discover_environment_usage_9e22bed3
+    scripts_agentic_start_worker_runtime_sh_entry_8fe72d4a -->|calls| scripts_agentic_start_worker_runtime_die_512e1184
+    scripts_agentic_start_worker_runtime_sh_entry_8fe72d4a -->|calls| scripts_agentic_start_worker_runtime_log_85a7394b
+    scripts_agentic_start_worker_runtime_sh_entry_8fe72d4a -->|calls| scripts_agentic_start_worker_runtime_usage_278c35d2
+    scripts_agentic_stop_agentic_services_sh_entry_7ef050b0 -->|calls| scripts_agentic_stop_agentic_services_main_ec455806
+    scripts_agentic_stop_agentic_services_kill_worke_d652b82f -->|calls| scripts_agentic_stop_agentic_services_is_protect_5b12f772
+    scripts_agentic_stop_agentic_services_main_ec455806 -->|calls| scripts_agentic_stop_agentic_services_kill_worke_d652b82f
+    scripts_agentic_verify_proxy_sh_entry_3d103e6a -->|calls| scripts_agentic_verify_proxy_check_5f7af40d
+    %% Omitted for readability: 68 nodes, 0 edges
+    class scripts_agentic_start_worker_runtime_sh_entry_8fe72d4a function;
+    class scripts_agentic_start_worker_runtime_die_512e1184 function;
+    class scripts_agentic_start_worker_runtime_log_85a7394b function;
+    class scripts_agentic_start_worker_runtime_usage_278c35d2 function;
+    class scripts_agentic_stop_agentic_services_sh_entry_7ef050b0 function;
+    class scripts_agentic_stop_agentic_services_main_ec455806 function;
+    class scripts_agentic_stop_agentic_services_kill_worke_d652b82f function;
+    class scripts_agentic_stop_agentic_services_is_protect_5b12f772 function;
+    class scripts_agentic_discover_environment_sh_entry_8609424d function;
+    class scripts_agentic_discover_environment_critical_fa_f86305d4 function;
+    class scripts_agentic_discover_environment_usage_9e22bed3 function;
+    class scripts_agentic_check_proxy_health_sh_entry_2df697a8 function;
+    class scripts_agentic_check_proxy_health_log_a579a281 function;
+    class scripts_agentic_verify_proxy_sh_entry_3d103e6a function;
+    class scripts_agentic_verify_proxy_check_5f7af40d function;
+    class github_workflows_windows_ci_windows_job_140bdecc klass;
+    class scripts_agentic_verify_task_spine_sh_entry_c19d4c5a function;
+    class scripts_agentic_verify_worker_runtime_sh_entry_4d0d4f07 function;
+    classDef entry fill:#422006,stroke:#fbbf24,color:#fde68a,stroke-width:1px;
+    classDef api fill:#450a0a,stroke:#f87171,color:#fee2e2,stroke-width:1px;
+    classDef async fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:1px;
+    classDef klass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:1px;
+    classDef ui fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:1px;
+    classDef module fill:#172554,stroke:#60a5fa,color:#dbeafe,stroke-width:1px;
+    classDef test fill:#3f3f46,stroke:#a1a1aa,color:#f4f4f5,stroke-width:1px;
+    classDef concept fill:#292524,stroke:#a8a29e,color:#fafaf9,stroke-dasharray:4 3;
+    classDef function fill:#0f172a,stroke:#38bdf8,color:#e0f2fe,stroke-width:1px;
+</div>
+
+<h3>Call Details</h3>
+<table class="call-table">
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:28%">Node</th>
+  <th style="width:10%">Type</th>
+  <th style="width:17%">Caller</th>
+  <th style="width:20%">Callees</th>
+  <th style="width:20%">Description</th>
+</tr>
+<tr>
+  <td>1</td>
+  <td><code>verify_task_spine.sh</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>verify_task_spine.sh node in scripts/agentic/verify_task_spine.sh.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>verify_task_spine.sh script</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td><code>banner()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small><br><code>die()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small><br><code>step_fail()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small><br>+1 more</td>
+  <td>verify_task_spine.sh script node in scripts/agentic/verify_task_spine.sh.</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><code>banner()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>verify_task_spine.sh script</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td>No direct outbound edge</td>
+  <td>banner() node in scripts/agentic/verify_task_spine.sh.</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><code>step_ok()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>verify_task_spine.sh script</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td>No direct outbound edge</td>
+  <td>step_ok() node in scripts/agentic/verify_task_spine.sh.</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td><code>step_fail()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>verify_task_spine.sh script</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td>No direct outbound edge</td>
+  <td>step_fail() node in scripts/agentic/verify_task_spine.sh.</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td><code>die()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td><code>verify_task_spine.sh script</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td>No direct outbound edge</td>
+  <td>die() node in scripts/agentic/verify_task_spine.sh.</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td><code>adapter_call()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>adapter_call() node in scripts/agentic/verify_task_spine.sh.</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td><code>val()</code><br><small style="color:var(--muted)">scripts/agentic/verify_task_spine.sh</small></td>
+  <td><span class="tag tag-func">Function</span></td>
+  <td>External entry / no inbound edge</td>
+  <td>No direct outbound edge</td>
+  <td>val() node in scripts/agentic/verify_task_spine.sh.</td>
 </tr>
 <tr>
   <td>9</td>
@@ -4172,7 +4169,7 @@ flowchart LR
     <h4>Key Files</h4>
     <table style="width:100%;font-size:0.85rem;">
       <tr><th>File</th><th>Coverage</th></tr>
-      <tr><td><code>scripts/agentic/start_proxy.sh</code></td><td>8 nodes</td></tr>
+      <tr><td><code>scripts/agentic/verify_task_spine.sh</code></td><td>8 nodes</td></tr>
 <tr><td><code>scripts/agentic/check_proxy_health.sh</code></td><td>7 nodes</td></tr>
 <tr><td><code>scripts/agentic/verify_worker_runtime.sh</code></td><td>6 nodes</td></tr>
 <tr><td><code>scripts/agentic/start_worker_runtime.sh</code></td><td>5 nodes</td></tr>
@@ -4184,7 +4181,7 @@ flowchart LR
   </div>
   <div class="card">
     <h4>Design Notes</h4>
-    <p>This section comes from graphify community clustering. Relationship summary: defines x27, calls x19, contains x13, references x8. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
+    <p>This section comes from graphify community clustering. Relationship summary: defines x27, calls x21, contains x13, references x8. The diagram prioritizes high-confidence calls or usage relationships; the table keeps the broader node inventory.</p>
   </div>
 </div>
 <hr>
@@ -4309,7 +4306,7 @@ flowchart LR
 
 <div style="text-align:center; padding:40px 0; color: var(--muted); font-size:0.9rem;">
   <p>merged-agentic-swarm — Architecture Documentation</p>
-  <p>Generated: 2026-08-10 07:32 UTC · graphify callflow-html</p>
+  <p>Generated: 2026-08-10 20:16 UTC · graphify callflow-html</p>
 </div>
 
 </div><!-- .container -->
