@@ -260,9 +260,7 @@ class TestBanPersistence:
         assert fabric_mod._permanently_dead.get("test-ban-provider", 0) > time.time()
 
     def test_expired_ban_dropped_on_load(self):
-        fabric_mod._BANS_STATE_PATH.write_text(
-            json.dumps({"test-expired-provider": time.time() - 1}), encoding="utf-8"
-        )
+        fabric_mod._BANS_STATE_PATH.write_text(json.dumps({"test-expired-provider": time.time() - 1}), encoding="utf-8")
         fabric_mod._load_bans()
         assert "test-expired-provider" not in fabric_mod._permanently_dead
 
@@ -484,7 +482,17 @@ class TestFabricRouteOverlay:
         overlay = tmp_path / "fabric-routes.json"
         overlay.write_text(
             json.dumps(
-                {"routes": {"fast-flash": [{"provider": "nvidia_nim", "model": "z-ai/glm-5.2", "url": "http://localhost:8000/v1/chat/completions"}]}}
+                {
+                    "routes": {
+                        "fast-flash": [
+                            {
+                                "provider": "nvidia_nim",
+                                "model": "z-ai/glm-5.2",
+                                "url": "http://localhost:8000/v1/chat/completions",
+                            }
+                        ]
+                    }
+                }
             ),
             encoding="utf-8",
         )
@@ -502,7 +510,17 @@ class TestFabricRouteOverlay:
         # Reload after the file changes -> new overlay applies.
         overlay.write_text(
             json.dumps(
-                {"routes": {"fast-flash": [{"provider": "mistral", "model": "mistral-large-latest", "url": "http://localhost:8000/v1/chat/completions"}]}}
+                {
+                    "routes": {
+                        "fast-flash": [
+                            {
+                                "provider": "mistral",
+                                "model": "mistral-large-latest",
+                                "url": "http://localhost:8000/v1/chat/completions",
+                            }
+                        ]
+                    }
+                }
             ),
             encoding="utf-8",
         )
@@ -537,12 +555,20 @@ class TestMalformedOverlayRoutes:
         mpf = self._install(
             monkeypatch,
             tmp_path,
-            {"routes": {"alias": [
-                {"provider": "litellm", "model": "smart-auto", "url": "http://localhost:4000/v1/chat/completions"},
-                {"provider": "litellm", "model": "missing-url"},
-                {"model": "no-provider", "url": "http://x"},
-                {"provider": 7, "model": "smart-auto", "url": "http://x"},
-            ]}},
+            {
+                "routes": {
+                    "alias": [
+                        {
+                            "provider": "litellm",
+                            "model": "smart-auto",
+                            "url": "http://localhost:4000/v1/chat/completions",
+                        },
+                        {"provider": "litellm", "model": "missing-url"},
+                        {"model": "no-provider", "url": "http://x"},
+                        {"provider": 7, "model": "smart-auto", "url": "http://x"},
+                    ]
+                }
+            },
         )
         fabric = mpf.MultiProviderFabric()
         routes = fabric._build_route_list("alias")

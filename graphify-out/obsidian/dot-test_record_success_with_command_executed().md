@@ -1,0 +1,18 @@
+---
+source_file: "tests/test_progress_ledger_service.py"
+type: "code"
+community: "ProgressLedgerService"
+location: "L108"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/ProgressLedgerService
+---
+
+# .test_record_success_with_command_executed()
+
+## Connections
+- [[ProgressLedgerService]] - `calls` [INFERRED]
+- [[TestProgressLedgerService]] - `method` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/ProgressLedgerService

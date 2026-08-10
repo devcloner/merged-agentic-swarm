@@ -71,6 +71,10 @@ class StreamingProxyConfig:
     read_timeout: float = 120.0
     """Timeout for reading the first upstream byte after connect (seconds)."""
 
+    stream_idle_timeout_seconds: float = 60.0
+    """Max seconds between stream chunks; a stall longer than this closes the
+    stream (the first-byte read timeout does not cover mid-stream stalls)."""
+
     pool_max_connections: int = 20
     """Maximum connections in the httpx connection pool."""
 
@@ -350,14 +354,32 @@ class PassthroughStreamingProxy:
         # each raw network chunk immediately with no ByteChunker aggregation
         # and no content decoding — SSE bytes reach the client untouched.
         async def byte_stream() -> AsyncIterator[bytes]:
+            raw_iter = upstream_resp.aiter_raw()
             try:
-                async for chunk in upstream_resp.aiter_raw():
+                while True:
+                    try:
+                        # Per-chunk idle timeout: a stalled upstream that stops
+                        # emitting bytes would otherwise hang the client forever
+                        # (read_timeout only guards the first byte).
+                        chunk = await asyncio.wait_for(
+                            raw_iter.__anext__(),
+                            timeout=self.config.stream_idle_timeout_seconds,
+                        )
+                    except TimeoutError:
+                        logger.warning("Streaming proxy: upstream stalled mid-stream; closing")
+                        await self.circuit_breaker.record_failure()
+                        return
                     yield chunk
+            except httpx.TransportError:
+                # Mid-stream transport drop — count it against the circuit
+                # breaker so a flaky upstream is not retried on every request.
+                logger.warning("Streaming proxy: mid-stream upstream transport failure", exc_info=True)
+                await self.circuit_breaker.record_failure()
+                return
             except Exception:
-                # Mid-stream read failure (transport drop, client abort):
-                # close the upstream connection and stop the stream.  The
-                # client sees a truncated response, never a proxy error.
-                logger.debug("Streaming proxy: mid-stream upstream failure", exc_info=True)
+                # Client abort / any other mid-stream error: close cleanly and
+                # stop. The client sees a truncated response, never a proxy error.
+                logger.debug("Streaming proxy: mid-stream failure", exc_info=True)
                 return
             finally:
                 if not upstream_resp.is_closed:

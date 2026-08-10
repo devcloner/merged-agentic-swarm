@@ -10,14 +10,16 @@ on:
       mode:
         description: >-
           Routing mode. gateway = public LiteLLM (:4000), internal = LiteLLM on
-          localhost (self-hosted runner), fcc = FCC proxy (:8080), direct = OpenAI/
-          Anthropic/OpenRouter keys with no custom proxy, cloneclove = CloudCLI UI
-          API (cloneclove.com) with real API key.
+          localhost (self-hosted runner), fcc = FCC proxy (:8080), claudeproxy =
+          MAS key-pool proxy (:8089), direct = OpenAI/Anthropic/OpenRouter keys
+          with no custom proxy, cloneclove = CloudCLI UI API (cloneclove.com)
+          with real API key.
         type: choice
         options:
           - gateway
           - internal
           - fcc
+          - claudeproxy
           - direct
           - cloneclove
         default: gateway
@@ -25,8 +27,9 @@ on:
         description: >-
           Model id for the run (provider/model). Empty uses the per-mode default
           (gateway/internal -> litellm/smart-auto, fcc -> deepseek-v4-flash,
-          direct -> openrouter/anthropic/claude-sonnet-4-5, cloneclove -> claude
-          managed by cloneclove.com).
+          claudeproxy -> claude-sonnet-4-5, direct ->
+          openrouter/anthropic/claude-sonnet-4-5, cloneclove -> claude managed
+          by cloneclove.com).
         type: string
         default: ""
       prompt:
@@ -87,7 +90,12 @@ jobs:
               ;;
             fcc)
               MODEL="fcc/anthropic/opencode_go/deepseek-v4-flash"
-              CONFIG='{"provider":{"fcc":{"npm":"@ai-sdk/openai-compatible","name":"FCC Proxy","options":{"baseURL":"http://150.230.171.227:8080","apiKey":"{env:FCC_AUTH_TOKEN}"},"models":{"anthropic/opencode_go/deepseek-v4-flash":{"name":"DeepSeek V4 Flash"},"anthropic/nvidia_nim/deepseek-v4":{"name":"NVIDIA NIM DeepSeek V4"}}}}}'
+              CONFIG='{"provider":{"fcc":{"npm":"@ai-sdk/openai-compatible","name":"FCC Proxy","options":{"baseURL":"https://fcc.cloneclove.com","apiKey":"{env:FCC_AUTH_TOKEN}"},"models":{"anthropic/opencode_go/deepseek-v4-flash":{"name":"DeepSeek V4 Flash"},"anthropic/nvidia_nim/deepseek-v4":{"name":"NVIDIA NIM DeepSeek V4"}}}}}'
+              ;;
+            claudeproxy)
+              MODEL="claudeproxy/claude-sonnet-4-5"
+              # Multi-provider key-pool fallback proxy (public HTTPS subdomain).
+              CONFIG='{"provider":{"claudeproxy":{"npm":"@ai-sdk/openai-compatible","name":"Claude Proxy","options":{"baseURL":"https://claudeproxy.cloneclove.com/v1","apiKey":"{env:FCC_AUTH_TOKEN}"},"models":{"claude-sonnet-4-5":{"name":"Claude Sonnet 4.5"}}}}}'
               ;;
             direct)
               MODEL="openrouter/anthropic/claude-sonnet-4-5"
@@ -100,7 +108,7 @@ jobs:
             gateway|*)
               MODEL="litellm/smart-auto"
               # Public LiteLLM gateway (reachable from GitHub-hosted runners).
-              CONFIG='{"provider":{"litellm":{"npm":"@ai-sdk/openai-compatible","name":"LiteLLM Gateway","options":{"baseURL":"http://150.230.171.227:4000/v1","apiKey":"{env:LITELLM_MASTER_KEY}"},"models":{"smart-auto":{"name":"Smart Auto","limit":{"context":1000000,"output":8192}},"fast-flash":{"name":"Fast Flash","limit":{"context":1000000,"output":8192}},"high-throughput":{"name":"High Throughput","limit":{"context":1000000,"output":8192}}}}}}'
+              CONFIG='{"provider":{"litellm":{"npm":"@ai-sdk/openai-compatible","name":"LiteLLM Gateway","options":{"baseURL":"https://litellm.cloneclove.com/v1","apiKey":"{env:LITELLM_MASTER_KEY}"},"models":{"smart-auto":{"name":"Smart Auto","limit":{"context":1000000,"output":8192}},"fast-flash":{"name":"Fast Flash","limit":{"context":1000000,"output":8192}},"high-throughput":{"name":"High Throughput","limit":{"context":1000000,"output":8192}}}}}}'
               ;;
           esac
           {
@@ -119,20 +127,24 @@ jobs:
         shell: bash
         env:
           LITELLM_MASTER_KEY: ${{ secrets.LITELLM_MASTER_KEY }}
+          FCC_AUTH_TOKEN: ${{ secrets.FCC_AUTH_TOKEN }}
         run: |
           set -euo pipefail
-          case "${INPUT_MODE:-gateway}" in
-            gateway) BASE="http://150.230.171.227:4000/v1" ;;
-            internal) BASE="http://127.0.0.1:4000/v1" ;;
+          MODE="${INPUT_MODE:-gateway}"
+          case "$MODE" in
+            gateway)  BASE="https://litellm.cloneclove.com/v1/models";   KEY="${LITELLM_MASTER_KEY}"; HDR="Authorization: Bearer ${KEY}" ;;
+            internal) BASE="http://127.0.0.1:4000/v1/models";            KEY="${LITELLM_MASTER_KEY}"; HDR="Authorization: Bearer ${KEY}" ;;
+            fcc)      BASE="https://fcc.cloneclove.com/v1/models";       KEY="${FCC_AUTH_TOKEN}";      HDR="x-api-key: ${KEY}" ;;
+            claudeproxy) BASE="https://claudeproxy.cloneclove.com/health"; KEY=""; HDR="" ;;
             *) exit 0 ;;
           esac
-          if [ -z "${LITELLM_MASTER_KEY:-}" ]; then
-            echo "::error::LITELLM_MASTER_KEY secret is not set — required for mode ${INPUT_MODE:-gateway}. Set it in repo settings → secrets and variables."
+          if [ "$MODE" != "claudeproxy" ] && [ -z "$KEY" ]; then
+            echo "::error::required secret is not set for mode $MODE. Set it in repo settings → secrets and variables."
             exit 1
           fi
-          CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$BASE/models" -H "Authorization: Bearer ${LITELLM_MASTER_KEY}")
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$BASE" ${HDR:+-H "$HDR"})
           if [ "$CODE" != "200" ]; then
-            echo "::error::provider check failed: HTTP ${CODE} at ${BASE}. Check the gateway is up and LITELLM_MASTER_KEY holds a valid gateway key."
+            echo "::error::provider check failed: HTTP ${CODE} at ${BASE}. Confirm the proxy is up and the secret holds a valid key."
             exit 1
           fi
           echo "provider OK: ${BASE} (HTTP ${CODE})"

@@ -29,7 +29,7 @@ REPO = Path(__file__).resolve().parent.parent
 PLAN_FILE = REPO / ".ultraswarm-plan.json"
 PACKAGE = REPO / "src" / "merged_agentic_swarm"
 TESTS = REPO / "tests"
-DEFAULT_PROJECT = "lunaclone/merged-agentic-swarm"
+DEFAULT_PROJECT = "zev-oer/merged-agentic-swarm"  # moved from lunaclone (2026-08-09); glab POST 405 on old path
 ULTRASWARM_HOME = Path(os.environ.get("ULTRASWARM_HOME", "~/projects/ultraswarm")).expanduser()
 
 # Plan-schema task keys (runner rejects unknown keys).

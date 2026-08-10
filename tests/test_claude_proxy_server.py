@@ -255,6 +255,79 @@ class TestClaudeProxyHandler:
             urllib.request.urlopen(req, timeout=5)
         assert exc.value.code == 413
 
+    def test_fast_fallback_router_used_when_flag_set(self, monkeypatch):
+        """#33: FAST_FALLBACK_ENABLED routes through the hedged router."""
+        import urllib.request
+
+        import merged_agentic_swarm.proxy.claude_proxy_server as proxy_mod
+
+        captured = []
+
+        def fake_dispatch(**kwargs):
+            captured.append(kwargs)
+            return {
+                "id": "msg_1",
+                "type": "message",
+                "role": "assistant",
+                "content": [{"type": "text", "text": "fast fallback"}],
+            }
+
+        monkeypatch.setenv("FAST_FALLBACK_ENABLED", "1")
+        monkeypatch.setattr(proxy_mod.default_fast_fallback, "dispatch", fake_dispatch)
+        payload = json.dumps({"model": "claude-3-7-sonnet", "messages": [{"role": "user", "content": "Hi"}]}).encode(
+            "utf-8"
+        )
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/messages",
+            data=payload,
+            headers={"Content-Type": "application/json", "x-api-key": "freecc"},
+            method="POST",
+        )
+        resp = urllib.request.urlopen(req, timeout=5)
+        data = json.loads(resp.read().decode("utf-8"))
+        assert resp.status == 200
+        assert captured, "fast-fallback router should have been used"
+        assert captured[0]["model_alias"] == "claude-3-7-sonnet"
+        assert data["content"][0]["text"] == "fast fallback"
+
+    def test_fast_fallback_router_not_used_when_flag_unset(self, monkeypatch):
+        """#33: without the flag the proxy keeps using the fabric dispatch path."""
+        import urllib.request
+
+        import merged_agentic_swarm.proxy.claude_proxy_server as proxy_mod
+
+        used = []
+
+        def fake_dispatch(**kwargs):
+            used.append(True)
+            return {}
+
+        def fake_fabric_dispatch(**kwargs):
+            return {
+                "id": "msg_1",
+                "type": "message",
+                "role": "assistant",
+                "content": [{"type": "text", "text": "fabric"}],
+            }
+
+        monkeypatch.delenv("FAST_FALLBACK_ENABLED", raising=False)
+        monkeypatch.setattr(proxy_mod.default_fast_fallback, "dispatch", fake_dispatch)
+        monkeypatch.setattr(proxy_mod.default_fabric, "dispatch_request", fake_fabric_dispatch)
+        payload = json.dumps({"model": "claude-3-7-sonnet", "messages": [{"role": "user", "content": "Hi"}]}).encode(
+            "utf-8"
+        )
+        req = urllib.request.Request(
+            f"{self.base_url}/v1/messages",
+            data=payload,
+            headers={"Content-Type": "application/json", "x-api-key": "freecc"},
+            method="POST",
+        )
+        resp = urllib.request.urlopen(req, timeout=5)
+        data = json.loads(resp.read().decode("utf-8"))
+        assert resp.status == 200
+        assert used == []  # router not used without the flag
+        assert data["content"][0]["text"] == "fabric"
+
     def test_post_chat_completions_with_invalid_json(self):
         import urllib.request
         from urllib.error import HTTPError

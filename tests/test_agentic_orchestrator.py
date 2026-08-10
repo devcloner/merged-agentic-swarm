@@ -14,6 +14,7 @@ calls) runs for real against a tmp registry dir.
 
 import logging
 import sys
+import threading
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -249,6 +250,35 @@ class TestRunFullAgenticWorkflow:
         assert result["status"] == "success"
         assert all("ramp_sequence" not in ks for ks in batch_kwarg_sets)
         assert all("model" not in ks for ks in ledger_kwarg_sets)
+
+    def test_workflow_cancel_event_aborts_between_waves(self, monkeypatch, tmp_path):
+        """#32: a set cancel_event makes the workflow return an aborted result."""
+        orch = self._stub_workflow(monkeypatch, tmp_path)
+        cancel = threading.Event()
+        cancel.set()
+        result = orch.run_full_agentic_workflow("# title\n\nbody", cancel_event=cancel)
+        assert result["status"] == "aborted"
+        assert result["waves_completed"] == 0
+        assert result["reason"] == "cancelled by user"
+
+
+class TestCancellationCheck:
+    def test_event_set_returns_aborted(self):
+        from merged_agentic_swarm.tools.agentic_orchestrator import _cancellation_check
+
+        cancel = threading.Event()
+        cancel.set()
+        result = _cancellation_check(cancel, 2)
+        assert result is not None
+        assert result["status"] == "aborted"
+        assert result["waves_completed"] == 2
+        assert isinstance(result.get("timestamp"), float)
+
+    def test_event_unset_or_none_returns_none(self):
+        from merged_agentic_swarm.tools.agentic_orchestrator import _cancellation_check
+
+        assert _cancellation_check(threading.Event(), 1) is None
+        assert _cancellation_check(None, 1) is None
 
 
 class TestRunSyntaxVerificationPaths:

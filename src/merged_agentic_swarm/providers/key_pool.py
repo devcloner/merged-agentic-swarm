@@ -178,11 +178,7 @@ class KeyPoolManager:
         self._lock so get_key/mark_* never observe a half-built pool.
         """
         with self._lock:
-            existing = {
-                key.key_id: key
-                for keys in self.keys_by_provider.values()
-                for key in keys
-            }
+            existing = {key.key_id: key for keys in self.keys_by_provider.values() for key in keys}
             new_pools: dict[str, list[APIKeyInfo]] = {}
             added = 0
             preserved = 0
@@ -198,8 +194,7 @@ class KeyPoolManager:
                     added += 1
             self.keys_by_provider = new_pools
             logger.info(
-                f"Reloaded key pools: {added} new, {preserved} preserved across "
-                f"{list(self.keys_by_provider.keys())}"
+                f"Reloaded key pools: {added} new, {preserved} preserved across {list(self.keys_by_provider.keys())}"
             )
 
     def add_key(self, provider: str, secret_value: str, key_id: str):
@@ -279,8 +274,7 @@ class KeyPoolManager:
                 "active_keys": sum(
                     1
                     for k in keys
-                    if k.status == KeyStatus.ACTIVE
-                    or (k.status == KeyStatus.COOLDOWN and now >= k.cooldown_until)
+                    if k.status == KeyStatus.ACTIVE or (k.status == KeyStatus.COOLDOWN and now >= k.cooldown_until)
                 ),
                 "cooldown_keys": len(cooling),
                 "exhausted_keys": sum(1 for k in keys if k.status == KeyStatus.EXHAUSTED),

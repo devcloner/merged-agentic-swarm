@@ -5,7 +5,6 @@ import httpx
 import pytest
 
 from merged_agentic_swarm.health_check import (
-    DEFAULT_PROMPT,
     HealthConfig,
     HopResult,
     ProxyChainHealth,
@@ -146,9 +145,7 @@ def test_check_streaming_fcc_happy_path(monkeypatch):
     """check_streaming through FCC endpoint measures TTFB and total latency."""
 
     events = (
-        _sse_event("content_block_start", "")
-        + _sse_event("content_block_delta", "OK")
-        + _sse_event("message_stop", "")
+        _sse_event("content_block_start", "") + _sse_event("content_block_delta", "OK") + _sse_event("message_stop", "")
     )
 
     async def handler(request):
@@ -184,9 +181,7 @@ def test_check_streaming_http_error(monkeypatch):
     """check_streaming reports failure immediately on non-2xx response."""
 
     async def handler(request):
-        return httpx.Response(
-            401, json={"error": "unauthorized"}, stream=httpx.ByteStream(b"")
-        )
+        return httpx.Response(401, json={"error": "unauthorized"}, stream=httpx.ByteStream(b""))
 
     _patch_client(monkeypatch, handler)
     result = asyncio.run(ProxyChainHealth(HealthConfig()).check_streaming())
@@ -210,9 +205,7 @@ def test_check_streaming_routatic_endpoint(monkeypatch):
     """check_streaming targets routatic-proxy when endpoint='routatic'."""
 
     events = (
-        _sse_event("content_block_start", "")
-        + _sse_event("content_block_delta", "OK")
-        + _sse_event("message_stop", "")
+        _sse_event("content_block_start", "") + _sse_event("content_block_delta", "OK") + _sse_event("message_stop", "")
     )
 
     seen_url = []
@@ -239,9 +232,7 @@ def test_check_providers_happy_path(monkeypatch):
         if "/health" in str(request.url):
             return httpx.Response(200, json={"status": "ok"})
         # /v1/models
-        return httpx.Response(
-            200, json={"data": [{"id": "m1"}, {"id": "m2"}, {"id": "m3"}]}
-        )
+        return httpx.Response(200, json={"data": [{"id": "m1"}, {"id": "m2"}, {"id": "m3"}]})
 
     _patch_client(monkeypatch, handler)
     results = asyncio.run(ProxyChainHealth(HealthConfig()).check_providers())
@@ -434,9 +425,7 @@ def test_main_stream_subcommand(monkeypatch, capsys):
     """'stream' subcommand runs only the streaming check."""
 
     events = (
-        _sse_event("content_block_start", "")
-        + _sse_event("content_block_delta", "OK")
-        + _sse_event("message_stop", "")
+        _sse_event("content_block_start", "") + _sse_event("content_block_delta", "OK") + _sse_event("message_stop", "")
     )
 
     async def handler(request):

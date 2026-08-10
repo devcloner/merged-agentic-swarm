@@ -18,6 +18,8 @@ src/merged_agentic_swarm/tools/token-savior/
 .ultraswarm-plan.json
 
 # ── Python ──────────────────────────────────────────────────────
+.coverage
+coverage.json
 __pycache__/
 *.pyc
 *.py[cod]

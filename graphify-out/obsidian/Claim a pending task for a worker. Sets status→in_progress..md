@@ -1,0 +1,17 @@
+---
+source_file: "src/merged_agentic_swarm/services/task_spine_adapter.py"
+type: "rationale"
+community: "TaskSpineStore"
+location: "L188"
+tags:
+  - graphify/rationale
+  - graphify/EXTRACTED
+  - community/TaskSpineStore
+---
+
+# Claim a pending task for a worker. Sets status→in_progress.
+
+## Connections
+- [[dot-claim()]] - `rationale_for` [EXTRACTED]
+
+#graphify/rationale #graphify/EXTRACTED #community/TaskSpineStore

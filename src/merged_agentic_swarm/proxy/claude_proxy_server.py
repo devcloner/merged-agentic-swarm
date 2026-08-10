@@ -17,11 +17,44 @@ from typing import Any
 
 import requests
 
+from merged_agentic_swarm.fast_fallback import default_fast_fallback
 from merged_agentic_swarm.fast_pool import warm_all
 from merged_agentic_swarm.providers.key_pool import default_key_pool
 from merged_agentic_swarm.providers.multi_provider_fabric import default_fabric
 
 logger = logging.getLogger("claude_proxy")
+
+FAST_FALLBACK_FLAG = "FAST_FALLBACK_ENABLED"
+
+
+def _proxy_dispatch(
+    model_alias: str,
+    messages: list[dict[str, Any]],
+    system_prompt: str | None = None,
+    max_tokens: int = 4096,
+    temperature: float = 0.7,
+) -> dict[str, Any]:
+    """Route a request through the hedged fast-fallback router when enabled.
+
+    Both routers return the same Anthropic-shaped dict (with a simulation
+    fallback), so the two dispatch paths are interchangeable at the proxy.
+    """
+    if os.environ.get(FAST_FALLBACK_FLAG, "").lower() in ("1", "true", "yes"):
+        return default_fast_fallback.dispatch(
+            model_alias=model_alias,
+            messages=messages,
+            system_prompt=system_prompt,
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
+    return default_fabric.dispatch_request(
+        model_alias=model_alias,
+        messages=messages,
+        system_prompt=system_prompt,
+        max_tokens=max_tokens,
+        temperature=temperature,
+    )
+
 
 # ── Request body size limits ─────────────────────────────────────────────
 MAX_JSON_BODY_BYTES = 5 * 1024 * 1024  # 5 MiB for JSON endpoints
@@ -215,7 +248,7 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
             max_tokens = req_data.get("max_tokens", 4096)
             temperature = req_data.get("temperature", 0.7)
 
-            response_data = default_fabric.dispatch_request(
+            response_data = _proxy_dispatch(
                 model_alias=model,
                 messages=messages,
                 system_prompt=system_prompt,
@@ -230,7 +263,7 @@ class ClaudeProxyHandler(BaseHTTPRequestHandler):
             max_tokens = req_data.get("max_tokens", 4096)
             temperature = req_data.get("temperature", 0.7)
 
-            anthropic_resp = default_fabric.dispatch_request(
+            anthropic_resp = _proxy_dispatch(
                 model_alias=model, messages=messages, max_tokens=max_tokens, temperature=temperature
             )
 

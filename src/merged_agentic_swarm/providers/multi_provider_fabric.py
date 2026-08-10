@@ -31,9 +31,7 @@ _fabric_lock = threading.Lock()
 
 # Bans persist across restarts so a 401-perma-banned provider is not retried on
 # every fresh process (wasting a request before re-banning).
-_BANS_STATE_PATH = (
-    Path(__file__).resolve().parents[3] / "docs" / "agentic" / "registry" / "provider-bans.json"
-)
+_BANS_STATE_PATH = Path(__file__).resolve().parents[3] / "docs" / "agentic" / "registry" / "provider-bans.json"
 
 
 def _persist_bans() -> None:

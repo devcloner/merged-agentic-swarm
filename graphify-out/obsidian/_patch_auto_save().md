@@ -1,0 +1,23 @@
+---
+source_file: "tests/test_agentic_cli.py"
+type: "code"
+community: "test_agentic_cli.py"
+location: "L51"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/test_agentic_clipy
+---
+
+# _patch_auto_save()
+
+## Connections
+- [[dot-test_run_auto_saves_report_on_success()]] - `calls` [EXTRACTED]
+- [[dot-test_run_profile_resolves_and_passes_ramp_and_model()]] - `calls` [EXTRACTED]
+- [[dot-test_run_profile_through_main()]] - `calls` [EXTRACTED]
+- [[dot-test_run_success_prints_result()]] - `calls` [EXTRACTED]
+- [[dot-test_run_verbose_prints_full_json()]] - `calls` [EXTRACTED]
+- [[_fake_saved()]] - `calls` [EXTRACTED]
+- [[test_agentic_cli.py]] - `contains` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/test_agentic_clipy

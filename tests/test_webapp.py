@@ -13,6 +13,7 @@ fabric-routes.json is ever written from a test.
 
 import json
 import os
+import threading
 from pathlib import Path
 from unittest.mock import patch
 
@@ -31,9 +32,11 @@ def _fresh_caches():
     """Start each test with empty disk caches so patches don't leak across tests."""
     swarm_profiles._profiles_cache = None
     mr._registry_cache = None
+    webapp._run_registry.clear()
     yield
     swarm_profiles._profiles_cache = None
     mr._registry_cache = None
+    webapp._run_registry.clear()
 
 
 @pytest.fixture
@@ -456,6 +459,8 @@ class TestRun:
         assert captured["ramp_sequence"] == [4]
         assert captured["default_model"] == "fast-flash"
         assert captured["gates"] is False
+        # #32: a cancel_event is threaded into the workflow for run cancellation.
+        assert isinstance(captured["cancel_event"], threading.Event)
 
     def test_run_learning_profile_forwards_none_ramp(self, client):
         captured = {}
@@ -479,6 +484,52 @@ class TestRun:
 
     def test_run_missing_profile_400(self, client):
         assert client.post("/api/run", json={"prd": "x"}).status_code == 400
+
+    def test_run_status_lists_and_details_runs(self, client):
+        """#32: GET /api/run/status reports runs started by POST /api/run."""
+        captured = {}
+
+        def fake_run(self, **kwargs):
+            captured.update(kwargs)
+            return {"status": "success"}
+
+        with patch.object(MultiLayeredAgenticOrchestrator, "run_full_agentic_workflow", fake_run):
+            client.post("/api/run", json={"profile": "patch", "prd": "# title\n\nbody"})
+            client.app.state.last_run_thread.join(timeout=10)
+        status = client.get("/api/run/status").json()
+        assert status["runs"]
+        run_id = next(iter(status["runs"]))
+        detail = client.get(f"/api/run/status?run_id={run_id}").json()
+        assert detail["run_id"] == run_id
+        assert detail["status"] in ("completed", "running")
+        assert detail["cancel_requested"] is False
+
+    def test_run_status_unknown_404(self, client):
+        assert client.get("/api/run/status?run_id=nope").status_code == 404
+
+    def test_run_cancel_marks_cancelling(self, client):
+        """#32: POST /api/run/{id}/cancel signals the workflow's cancel_event."""
+        captured = {}
+
+        def fake_run(self, **kwargs):
+            captured.update(kwargs)
+            cancel = kwargs.get("cancel_event")
+            if cancel is not None:
+                cancel.wait(timeout=5)
+            return {"status": "success"}
+
+        with patch.object(MultiLayeredAgenticOrchestrator, "run_full_agentic_workflow", fake_run):
+            client.post("/api/run", json={"profile": "patch", "prd": "# title\n\nbody"})
+            thread = client.app.state.last_run_thread
+            run_id = next(iter(client.get("/api/run/status").json()["runs"]))
+            resp = client.post(f"/api/run/{run_id}/cancel").json()
+            assert resp["cancelled"] is True
+            assert resp["status"] in ("cancelling", "aborted")
+            thread.join(timeout=10)
+            assert captured["cancel_event"].is_set() is True
+
+    def test_run_cancel_unknown_404(self, client):
+        assert client.post("/api/run/nope/cancel").status_code == 404
 
 
 def test_dashboard_html(client):

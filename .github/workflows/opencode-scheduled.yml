@@ -37,7 +37,7 @@ jobs:
         run: |
           {
             echo 'OPENCODE_CONFIG_CONTENT<<EOF'
-            echo '{"provider":{"litellm":{"npm":"@ai-sdk/openai-compatible","name":"LiteLLM Gateway","options":{"baseURL":"http://150.230.171.227:4000/v1","apiKey":"{env:LITELLM_MASTER_KEY}"},"models":{"smart-auto":{"name":"Smart Auto","limit":{"context":1000000,"output":8192}},"fast-flash":{"name":"Fast Flash","limit":{"context":1000000,"output":8192}},"high-throughput":{"name":"High Throughput","limit":{"context":1000000,"output":8192}}}}}}'
+            echo '{"provider":{"litellm":{"npm":"@ai-sdk/openai-compatible","name":"LiteLLM Gateway","options":{"baseURL":"https://litellm.cloneclove.com/v1","apiKey":"{env:LITELLM_MASTER_KEY}"},"models":{"smart-auto":{"name":"Smart Auto","limit":{"context":1000000,"output":8192}},"fast-flash":{"name":"Fast Flash","limit":{"context":1000000,"output":8192}},"high-throughput":{"name":"High Throughput","limit":{"context":1000000,"output":8192}}}}}}'
             echo 'EOF'
           } >> "$GITHUB_ENV"
 

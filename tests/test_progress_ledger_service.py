@@ -182,8 +182,12 @@ class TestProgressLedgerService:
         ledger_file = os.path.join(temp_dir, "ledger.json")
         ledger = ProgressLedgerService(ledger_file=ledger_file)
         ledger.log_progress(
-            task_id="T-01", subtask_id=None, worker_id="w1", wave_id=0,
-            action="test", status="in_progress",
+            task_id="T-01",
+            subtask_id=None,
+            worker_id="w1",
+            wave_id=0,
+            action="test",
+            status="in_progress",
         )
 
         with ThreadPoolExecutor(max_workers=4) as ex:

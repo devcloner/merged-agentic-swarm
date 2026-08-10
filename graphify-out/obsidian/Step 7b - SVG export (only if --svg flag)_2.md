@@ -1,0 +1,17 @@
+---
+source_file: ".opencode/skills/graphify/references/exports.md"
+type: "document"
+community: "graphify reference: extra exports and benchmark"
+location: "L47"
+tags:
+  - graphify/document
+  - graphify/EXTRACTED
+  - community/graphify_reference_extra_exports_and_benchmark
+---
+
+# Step 7b - SVG export (only if --svg flag)
+
+## Connections
+- [[graphify reference extra exports and benchmark_2]] - `contains` [EXTRACTED]
+
+#graphify/document #graphify/EXTRACTED #community/graphify_reference_extra_exports_and_benchmark

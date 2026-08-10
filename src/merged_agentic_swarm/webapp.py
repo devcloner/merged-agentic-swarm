@@ -38,6 +38,7 @@ import threading
 import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from dataclasses import dataclass
 from pathlib import Path
 
 import httpx
@@ -265,29 +266,64 @@ def _write_fabric_overlay(alias: str, routes: list[dict]) -> None:
         reload_fabric()
 
 
-def _spawn_agentic_run(profile: dict, alias: str, prd: str) -> threading.Thread:
+@dataclass
+class RunHandle:
+    """Registry entry for a background workflow run."""
+
+    id: str
+    cancel_event: threading.Event
+    started_at: float
+    status: str = "running"
+    thread: threading.Thread | None = None
+
+
+_run_registry: dict[str, RunHandle] = {}
+_run_registry_lock = threading.Lock()
+
+
+def _serialize_run(handle: RunHandle) -> dict:
+    status = handle.status
+    if status == "running" and handle.thread is not None and not handle.thread.is_alive():
+        status = "completed"
+    return {
+        "run_id": handle.id,
+        "status": status,
+        "started_at": handle.started_at,
+        "cancel_requested": handle.cancel_event.is_set(),
+        "alive": handle.thread is not None and handle.thread.is_alive(),
+    }
+
+
+def _spawn_agentic_run(profile: dict, alias: str, prd: str) -> RunHandle:
     """Start a real agentic workflow on a background daemon thread (returns now).
 
-    ``run_full_agentic_workflow`` is called with keyword arguments only — its
-    signature is being extended with a trailing optional ``gates`` kwarg.
+    Returns a :class:`RunHandle` so callers can poll ``/api/run/status`` and
+    cancel the run via its ``cancel_event`` (checked between waves).
     """
     from merged_agentic_swarm.tools.agentic_orchestrator import MultiLayeredAgenticOrchestrator
+
+    cancel_event = threading.Event()
+    handle = RunHandle(id=f"run-{int(time.time() * 1000)}", cancel_event=cancel_event, started_at=time.time())
 
     def _runner() -> None:
         try:
             orchestrator = MultiLayeredAgenticOrchestrator()
-            orchestrator.run_full_agentic_workflow(
+            result = orchestrator.run_full_agentic_workflow(
                 prd_content=prd,
                 ramp_sequence=profile.get("waves") or None,
                 default_model=alias,
                 gates=profile.get("gates"),
+                cancel_event=cancel_event,
             )
+            handle.status = "aborted" if result.get("status") == "aborted" else "completed"
         except Exception:
             logger.exception("agentic run failed in background thread")
+            handle.status = "error"
 
-    thread = threading.Thread(target=_runner, name="agentic-run", daemon=True)
+    thread = threading.Thread(target=_runner, name=f"agentic-run-{handle.id}", daemon=True)
+    handle.thread = thread
     thread.start()
-    return thread
+    return handle
 
 
 def _role_mapping() -> dict[str, str]:
@@ -568,9 +604,36 @@ async def handle_run(request: Request) -> JSONResponse:
     except KeyError:
         return JSONResponse({"error": f"unknown profile: {name}"}, status_code=404)
     alias = swarm_profiles.resolve_model_alias_for_profile(name)
-    thread = _spawn_agentic_run(profile, alias, prd)
-    request.app.state.last_run_thread = thread
+    handle = _spawn_agentic_run(profile, alias, prd)
+    with _run_registry_lock:
+        _run_registry[handle.id] = handle
+    request.app.state.last_run_thread = handle.thread
     return JSONResponse({"started": True, "profile": name, "model_alias": alias})
+
+
+async def handle_run_status(request: Request) -> JSONResponse:
+    """Report live status for a run (or all runs when no ``run_id`` is given)."""
+    run_id = request.query_params.get("run_id")
+    with _run_registry_lock:
+        if run_id is None:
+            return JSONResponse({"runs": {rid: _serialize_run(h) for rid, h in _run_registry.items()}})
+        handle = _run_registry.get(run_id)
+    if handle is None:
+        return JSONResponse({"error": f"unknown run: {run_id}"}, status_code=404)
+    return JSONResponse(_serialize_run(handle))
+
+
+async def handle_run_cancel(request: Request) -> JSONResponse:
+    """Signal a running workflow to abort at the next wave boundary."""
+    run_id = request.path_params.get("run_id")
+    with _run_registry_lock:
+        handle = _run_registry.get(run_id)
+    if handle is None:
+        return JSONResponse({"error": f"unknown run: {run_id}"}, status_code=404)
+    handle.cancel_event.set()
+    if handle.status == "running":
+        handle.status = "cancelling"
+    return JSONResponse({"cancelled": True, "run_id": run_id, "status": handle.status})
 
 
 # ── App factory ─────────────────────────────────────────────────────────────
@@ -609,6 +672,8 @@ def create_app(transport: httpx.AsyncBaseTransport | None = None) -> Starlette:
             Route("/api/latency-test", handle_latency_test, methods=["POST"]),
             Route("/api/run-plan", handle_run_plan, methods=["POST"]),
             Route("/api/run", handle_run, methods=["POST"]),
+            Route("/api/run/status", handle_run_status, methods=["GET"]),
+            Route("/api/run/{run_id}/cancel", handle_run_cancel, methods=["POST"]),
         ],
         lifespan=lifespan,
     )

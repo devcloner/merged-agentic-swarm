@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -29,6 +30,14 @@ from merged_agentic_swarm.services.wave_gate_service import default_wave_control
 from merged_agentic_swarm.tools.knowledge_cache import default_knowledge_cache
 
 logger = logging.getLogger("agentic_orchestrator")
+
+
+def _cancellation_check(cancel_event: threading.Event | None, wave: int) -> dict[str, Any] | None:
+    """Return an aborted result if the run was cancelled, else None."""
+    if cancel_event is not None and cancel_event.is_set():
+        logger.warning(f"Workflow cancelled by user (wave {wave}); aborting.")
+        return {"status": "aborted", "reason": "cancelled by user", "waves_completed": wave, "timestamp": time.time()}
+    return None
 
 
 class MultiLayeredAgenticOrchestrator:
@@ -448,6 +457,7 @@ class MultiLayeredAgenticOrchestrator:
         ramp_sequence: list[int] | None = None,
         default_model: str | None = None,
         gates: bool | None = None,
+        cancel_event: threading.Event | None = None,
     ) -> dict[str, Any]:
         """Runs the complete self-healing 6-step agent-to-agent workflow.
 
@@ -528,6 +538,9 @@ class MultiLayeredAgenticOrchestrator:
         abort_w0 = self._abort_on_gate_failure(passed_w0, reason_w0, 0, gates)
         if abort_w0 is not None:
             return abort_w0
+        aborted = _cancellation_check(cancel_event, 0)
+        if aborted is not None:
+            return aborted
 
         # Step 3: Wave 1 - Key Pool Proxy & Fabric Gate
         logger.info("--- Step 3: Wave 1 Execution (Key Pool Proxy & Model Fabric) ---")
@@ -585,6 +598,9 @@ class MultiLayeredAgenticOrchestrator:
         abort_w1 = self._abort_on_gate_failure(passed_w1, reason_w1, 1, gates)
         if abort_w1 is not None:
             return abort_w1
+        aborted = _cancellation_check(cancel_event, 1)
+        if aborted is not None:
+            return aborted
 
         # Step 4: Wave 2 - OpenCode 40-Worker Swarm & Durable Agent Factory
         logger.info("--- Step 4: Wave 2 Execution (OpenCode Swarm & Durable Agents) ---")
@@ -690,6 +706,9 @@ class MultiLayeredAgenticOrchestrator:
         abort_w2 = self._abort_on_gate_failure(passed_w2, reason_w2, 2, gates)
         if abort_w2 is not None:
             return abort_w2
+        aborted = _cancellation_check(cancel_event, 2)
+        if aborted is not None:
+            return aborted
 
         # Cold-path promotion after Wave 2: promote learnings to registries
         cold_2 = self._promote_cold_path(phase_label="wave_2")
@@ -759,6 +778,9 @@ class MultiLayeredAgenticOrchestrator:
         abort_w3 = self._abort_on_gate_failure(passed_w3, reason_w3, 3, gates)
         if abort_w3 is not None:
             return abort_w3
+        aborted = _cancellation_check(cancel_event, 3)
+        if aborted is not None:
+            return aborted
 
         # Step 5.5: Wave 4 - Synthesis & Final Reporting
         logger.info("--- Step 5.5: Wave 4 Execution (Synthesis & Final Reporting) ---")

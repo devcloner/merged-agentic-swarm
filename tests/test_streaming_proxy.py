@@ -54,6 +54,20 @@ class _ChunkStream(httpx.AsyncByteStream):
             self._on_close()
 
 
+class _StallStream(httpx.AsyncByteStream):
+    """Async byte stream that never yields (simulates a stalled upstream)."""
+
+    def __init__(self):
+        self.closed = False
+
+    async def __aiter__(self):
+        await asyncio.Event().wait()  # never set → each read stalls forever
+        yield  # unreachable; the yield makes this an async generator
+
+    async def aclose(self):
+        self.closed = True
+
+
 def _sse_response(chunks, *, request, status=200, headers=None, stream=None):
     """Build an upstream ``httpx.Response`` that streams ``chunks`` as SSE."""
     all_headers = {"content-type": "text/event-stream"}
@@ -378,10 +392,32 @@ async def test_mid_stream_failure_stops_gracefully_and_closes_upstream():
     gen = resp.body_iterator
     assert await anext(gen) == b"event: a\n\n"
     assert await anext(gen) == b"event: b\n\n"
-    # The read error is swallowed at the proxy boundary → stream just ends
+    # The read error is swallowed at the proxy boundary → stream just ends,
+    # but the mid-stream transport drop is counted against the breaker.
     with pytest.raises(StopAsyncIteration):
         await anext(gen)
     assert holder["stream"].closed is True
+    assert proxy.circuit_breaker.failure_count == 1
+    await proxy.close()
+
+
+@pytest.mark.asyncio
+async def test_stalled_upstream_times_out_and_records_failure():
+    """#39: an upstream that stalls mid-stream must not hang the client forever."""
+    holder = {}
+
+    def handler(request):
+        stream = _StallStream()
+        holder["stream"] = stream
+        return _sse_response([], request=request, stream=stream)
+
+    proxy = make_proxy(handler, stream_idle_timeout_seconds=0.05)
+    resp = await post(proxy)
+    gen = resp.body_iterator
+    with pytest.raises(StopAsyncIteration):
+        await anext(gen)
+    assert holder["stream"].closed is True
+    assert proxy.circuit_breaker.failure_count == 1
     await proxy.close()
 
 
