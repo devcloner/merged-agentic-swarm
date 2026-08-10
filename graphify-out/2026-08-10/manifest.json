@@ -375,9 +375,9 @@
     "semantic_hash": "ce9239654a8ac3f80bdbc8090f0480b7"
   },
   "src/merged_agentic_swarm/webapp.py": {
-    "mtime": 1786146349.0734658,
-    "ast_hash": "a7ec577f877937888acdd38a3fd2a990",
-    "semantic_hash": "a7ec577f877937888acdd38a3fd2a990"
+    "mtime": 1786397661.175306,
+    "ast_hash": "f7c7caf72005707d9652ce20084c6f04",
+    "semantic_hash": ""
   },
   "tests/__init__.py": {
     "mtime": 1785533287.5369754,
@@ -755,9 +755,9 @@
     "semantic_hash": "6a47d64fcc136324ca395065a707ef76"
   },
   "CLAUDE.md": {
-    "mtime": 1786294244.0467608,
-    "ast_hash": "27c57df577158c4e1a01be785e0d1e1d",
-    "semantic_hash": "27c57df577158c4e1a01be785e0d1e1d"
+    "mtime": 1786393011.5383027,
+    "ast_hash": "6d00565665601dd70650f07f69962947",
+    "semantic_hash": ""
   },
   "Merged Agentic Swarm Blueprin.md": {
     "mtime": 1785533287.5156507,
@@ -1062,6 +1062,16 @@
   "GEMINI.md": {
     "mtime": 1786346924.8044202,
     "ast_hash": "82efb97a359f5c7290bf2513d14686be",
+    "semantic_hash": ""
+  },
+  "scripts/graphify-obsidian-sync.sh": {
+    "mtime": 1786393110.7146614,
+    "ast_hash": "a607a05d1540eef1d38a1505eca87a85",
+    "semantic_hash": ""
+  },
+  "docs/ultraswarm-failure-report-2026-08-10.md": {
+    "mtime": 1786397240.0850272,
+    "ast_hash": "482490420c11cae6f33325b915e15335",
     "semantic_hash": ""
   }
 }

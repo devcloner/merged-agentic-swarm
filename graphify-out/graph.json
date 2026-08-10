@@ -2579,8 +2579,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_agentic_run_spotify_ai_workflow",
-      "community": 7,
-      "community_name": "WorkerRole",
+      "community": 124,
+      "community_name": "knowledge_cache.py",
       "norm_label": "run_spotify_ai_workflow.py"
     },
     {
@@ -2591,8 +2591,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "scripts_agentic_run_spotify_ai_workflow_run_git",
-      "community": 7,
-      "community_name": "WorkerRole",
+      "community": 124,
+      "community_name": "knowledge_cache.py",
       "norm_label": "run_git()"
     },
     {
@@ -2602,8 +2602,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_agentic_run_spotify_ai_workflow_rationale_1",
-      "community": 7,
-      "community_name": "WorkerRole",
+      "community": 124,
+      "community_name": "knowledge_cache.py",
       "norm_label": "run the agentic swarm orchestrator against spotify-ai project. produces an..."
     },
     {
@@ -3454,8 +3454,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_agentic_verify_learning_loop",
-      "community": 7,
-      "community_name": "WorkerRole",
+      "community": 124,
+      "community_name": "knowledge_cache.py",
       "norm_label": "verify_learning_loop.py"
     },
     {
@@ -3465,8 +3465,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_agentic_verify_learning_loop_rationale_1",
-      "community": 7,
-      "community_name": "WorkerRole",
+      "community": 124,
+      "community_name": "knowledge_cache.py",
       "norm_label": "phase 5: durable learning loop end-to-end verification"
     },
     {
@@ -4148,8 +4148,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_fallback",
-      "community": 19,
-      "community_name": "FastFallbackRouter",
+      "community": 17,
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "fast_fallback.py"
     },
     {
@@ -4473,8 +4473,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_fallback_rationale_1",
-      "community": 19,
-      "community_name": "FastFallbackRouter",
+      "community": 17,
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "fast fallback router \u2014 parallel-probe, minimal-latency fallback dispatch. why..."
     },
     {
@@ -4628,7 +4628,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "fast_pool.py"
     },
     {
@@ -4641,7 +4641,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_fastpoolconfig",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "fastpoolconfig"
     },
     {
@@ -4653,8 +4653,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_dnscache",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": "_dnscache"
     },
     {
@@ -4665,8 +4665,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_dnscache_init",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": ".__init__()"
     },
     {
@@ -4677,8 +4677,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_dnscache_get",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": ".get()"
     },
     {
@@ -4689,8 +4689,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_dnscache_set",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": ".set()"
     },
     {
@@ -4701,8 +4701,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_dnscache_delete",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": ".delete()"
     },
     {
@@ -4713,8 +4713,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_dnscache_clear",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": ".clear()"
     },
     {
@@ -4725,8 +4725,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_resolve_host",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": "_resolve_host()"
     },
     {
@@ -4738,8 +4738,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_cacheddnsbackend",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": "_cacheddnsbackend"
     },
     {
@@ -4749,8 +4749,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "syncbackend",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": "syncbackend"
     },
     {
@@ -4761,8 +4761,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_cacheddnsbackend_connect_tcp",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": ".connect_tcp()"
     },
     {
@@ -4772,8 +4772,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_py_any",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": "any"
     },
     {
@@ -4783,8 +4783,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "networkstream",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": "networkstream"
     },
     {
@@ -4797,7 +4797,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_pooledtransport",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "_pooledtransport"
     },
     {
@@ -4809,7 +4809,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_pooledtransport_init",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": ".__init__()"
     },
     {
@@ -4820,7 +4820,7 @@
       "_origin": "ast",
       "id": "limits",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "limits"
     },
     {
@@ -4832,7 +4832,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_build_transport",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "_build_transport()"
     },
     {
@@ -4843,7 +4843,7 @@
       "_origin": "ast",
       "id": "httptransport",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "httptransport"
     },
     {
@@ -4855,7 +4855,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_create_client",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "_create_client()"
     },
     {
@@ -4866,7 +4866,7 @@
       "_origin": "ast",
       "id": "client",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "client"
     },
     {
@@ -4878,7 +4878,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_get_client",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "get_client()"
     },
     {
@@ -4890,7 +4890,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_close_thread_client",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "close_thread_client()"
     },
     {
@@ -4902,7 +4902,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_dispatch",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "dispatch()"
     },
     {
@@ -4913,7 +4913,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_py_response",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "response"
     },
     {
@@ -4925,7 +4925,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_prewarm_hosts",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "prewarm_hosts()"
     },
     {
@@ -4937,7 +4937,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_warm_all",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "warm_all()"
     },
     {
@@ -4948,7 +4948,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_1",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "fast http connection pool \u2014 latency-optimized transport for multi-provider..."
     },
     {
@@ -4959,7 +4959,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_45",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "connection-pool tunables for the multi-provider fabric."
     },
     {
@@ -4969,8 +4969,8 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_72",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": "lightweight ttl-bounded dns cache to avoid repeated gethostbyname calls. all..."
     },
     {
@@ -4980,8 +4980,8 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_103",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": "drop one entry (used to invalidate a stale cached ip)."
     },
     {
@@ -4991,8 +4991,8 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_118",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": "resolve hostname to ip, consulting the in-process dns cache first. returns the..."
     },
     {
@@ -5002,8 +5002,8 @@
       "source_location": "L135",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_135",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 66,
+      "community_name": "_DNSCache",
       "norm_label": "httpcore sync backend that connects to a cached ip for each hostname...."
     },
     {
@@ -5014,7 +5014,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_170",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "``httpx.httptransport`` whose httpcore pool uses the dns-cached backend...."
     },
     {
@@ -5025,7 +5025,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_194",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "build an httpx transport with connection pooling, keepalive, and dns cache."
     },
     {
@@ -5036,7 +5036,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_207",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "create a fresh httpx.client with connection pooling. each thread gets its own..."
     },
     {
@@ -5047,7 +5047,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_227",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "return the thread-local httpx client, creating one on first access. within a..."
     },
     {
@@ -5058,7 +5058,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_241",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "close the current thread's httpx client (called at thread shutdown)."
     },
     {
@@ -5069,7 +5069,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_258",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "send a post request through the pooled client and return the response...."
     },
     {
@@ -5080,7 +5080,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_312",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "pre-warm dns + tls handshake for a list of hostnames. opens a tcp connection to..."
     },
     {
@@ -5091,7 +5091,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_fast_pool_rationale_355",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "pre-warm connections to all known provider hosts. call at startup."
     },
     {
@@ -5972,7 +5972,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_init",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "models/__init__.py"
     },
     {
@@ -5983,7 +5983,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_init_rationale_1",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "models package initialization"
     },
     {
@@ -5993,7 +5993,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "agent_models.py"
     },
@@ -6006,7 +6006,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_workerrole",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "workerrole"
     },
@@ -6017,7 +6017,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_py_str",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "str"
     },
@@ -6028,7 +6028,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_py_enum",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "enum"
     },
@@ -6041,7 +6041,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_agenttype",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "agenttype"
     },
@@ -6054,7 +6054,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_agentspec",
-      "community": 57,
+      "community": 95,
       "community_name": "AgentSpec",
       "norm_label": "agentspec"
     },
@@ -6066,7 +6066,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_agentspec_is_expired",
-      "community": 57,
+      "community": 95,
       "community_name": "AgentSpec",
       "norm_label": ".is_expired()"
     },
@@ -6079,7 +6079,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_agentspec_to_dict",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".to_dict()"
     },
     {
@@ -6090,7 +6090,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_py_any",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "any"
     },
     {
@@ -6103,7 +6103,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_workerpoolconfig",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "workerpoolconfig"
     },
     {
@@ -6116,7 +6116,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_spawnchainentry",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "spawnchainentry"
     },
     {
@@ -6128,7 +6128,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_spawnchainentry_to_dict",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".to_dict()"
     },
     {
@@ -6141,7 +6141,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_workerpoolstate",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "workerpoolstate"
     },
     {
@@ -6153,7 +6153,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_workerpoolstate_record_pool_success",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".record_pool_success()"
     },
     {
@@ -6165,7 +6165,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_workerpoolstate_record_pool_failure",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".record_pool_failure()"
     },
     {
@@ -6177,7 +6177,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_workerpoolstate_get_pool_summary",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".get_pool_summary()"
     },
     {
@@ -6189,7 +6189,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_workerpoolstate_to_dict",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".to_dict()"
     },
     {
@@ -6199,7 +6199,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_rationale_1",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "agent, worker pool, and spawn chain data models"
     },
@@ -6210,7 +6210,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_rationale_46",
-      "community": 57,
+      "community": 95,
       "community_name": "AgentSpec",
       "norm_label": "return true if this agent has a ttl and has exceeded it."
     },
@@ -6222,7 +6222,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_rationale_101",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "increment the completed counter for the given pool."
     },
     {
@@ -6233,7 +6233,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_rationale_107",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "increment the failed or rate_limited counter for the given pool."
     },
     {
@@ -6244,7 +6244,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_agent_models_rationale_116",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "return a copy of the pool_health dict."
     },
     {
@@ -6254,8 +6254,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_ledger_models",
-      "community": 95,
-      "community_name": "services/__init__.py",
+      "community": 39,
+      "community_name": "ProgressLogEntry",
       "norm_label": "ledger_models.py"
     },
     {
@@ -6376,8 +6376,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_ledger_models_rationale_1",
-      "community": 95,
-      "community_name": "services/__init__.py",
+      "community": 39,
+      "community_name": "ProgressLogEntry",
       "norm_label": "progress ledger, success markers, and obstacle playbooks models"
     },
     {
@@ -6388,7 +6388,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "prd_models.py"
     },
     {
@@ -6401,7 +6401,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_taskstatus",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "taskstatus"
     },
     {
@@ -6412,7 +6412,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_py_str",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "str"
     },
     {
@@ -6423,7 +6423,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_py_enum",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "enum"
     },
     {
@@ -6436,7 +6436,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_taskpriority",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "taskpriority"
     },
     {
@@ -6448,7 +6448,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_subtask",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": "subtask"
     },
@@ -6460,7 +6460,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_subtask_to_dict",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".to_dict()"
     },
@@ -6471,7 +6471,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_py_any",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": "any"
     },
@@ -6484,7 +6484,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_epictask",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": "epictask"
     },
@@ -6496,7 +6496,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_epictask_to_dict",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".to_dict()"
     },
@@ -6510,7 +6510,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_specgap",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "specgap"
     },
     {
@@ -6521,7 +6521,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_specgap_to_dict",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".to_dict()"
     },
@@ -6535,7 +6535,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_prddocument",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "prddocument"
     },
     {
@@ -6548,7 +6548,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_prdanalysisresult",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "prdanalysisresult"
     },
     {
@@ -6559,7 +6559,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_prdanalysisresult_to_dict",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".to_dict()"
     },
@@ -6571,7 +6571,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_prd_models_rationale_1",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "prd and task master data models"
     },
     {
@@ -6582,7 +6582,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_wave_models",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "wave_models.py"
     },
     {
@@ -6595,7 +6595,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_wave_models_wavephase",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "wavephase"
     },
     {
@@ -6606,7 +6606,7 @@
       "_origin": "ast",
       "id": "int",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "int"
     },
     {
@@ -6617,7 +6617,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_wave_models_py_enum",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "enum"
     },
     {
@@ -6630,7 +6630,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_wave_models_wavestatus",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "wavestatus"
     },
     {
@@ -6641,7 +6641,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_wave_models_py_str",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "str"
     },
     {
@@ -6654,7 +6654,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_wave_models_wavegatecriteria",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "wavegatecriteria"
     },
     {
@@ -6665,8 +6665,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_wave_models_wavegatecriteria_to_dict",
-      "community": 98,
-      "community_name": "Any",
+      "community": 9,
+      "community_name": "WaveGateController",
       "norm_label": ".to_dict()"
     },
     {
@@ -6676,8 +6676,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_wave_models_py_any",
-      "community": 98,
-      "community_name": "Any",
+      "community": 9,
+      "community_name": "WaveGateController",
       "norm_label": "any"
     },
     {
@@ -6690,7 +6690,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_wave_models_waveexecutionstate",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "waveexecutionstate"
     },
     {
@@ -6701,8 +6701,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_wave_models_waveexecutionstate_to_dict",
-      "community": 98,
-      "community_name": "Any",
+      "community": 9,
+      "community_name": "WaveGateController",
       "norm_label": ".to_dict()"
     },
     {
@@ -6713,7 +6713,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_models_wave_models_rationale_1",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "wave gates data models"
     },
     {
@@ -6723,8 +6723,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_init",
-      "community": 64,
-      "community_name": "multi_provider_fabric.py",
+      "community": 45,
+      "community_name": "APIKeyInfo",
       "norm_label": "providers/__init__.py"
     },
     {
@@ -6734,8 +6734,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_init_rationale_1",
-      "community": 64,
-      "community_name": "multi_provider_fabric.py",
+      "community": 45,
+      "community_name": "APIKeyInfo",
       "norm_label": "providers package initialization"
     },
     {
@@ -6745,8 +6745,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool",
-      "community": 64,
-      "community_name": "multi_provider_fabric.py",
+      "community": 45,
+      "community_name": "APIKeyInfo",
       "norm_label": "key_pool.py"
     },
     {
@@ -6758,8 +6758,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_keystatus",
-      "community": 64,
-      "community_name": "multi_provider_fabric.py",
+      "community": 45,
+      "community_name": "APIKeyInfo",
       "norm_label": "keystatus"
     },
     {
@@ -6769,8 +6769,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_py_str",
-      "community": 64,
-      "community_name": "multi_provider_fabric.py",
+      "community": 45,
+      "community_name": "APIKeyInfo",
       "norm_label": "str"
     },
     {
@@ -6780,8 +6780,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_py_enum",
-      "community": 64,
-      "community_name": "multi_provider_fabric.py",
+      "community": 45,
+      "community_name": "APIKeyInfo",
       "norm_label": "enum"
     },
     {
@@ -6830,8 +6830,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_keypoolmanager_init",
-      "community": 45,
-      "community_name": "APIKeyInfo",
+      "community": 125,
+      "community_name": ".load_keys",
       "norm_label": ".__init__()"
     },
     {
@@ -6842,8 +6842,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_keypoolmanager_collect_keys_from_sources",
-      "community": 45,
-      "community_name": "APIKeyInfo",
+      "community": 125,
+      "community_name": ".load_keys",
       "norm_label": "._collect_keys_from_sources()"
     },
     {
@@ -6854,8 +6854,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_keypoolmanager_load_keys",
-      "community": 45,
-      "community_name": "APIKeyInfo",
+      "community": 125,
+      "community_name": ".load_keys",
       "norm_label": ".load_keys()"
     },
     {
@@ -6866,8 +6866,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_keypoolmanager_reload",
-      "community": 45,
-      "community_name": "APIKeyInfo",
+      "community": 125,
+      "community_name": ".load_keys",
       "norm_label": ".reload()"
     },
     {
@@ -6878,8 +6878,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_keypoolmanager_add_key",
-      "community": 45,
-      "community_name": "APIKeyInfo",
+      "community": 125,
+      "community_name": ".load_keys",
       "norm_label": ".add_key()"
     },
     {
@@ -6938,8 +6938,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_keypoolmanager_get_summary",
-      "community": 22,
-      "community_name": "KeyPoolManager",
+      "community": 181,
+      "community_name": ".get_summary",
       "norm_label": ".get_summary()"
     },
     {
@@ -6949,8 +6949,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_py_any",
-      "community": 22,
-      "community_name": "KeyPoolManager",
+      "community": 181,
+      "community_name": ".get_summary",
       "norm_label": "any"
     },
     {
@@ -6961,8 +6961,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_keypoolmanager_get_summary_unlocked",
-      "community": 22,
-      "community_name": "KeyPoolManager",
+      "community": 181,
+      "community_name": ".get_summary",
       "norm_label": "._get_summary_unlocked()"
     },
     {
@@ -6972,8 +6972,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_rationale_1",
-      "community": 64,
-      "community_name": "multi_provider_fabric.py",
+      "community": 45,
+      "community_name": "APIKeyInfo",
       "norm_label": "api key pool manager & key rotator supports multi-provider key rotation, quota..."
     },
     {
@@ -6994,8 +6994,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_rationale_56",
-      "community": 45,
-      "community_name": "APIKeyInfo",
+      "community": 125,
+      "community_name": ".load_keys",
       "norm_label": "gather (provider, secret_value, key_id) candidates from all key sources...."
     },
     {
@@ -7005,8 +7005,8 @@
       "source_location": "L166",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_rationale_166",
-      "community": 45,
-      "community_name": "APIKeyInfo",
+      "community": 125,
+      "community_name": ".load_keys",
       "norm_label": "loads api keys from env file, environment variables, and local key files."
     },
     {
@@ -7016,8 +7016,8 @@
       "source_location": "L173",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_key_pool_rationale_173",
-      "community": 45,
-      "community_name": "APIKeyInfo",
+      "community": 125,
+      "community_name": ".load_keys",
       "norm_label": "hot-reload keys from all sources, preserving runtime stats for persistent keys...."
     },
     {
@@ -7049,7 +7049,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_multi_provider_fabric",
-      "community": 64,
+      "community": 17,
       "community_name": "multi_provider_fabric.py",
       "norm_label": "multi_provider_fabric.py"
     },
@@ -7073,7 +7073,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_multi_provider_fabric_load_bans",
-      "community": 64,
+      "community": 17,
       "community_name": "multi_provider_fabric.py",
       "norm_label": "_load_bans()"
     },
@@ -7132,7 +7132,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_multi_provider_fabric_reload_fabric_routes",
-      "community": 64,
+      "community": 17,
       "community_name": "multi_provider_fabric.py",
       "norm_label": "reload_fabric_routes()"
     },
@@ -7276,7 +7276,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_multi_provider_fabric_rationale_1",
-      "community": 64,
+      "community": 17,
       "community_name": "multi_provider_fabric.py",
       "norm_label": "multi-backend model fabric routes requests across providers with priority..."
     },
@@ -7298,7 +7298,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_multi_provider_fabric_rationale_57",
-      "community": 64,
+      "community": 17,
       "community_name": "multi_provider_fabric.py",
       "norm_label": "load persisted perma-bans into _permanently_dead, dropping expired entries."
     },
@@ -7342,7 +7342,7 @@
       "source_location": "L716",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_providers_multi_provider_fabric_rationale_716",
-      "community": 64,
+      "community": 17,
       "community_name": "multi_provider_fabric.py",
       "norm_label": "clear the overlay cache so the next dispatch re-reads the json file."
     },
@@ -7474,7 +7474,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_proxy_claude_proxy_server",
-      "community": 64,
+      "community": 17,
       "community_name": "multi_provider_fabric.py",
       "norm_label": "claude_proxy_server.py"
     },
@@ -7510,7 +7510,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_proxy_claude_proxy_server_parse_multipart",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": "_parse_multipart()"
     },
     {
@@ -7521,7 +7521,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_proxy_claude_proxy_server_forward_transcription",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": "_forward_transcription()"
     },
@@ -7534,8 +7534,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_proxy_claude_proxy_server_threadedhttpserver",
-      "community": 60,
-      "community_name": "ProxyServerDaemon",
+      "community": 140,
+      "community_name": "ThreadedHTTPServer",
       "norm_label": "threadedhttpserver"
     },
     {
@@ -7545,8 +7545,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "threadingmixin",
-      "community": 60,
-      "community_name": "ProxyServerDaemon",
+      "community": 140,
+      "community_name": "ThreadedHTTPServer",
       "norm_label": "threadingmixin"
     },
     {
@@ -7556,8 +7556,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "httpserver",
-      "community": 60,
-      "community_name": "ProxyServerDaemon",
+      "community": 140,
+      "community_name": "ThreadedHTTPServer",
       "norm_label": "httpserver"
     },
     {
@@ -7713,8 +7713,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_proxy_claude_proxy_server_proxyserverdaemon_start",
-      "community": 60,
-      "community_name": "ProxyServerDaemon",
+      "community": 140,
+      "community_name": "ThreadedHTTPServer",
       "norm_label": ".start()"
     },
     {
@@ -7748,7 +7748,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_proxy_claude_proxy_server_rationale_1",
-      "community": 64,
+      "community": 17,
       "community_name": "multi_provider_fabric.py",
       "norm_label": "claude api key pool proxy server exposes anthropic-compatible, openai-..."
     },
@@ -7771,7 +7771,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_proxy_claude_proxy_server_rationale_77",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": "return (file_bytes, file_name, model_name) from a multipart body."
     },
     {
@@ -7781,7 +7781,7 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_proxy_claude_proxy_server_rationale_120",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": "forward a transcription request to the configured whisper backend."
     },
@@ -7792,8 +7792,8 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_proxy_claude_proxy_server_rationale_149",
-      "community": 60,
-      "community_name": "ProxyServerDaemon",
+      "community": 140,
+      "community_name": "ThreadedHTTPServer",
       "norm_label": "threaded http server to handle concurrent requests."
     },
     {
@@ -7825,7 +7825,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_init",
-      "community": 95,
+      "community": 97,
       "community_name": "services/__init__.py",
       "norm_label": "services/__init__.py"
     },
@@ -7836,7 +7836,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_init_rationale_1",
-      "community": 95,
+      "community": 97,
       "community_name": "services/__init__.py",
       "norm_label": "services package initialization"
     },
@@ -7847,7 +7847,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_agent_factory_service",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "agent_factory_service.py"
     },
@@ -7859,8 +7859,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_agent_factory_service_agents_registry_path",
-      "community": 14,
-      "community_name": "DurableAgentRouter",
+      "community": 15,
+      "community_name": "WorkerRole",
       "norm_label": "agents_registry_path()"
     },
     {
@@ -7872,8 +7872,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_agent_factory_service_chainregistry",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": "chainregistry"
     },
     {
@@ -7884,8 +7884,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_agent_factory_service_chainregistry_init",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": ".__init__()"
     },
     {
@@ -7896,8 +7896,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_agent_factory_service_chainregistry_load_registry",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": ".load_registry()"
     },
     {
@@ -7908,8 +7908,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_agent_factory_service_chainregistry_save_registry",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": ".save_registry()"
     },
     {
@@ -7920,8 +7920,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_agent_factory_service_chainregistry_register_spawn",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": ".register_spawn()"
     },
     {
@@ -7932,8 +7932,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_agent_factory_service_chainregistry_next_entry_id",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": "._next_entry_id()"
     },
     {
@@ -8063,7 +8063,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_agent_factory_service_rationale_1",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "durable agent factory & knowledge-box -> spawn chain registry turns validated..."
     },
@@ -8074,8 +8074,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_agent_factory_service_rationale_21",
-      "community": 14,
-      "community_name": "DurableAgentRouter",
+      "community": 15,
+      "community_name": "WorkerRole",
       "norm_label": "resolve the durable cold-path agents registry (agents.jsonl). prefers an..."
     },
     {
@@ -8085,8 +8085,8 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_agent_factory_service_rationale_94",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": "generate a collision-proof spawn-chain entry_id (sequence + timestamp suffix)...."
     },
     {
@@ -8593,7 +8593,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_codebase_map_service",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "codebase_map_service.py"
     },
     {
@@ -8760,7 +8760,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_codebase_map_service_rationale_1",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "codebase mapper & spec gap closer service maps repository structure, ast..."
     },
     {
@@ -8848,7 +8848,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_model_routing",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "model_routing.py"
     },
     {
@@ -8860,7 +8860,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_model_routing_load_registry",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "_load_registry()"
     },
     {
@@ -8871,7 +8871,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_model_routing_py_any",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "any"
     },
     {
@@ -8883,7 +8883,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_model_routing_reload_registry",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "reload_registry()"
     },
     {
@@ -8895,7 +8895,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_model_routing_resolve_litellm_model_for_role",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "resolve_litellm_model_for_role()"
     },
     {
@@ -8907,7 +8907,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_model_routing_litellm_model_for_fabric_route",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "litellm_model_for_fabric_route()"
     },
     {
@@ -8918,7 +8918,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_model_routing_rationale_1",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "model role routing resolves a worker role (deep / main / fast tier, or a..."
     },
     {
@@ -8929,7 +8929,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_model_routing_rationale_55",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "load the provider registry (cached); return {} when missing/unreadable."
     },
     {
@@ -8940,7 +8940,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_model_routing_rationale_71",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "clear the cached registry and reload it from disk. called after the provider..."
     },
     {
@@ -8951,7 +8951,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_model_routing_rationale_83",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "return the litellm virtual gemini alias for a worker role. resolution order: 1...."
     },
     {
@@ -8962,7 +8962,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_model_routing_rationale_123",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "return the first litellm model in the fabric route list for a model alias."
     },
     {
@@ -8972,7 +8972,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_opencode_swarm_service",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "opencode_swarm_service.py"
     },
@@ -9201,8 +9201,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_opencode_swarm_service_opencodeswarmmanager_get_available_worker",
-      "community": 25,
-      "community_name": "OpenCodeSwarmManager",
+      "community": 95,
+      "community_name": "AgentSpec",
       "norm_label": ".get_available_worker()"
     },
     {
@@ -9213,8 +9213,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_opencode_swarm_service_opencodeswarmmanager_get_available_worker_unlocked",
-      "community": 25,
-      "community_name": "OpenCodeSwarmManager",
+      "community": 95,
+      "community_name": "AgentSpec",
       "norm_label": "._get_available_worker_unlocked()"
     },
     {
@@ -9225,8 +9225,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_opencode_swarm_service_opencodeswarmmanager_get_pool_id",
-      "community": 25,
-      "community_name": "OpenCodeSwarmManager",
+      "community": 14,
+      "community_name": "DurableAgentRouter",
       "norm_label": "._get_pool_id()"
     },
     {
@@ -9249,8 +9249,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_opencode_swarm_service_opencodeswarmmanager_target_repo_root",
-      "community": 58,
-      "community_name": "ConcurrencyRampController",
+      "community": 127,
+      "community_name": "TestTargetRepoRoot",
       "norm_label": "._target_repo_root()"
     },
     {
@@ -9284,7 +9284,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_opencode_swarm_service_rationale_1",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "opencode swarm pack coordinator (40-worker pool manager) allocates worker pools..."
     },
@@ -9438,8 +9438,8 @@
       "source_location": "L350",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_opencode_swarm_service_rationale_350",
-      "community": 25,
-      "community_name": "OpenCodeSwarmManager",
+      "community": 95,
+      "community_name": "AgentSpec",
       "norm_label": "gets an available worker matching the specified role using round-robin..."
     },
     {
@@ -9449,8 +9449,8 @@
       "source_location": "L358",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_opencode_swarm_service_rationale_358",
-      "community": 25,
-      "community_name": "OpenCodeSwarmManager",
+      "community": 95,
+      "community_name": "AgentSpec",
       "norm_label": "internal: must be called while holding self._worker_lock."
     },
     {
@@ -9460,8 +9460,8 @@
       "source_location": "L373",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_opencode_swarm_service_rationale_373",
-      "community": 25,
-      "community_name": "OpenCodeSwarmManager",
+      "community": 14,
+      "community_name": "DurableAgentRouter",
       "norm_label": "map a workerrole to a pool-health bucket key."
     },
     {
@@ -9482,8 +9482,8 @@
       "source_location": "L511",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_opencode_swarm_service_rationale_511",
-      "community": 58,
-      "community_name": "ConcurrencyRampController",
+      "community": 127,
+      "community_name": "TestTargetRepoRoot",
       "norm_label": "resolve the working repo the swarm writes into. ``swarm_target_repo`` env var..."
     },
     {
@@ -9515,8 +9515,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_progress_ledger_service",
-      "community": 95,
-      "community_name": "services/__init__.py",
+      "community": 39,
+      "community_name": "ProgressLogEntry",
       "norm_label": "progress_ledger_service.py"
     },
     {
@@ -9659,8 +9659,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_progress_ledger_service_rationale_1",
-      "community": 95,
-      "community_name": "services/__init__.py",
+      "community": 39,
+      "community_name": "ProgressLogEntry",
       "norm_label": "progress ledger, success markers, and self-healing obstacle playbook engine..."
     },
     {
@@ -9933,8 +9933,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_swarm_profiles",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "swarm_profiles.py"
     },
     {
@@ -9945,8 +9945,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_swarm_profiles_load_profiles",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "load_profiles()"
     },
     {
@@ -9957,8 +9957,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_swarm_profiles_resolve_profile",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "resolve_profile()"
     },
     {
@@ -9969,8 +9969,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_swarm_profiles_list_profiles",
-      "community": 41,
-      "community_name": "agentic_cli.py",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "list_profiles()"
     },
     {
@@ -9981,8 +9981,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_swarm_profiles_resolve_model_alias_for_profile",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "resolve_model_alias_for_profile()"
     },
     {
@@ -9992,8 +9992,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_swarm_profiles_rationale_1",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "swarm profile service named, slash-command-style presets for pushing a large..."
     },
     {
@@ -10003,8 +10003,8 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_swarm_profiles_rationale_63",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "load all swarm profiles (cached); fall back to the code-side dict when missing."
     },
     {
@@ -10014,8 +10014,8 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_swarm_profiles_rationale_80",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "return the resolved profile dict for a name; raise keyerror for unknown names."
     },
     {
@@ -10025,8 +10025,8 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_swarm_profiles_rationale_88",
-      "community": 41,
-      "community_name": "agentic_cli.py",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "return [{name, description}] entries for every known profile, name-sorted."
     },
     {
@@ -10036,8 +10036,8 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_swarm_profiles_rationale_94",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "return the profile's model alias, or resolve via model_routing when absent...."
     },
     {
@@ -10048,7 +10048,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_task_master_service",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "task_master_service.py"
     },
     {
@@ -10072,8 +10072,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_task_master_service_taskmasterservice_init",
-      "community": 20,
-      "community_name": "TaskMasterService",
+      "community": 8,
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".__init__()"
     },
     {
@@ -10085,7 +10085,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_task_master_service_taskmasterservice_load_state",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".load_state()"
     },
     {
@@ -10108,8 +10108,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_task_master_service_taskmasterservice_estimate_turns",
-      "community": 20,
-      "community_name": "TaskMasterService",
+      "community": 64,
+      "community_name": "SubTask",
       "norm_label": "._estimate_turns()"
     },
     {
@@ -10120,7 +10120,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_task_master_service_taskmasterservice_optimize_and_parse_prd",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".optimize_and_parse_prd()"
     },
@@ -10144,8 +10144,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_task_master_service_taskmasterservice_get_tasks_for_wave",
-      "community": 20,
-      "community_name": "TaskMasterService",
+      "community": 64,
+      "community_name": "SubTask",
       "norm_label": ".get_tasks_for_wave()"
     },
     {
@@ -10156,7 +10156,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_task_master_service_rationale_1",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "task master ai spine service prd optimization, task parsing, dependency..."
     },
     {
@@ -10178,7 +10178,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_task_master_service_rationale_47",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "loads persistent task master state from json file if present."
     },
     {
@@ -10199,8 +10199,8 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_task_master_service_rationale_94",
-      "community": 20,
-      "community_name": "TaskMasterService",
+      "community": 64,
+      "community_name": "SubTask",
       "norm_label": "rough complexity analysis: estimate turns based on task scope."
     },
     {
@@ -10210,7 +10210,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_task_master_service_rationale_119",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": "parses and optimizes prd via task master ai model fabric routing. calls the..."
     },
@@ -10714,7 +10714,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "wave_gate_service.py"
     },
     {
@@ -10726,7 +10726,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_wavegatecontroller",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": "wavegatecontroller"
     },
@@ -10739,7 +10739,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_wavegatecontroller_init",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".__init__()"
     },
     {
@@ -10751,7 +10751,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_wavegatecontroller_get_wave_state",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".get_wave_state()"
     },
     {
@@ -10762,7 +10762,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_wavegatecontroller_check_ownership",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": "._check_ownership()"
     },
@@ -10774,7 +10774,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_wavegatecontroller_record_verification_results",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": ".record_verification_results()"
     },
@@ -10785,7 +10785,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_py_any",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": "any"
     },
@@ -10797,7 +10797,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_wavegatecontroller_evaluate_gate_criteria",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": ".evaluate_gate_criteria()"
     },
@@ -10809,7 +10809,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_wavegatecontroller_evaluate_verification_criteria",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": "._evaluate_verification_criteria()"
     },
@@ -10821,7 +10821,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_wavegatecontroller_advance_wave",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": ".advance_wave()"
     },
@@ -10833,7 +10833,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_rationale_1",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "wave gates controller service enforces gated phase boundaries (wave 0 to wave..."
     },
     {
@@ -10843,7 +10843,7 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_rationale_62",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": "verify each subtask's output paths against the ownership map for pool_id...."
     },
@@ -10854,7 +10854,7 @@
       "source_location": "L126",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_rationale_126",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": "record the wave-3 verification outcome for the zero-defect gate. accepts the..."
     },
@@ -10865,7 +10865,7 @@
       "source_location": "L145",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_rationale_145",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": "evaluates whether all criteria for a wave gate are met."
     },
@@ -10876,7 +10876,7 @@
       "source_location": "L189",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_rationale_189",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": "evaluate wave 3's zero-defect verification criteria. uses the results recorded..."
     },
@@ -10887,7 +10887,7 @@
       "source_location": "L213",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_wave_gate_service_rationale_213",
-      "community": 77,
+      "community": 9,
       "community_name": "WaveGateController",
       "norm_label": "attempts to pass the current wave gate and advance to the next wave."
     },
@@ -10898,7 +10898,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "worker_runtime_adapter.py"
     },
@@ -10910,7 +10910,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_resolve_opencode_bin",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "_resolve_opencode_bin()"
     },
@@ -10922,7 +10922,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_opencode_available",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "_opencode_available()"
     },
@@ -10934,7 +10934,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_detect_mode",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "detect_mode()"
     },
@@ -10948,7 +10948,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_workerruntimeadapter",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "workerruntimeadapter"
     },
     {
@@ -10960,7 +10960,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_workerruntimeadapter_get_opencode_bin",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "._get_opencode_bin()"
     },
     {
@@ -10971,7 +10971,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_workerruntimeadapter_init",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": ".__init__()"
     },
@@ -10983,8 +10983,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_workerruntimeadapter_next_port",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "._next_port()"
     },
     {
@@ -10995,8 +10995,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_workerruntimeadapter_launch_worker",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".launch_worker()"
     },
     {
@@ -11006,8 +11006,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_py_any",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "any"
     },
     {
@@ -11018,8 +11018,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_workerruntimeadapter_launch_batch",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".launch_batch()"
     },
     {
@@ -11030,8 +11030,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_workerruntimeadapter_launch_via_opencode",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "._launch_via_opencode()"
     },
     {
@@ -11042,8 +11042,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_workerruntimeadapter_launch_via_native",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "._launch_via_native()"
     },
     {
@@ -11054,8 +11054,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_workerruntimeadapter_launch_via_fabric",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "._launch_via_fabric()"
     },
     {
@@ -11067,7 +11067,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_workerruntimeadapter_shutdown",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".shutdown()"
     },
     {
@@ -11079,7 +11079,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_get_runtime_adapter",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "get_runtime_adapter()"
     },
     {
@@ -11089,7 +11089,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_1",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "worker runtime adapter \u2014 unified launcher for opencode swarm workers. supports..."
     },
@@ -11100,7 +11100,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_37",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "resolve the opencode binary from path or known locations."
     },
@@ -11111,7 +11111,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_67",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "return true if the opencode binary exists and responds to --help."
     },
@@ -11122,7 +11122,7 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_86",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "auto-detect the best available runtime mode. priority: opencode >..."
     },
@@ -11134,7 +11134,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_100",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "unified adapter that launches workers in the selected execution mode. modes:..."
     },
     {
@@ -11145,7 +11145,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_113",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "return the resolved opencode binary, or none if unavailable."
     },
     {
@@ -11155,8 +11155,8 @@
       "source_location": "L152",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_152",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "launch a single worker with a task and return a result dict. result keys:..."
     },
     {
@@ -11166,8 +11166,8 @@
       "source_location": "L203",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_203",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "launch a batch of tasks for a given role, up to max_concurrency."
     },
     {
@@ -11177,8 +11177,8 @@
       "source_location": "L245",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_245",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "launch a task via the opencode cli. spawns `opencode serve --port <n>` as a..."
     },
     {
@@ -11188,8 +11188,8 @@
       "source_location": "L312",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_312",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "launch a task via native subagent fallback. calls the multi-provider fabric..."
     },
     {
@@ -11199,8 +11199,8 @@
       "source_location": "L337",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_337",
-      "community": 57,
-      "community_name": "AgentSpec",
+      "community": 7,
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "launch a task via direct fabric dispatch. identical to native_subagent in..."
     },
     {
@@ -11211,7 +11211,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_347",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "terminate all opencode worker processes."
     },
     {
@@ -11222,7 +11222,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_services_worker_runtime_adapter_rationale_364",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "return (or create) the global workerruntimeadapter singleton."
     },
     {
@@ -11716,8 +11716,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_tools_init",
-      "community": 7,
-      "community_name": "WorkerRole",
+      "community": 37,
+      "community_name": "TestTokenSavior",
       "norm_label": "tools/__init__.py"
     },
     {
@@ -11727,8 +11727,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_tools_init_rationale_1",
-      "community": 7,
-      "community_name": "WorkerRole",
+      "community": 37,
+      "community_name": "TestTokenSavior",
       "norm_label": "tools package initialization"
     },
     {
@@ -12002,8 +12002,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_tools_agentic_orchestrator",
-      "community": 7,
-      "community_name": "WorkerRole",
+      "community": 8,
+      "community_name": "PRDAnalysisResult",
       "norm_label": "agentic_orchestrator.py"
     },
     {
@@ -12192,8 +12192,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_tools_agentic_orchestrator_rationale_1",
-      "community": 7,
-      "community_name": "WorkerRole",
+      "community": 8,
+      "community_name": "PRDAnalysisResult",
       "norm_label": "agentic multi-layered workflow master orchestrator integrates task master ai,..."
     },
     {
@@ -12324,8 +12324,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_tools_knowledge_cache",
-      "community": 7,
-      "community_name": "WorkerRole",
+      "community": 124,
+      "community_name": "knowledge_cache.py",
       "norm_label": "knowledge_cache.py"
     },
     {
@@ -12431,8 +12431,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_tools_knowledge_cache_rationale_1",
-      "community": 7,
-      "community_name": "WorkerRole",
+      "community": 124,
+      "community_name": "knowledge_cache.py",
       "norm_label": "knowledge cache service persistent cache for validated learnings, obstacle..."
     },
     {
@@ -12559,7 +12559,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_clean_expired_sessions",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "_clean_expired_sessions()"
     },
     {
@@ -12630,8 +12630,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_report_detail",
-      "community": 46,
-      "community_name": "Request",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "_report_detail()"
     },
     {
@@ -12642,8 +12642,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_write_profiles",
-      "community": 107,
-      "community_name": "handle_profile_update",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "_write_profiles()"
     },
     {
@@ -12654,8 +12654,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_write_registry_roles",
-      "community": 97,
-      "community_name": "model_routing.py",
+      "community": 226,
+      "community_name": "_write_registry_roles",
       "norm_label": "_write_registry_roles()"
     },
     {
@@ -12667,7 +12667,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_load_fabric_overlay",
       "community": 79,
-      "community_name": "handle_chain_update",
+      "community_name": "_fabric_chains",
       "norm_label": "_load_fabric_overlay()"
     },
     {
@@ -12679,7 +12679,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_fabric_chains",
       "community": 79,
-      "community_name": "handle_chain_update",
+      "community_name": "_fabric_chains",
       "norm_label": "_fabric_chains()"
     },
     {
@@ -12691,7 +12691,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_write_fabric_overlay",
       "community": 79,
-      "community_name": "handle_chain_update",
+      "community_name": "_fabric_chains",
       "norm_label": "_write_fabric_overlay()"
     },
     {
@@ -12703,8 +12703,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_runhandle",
-      "community": 124,
-      "community_name": "handle_run_status",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "runhandle"
     },
     {
@@ -12715,8 +12715,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_serialize_run",
-      "community": 124,
-      "community_name": "handle_run_status",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "_serialize_run()"
     },
     {
@@ -12727,8 +12727,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_spawn_agentic_run",
-      "community": 124,
-      "community_name": "handle_run_status",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "_spawn_agentic_run()"
     },
     {
@@ -12740,7 +12740,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_role_mapping",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "_role_mapping()"
     },
     {
@@ -12752,7 +12752,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_fetch_litellm_aliases",
       "community": 78,
-      "community_name": "create_app",
+      "community_name": "_run_latency_test",
       "norm_label": "_fetch_litellm_aliases()"
     },
     {
@@ -12763,7 +12763,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_py_asyncclient",
       "community": 78,
-      "community_name": "create_app",
+      "community_name": "_run_latency_test",
       "norm_label": "asyncclient"
     },
     {
@@ -12774,8 +12774,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_latency_error",
-      "community": 101,
-      "community_name": "handle_latency_test",
+      "community": 78,
+      "community_name": "_run_latency_test",
       "norm_label": "_latency_error()"
     },
     {
@@ -12785,8 +12785,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "exception",
-      "community": 101,
-      "community_name": "handle_latency_test",
+      "community": 78,
+      "community_name": "_run_latency_test",
       "norm_label": "exception"
     },
     {
@@ -12797,8 +12797,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_run_latency_test",
-      "community": 101,
-      "community_name": "handle_latency_test",
+      "community": 78,
+      "community_name": "_run_latency_test",
       "norm_label": "_run_latency_test()"
     },
     {
@@ -12810,7 +12810,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_stream_chat_response",
       "community": 78,
-      "community_name": "create_app",
+      "community_name": "_run_latency_test",
       "norm_label": "_stream_chat_response()"
     },
     {
@@ -12822,7 +12822,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_chat",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "handle_chat()"
     },
     {
@@ -12833,7 +12833,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_py_request",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "request"
     },
     {
@@ -12845,7 +12845,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_chat_sessions",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "handle_chat_sessions()"
     },
     {
@@ -12857,7 +12857,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_chat_session",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "handle_chat_session()"
     },
     {
@@ -12869,7 +12869,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_dashboard",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "handle_dashboard()"
     },
     {
@@ -12880,7 +12880,7 @@
       "_origin": "ast",
       "id": "htmlresponse",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "htmlresponse"
     },
     {
@@ -12903,7 +12903,7 @@
       "_origin": "ast",
       "id": "jsonresponse",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "jsonresponse"
     },
     {
@@ -12914,8 +12914,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_reports_list",
-      "community": 4,
-      "community_name": "webapp.py",
+      "community": 46,
+      "community_name": "create_app",
       "norm_label": "handle_reports_list()"
     },
     {
@@ -12927,7 +12927,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_report_detail",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "handle_report_detail()"
     },
     {
@@ -12938,8 +12938,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_profiles",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 46,
+      "community_name": "create_app",
       "norm_label": "handle_profiles()"
     },
     {
@@ -12950,8 +12950,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_profile_update",
-      "community": 107,
-      "community_name": "handle_profile_update",
+      "community": 46,
+      "community_name": "create_app",
       "norm_label": "handle_profile_update()"
     },
     {
@@ -12962,7 +12962,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_models",
-      "community": 78,
+      "community": 46,
       "community_name": "create_app",
       "norm_label": "handle_models()"
     },
@@ -12974,8 +12974,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_model_role_update",
-      "community": 97,
-      "community_name": "model_routing.py",
+      "community": 46,
+      "community_name": "create_app",
       "norm_label": "handle_model_role_update()"
     },
     {
@@ -12986,8 +12986,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_chains",
-      "community": 79,
-      "community_name": "handle_chain_update",
+      "community": 46,
+      "community_name": "create_app",
       "norm_label": "handle_chains()"
     },
     {
@@ -12998,8 +12998,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_chain_update",
-      "community": 79,
-      "community_name": "handle_chain_update",
+      "community": 46,
+      "community_name": "create_app",
       "norm_label": "handle_chain_update()"
     },
     {
@@ -13010,8 +13010,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_latency_test",
-      "community": 101,
-      "community_name": "handle_latency_test",
+      "community": 46,
+      "community_name": "create_app",
       "norm_label": "handle_latency_test()"
     },
     {
@@ -13022,8 +13022,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_run_plan",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 46,
+      "community_name": "create_app",
       "norm_label": "handle_run_plan()"
     },
     {
@@ -13034,8 +13034,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_run",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "handle_run()"
     },
     {
@@ -13046,8 +13046,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_run_status",
-      "community": 124,
-      "community_name": "handle_run_status",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "handle_run_status()"
     },
     {
@@ -13059,7 +13059,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_handle_run_cancel",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "handle_run_cancel()"
     },
     {
@@ -13070,7 +13070,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_create_app",
-      "community": 78,
+      "community": 46,
       "community_name": "create_app",
       "norm_label": "create_app()"
     },
@@ -13081,7 +13081,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_py_asyncbasetransport",
-      "community": 78,
+      "community": 46,
       "community_name": "create_app",
       "norm_label": "asyncbasetransport"
     },
@@ -13092,7 +13092,7 @@
       "source_location": "",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_py_starlette",
-      "community": 78,
+      "community": 46,
       "community_name": "create_app",
       "norm_label": "starlette"
     },
@@ -13104,9 +13104,21 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_main",
-      "community": 78,
-      "community_name": "create_app",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "main()"
+    },
+    {
+      "label": "_load_dashboard_html()",
+      "file_type": "code",
+      "source_file": "src/merged_agentic_swarm/webapp.py",
+      "source_location": "L987",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_merged_agentic_swarm_webapp_load_dashboard_html",
+      "community": 4,
+      "community_name": "webapp.py",
+      "norm_label": "_load_dashboard_html()"
     },
     {
       "label": "Agentic Swarm \u2014 Web UI Control Panel. A Starlette control panel (JSON API + a\u2026",
@@ -13127,7 +13139,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_75",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "remove sessions older than ttl."
     },
     {
@@ -13192,8 +13204,8 @@
       "source_location": "L188",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_188",
-      "community": 46,
-      "community_name": "Request",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "load one report by safe stem; none when missing or unreadable."
     },
     {
@@ -13203,8 +13215,8 @@
       "source_location": "L203",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_203",
-      "community": 107,
-      "community_name": "handle_profile_update",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "persist profiles to disk atomically and invalidate the load cache."
     },
     {
@@ -13214,8 +13226,8 @@
       "source_location": "L212",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_212",
-      "community": 97,
-      "community_name": "model_routing.py",
+      "community": 226,
+      "community_name": "_write_registry_roles",
       "norm_label": "persist one role -> alias mapping into provider_registry.json atomically. the..."
     },
     {
@@ -13226,7 +13238,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_246",
       "community": 79,
-      "community_name": "handle_chain_update",
+      "community_name": "_fabric_chains",
       "norm_label": "fabric-routes.json as {\"routes\": {alias: [route, ...]}}; {} when absent."
     },
     {
@@ -13237,7 +13249,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_258",
       "community": 79,
-      "community_name": "handle_chain_update",
+      "community_name": "_fabric_chains",
       "norm_label": "merged fabric chain view: code model_fabric_routes overlaid per alias."
     },
     {
@@ -13248,7 +13260,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_270",
       "community": 79,
-      "community_name": "handle_chain_update",
+      "community_name": "_fabric_chains",
       "norm_label": "upsert one chain alias into fabric-routes.json atomically."
     },
     {
@@ -13258,8 +13270,8 @@
       "source_location": "L288",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_288",
-      "community": 124,
-      "community_name": "handle_run_status",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "registry entry for a background workflow run."
     },
     {
@@ -13269,8 +13281,8 @@
       "source_location": "L315",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_315",
-      "community": 124,
-      "community_name": "handle_run_status",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "start a real agentic workflow on a background daemon thread (returns now)...."
     },
     {
@@ -13281,7 +13293,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_347",
       "community": 97,
-      "community_name": "model_routing.py",
+      "community_name": "services/__init__.py",
       "norm_label": "tier + registered-role -> litellm alias via model_routing resolution."
     },
     {
@@ -13292,7 +13304,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_363",
       "community": 78,
-      "community_name": "create_app",
+      "community_name": "_run_latency_test",
       "norm_label": "live litellm /v1/models aliases; on failure (aliases=[], note)."
     },
     {
@@ -13302,8 +13314,8 @@
       "source_location": "L383",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_383",
-      "community": 101,
-      "community_name": "handle_latency_test",
+      "community": 78,
+      "community_name": "_run_latency_test",
       "norm_label": "ok:false payload \u2014 short error, never the key."
     },
     {
@@ -13313,8 +13325,8 @@
       "source_location": "L395",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_395",
-      "community": 101,
-      "community_name": "handle_latency_test",
+      "community": 78,
+      "community_name": "_run_latency_test",
       "norm_label": "stream one chat/completions request; report ttfb and total wall time."
     },
     {
@@ -13325,7 +13337,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_442",
       "community": 78,
-      "community_name": "create_app",
+      "community_name": "_run_latency_test",
       "norm_label": "generator that yields sse chunks from litellm chat/completions."
     },
     {
@@ -13336,7 +13348,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_483",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "post /api/chat \u2014 send a chat message, optionally stream the response."
     },
     {
@@ -13347,7 +13359,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_538",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "get /api/chat/sessions \u2014 list active sessions. post /api/chat/sessions \u2014 create..."
     },
     {
@@ -13358,7 +13370,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_568",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "get /api/chat/sessions/{session_id} \u2014 get session messages. post..."
     },
     {
@@ -13368,8 +13380,8 @@
       "source_location": "L855",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_855",
-      "community": 15,
-      "community_name": "resolve_model_alias_for_profile",
+      "community": 97,
+      "community_name": "services/__init__.py",
       "norm_label": "start a real agentic workflow in a background daemon thread; return now."
     },
     {
@@ -13379,8 +13391,8 @@
       "source_location": "L881",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_881",
-      "community": 124,
-      "community_name": "handle_run_status",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "report live status for a run (or all runs when no ``run_id`` is given)."
     },
     {
@@ -13391,7 +13403,7 @@
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_893",
       "community": 46,
-      "community_name": "Request",
+      "community_name": "create_app",
       "norm_label": "signal a running workflow to abort at the next wave boundary."
     },
     {
@@ -13401,7 +13413,7 @@
       "source_location": "L909",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_909",
-      "community": 78,
+      "community": 46,
       "community_name": "create_app",
       "norm_label": "create the control-panel starlette app. a shared ``httpx.asyncclient``..."
     },
@@ -13412,9 +13424,20 @@
       "source_location": "L954",
       "_origin": "ast",
       "id": "src_merged_agentic_swarm_webapp_rationale_954",
-      "community": 78,
-      "community_name": "create_app",
+      "community": 4,
+      "community_name": "webapp.py",
       "norm_label": "run the control panel. defaults to loopback; pass --host 0.0.0.0 to expose."
+    },
+    {
+      "label": "Load the dashboard HTML template from disk (cached after first read).",
+      "file_type": "rationale",
+      "source_file": "src/merged_agentic_swarm/webapp.py",
+      "source_location": "L988",
+      "_origin": "ast",
+      "id": "src_merged_agentic_swarm_webapp_rationale_988",
+      "community": 4,
+      "community_name": "webapp.py",
+      "norm_label": "load the dashboard html template from disk (cached after first read)."
     },
     {
       "label": "tests/__init__.py",
@@ -13812,8 +13835,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_agent_factory_service",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": "test_agent_factory_service.py"
     },
     {
@@ -13823,8 +13846,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_py_fixture",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": "fixture"
     },
     {
@@ -13835,8 +13858,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_isolated_agents_registry",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": "isolated_agents_registry()"
     },
     {
@@ -13848,8 +13871,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_testchainregistry",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": "testchainregistry"
     },
     {
@@ -13860,8 +13883,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_testchainregistry_test_default_registry",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": ".test_default_registry()"
     },
     {
@@ -13872,8 +13895,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_testchainregistry_test_register_spawn",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": ".test_register_spawn()"
     },
     {
@@ -13884,8 +13907,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_testchainregistry_test_persists_across_loads",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": ".test_persists_across_loads()"
     },
     {
@@ -13896,8 +13919,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_testchainregistry_test_register_spawn_with_parent",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": ".test_register_spawn_with_parent()"
     },
     {
@@ -13908,8 +13931,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_testchainregistry_test_load_corrupted_file",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": ".test_load_corrupted_file()"
     },
     {
@@ -13920,8 +13943,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_testchainregistry_test_register_spawn_entry_ids_unique_within_batch",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": ".test_register_spawn_entry_ids_unique_within_batch()"
     },
     {
@@ -13932,8 +13955,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_testchainregistry_test_register_spawn_entry_ids_unique_across_instances",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": ".test_register_spawn_entry_ids_unique_across_instances()"
     },
     {
@@ -14124,8 +14147,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_rationale_1",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": "tests for services/agent_factory_service.py coverage: chainregistry (load,..."
     },
     {
@@ -14135,8 +14158,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_rationale_18",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": "return a temp path for the durable cold-path agents.jsonl registry."
     },
     {
@@ -14146,8 +14169,8 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_rationale_79",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": "#18: entry_ids in one promotion batch must never collide."
     },
     {
@@ -14157,8 +14180,8 @@
       "source_location": "L92",
       "_origin": "ast",
       "id": "tests_test_agent_factory_service_rationale_92",
-      "community": 11,
-      "community_name": "DurableAgentFactory",
+      "community": 50,
+      "community_name": "ChainRegistry",
       "norm_label": "#18: separate registry instances sharing a file must not reuse entry_ids."
     },
     {
@@ -14235,7 +14258,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "test_agent_models.py"
     },
     {
@@ -14248,7 +14271,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerrole",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "testworkerrole"
     },
     {
@@ -14260,7 +14283,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerrole_test_values",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_values()"
     },
     {
@@ -14273,7 +14296,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testagenttype",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "testagenttype"
     },
     {
@@ -14285,7 +14308,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testagenttype_test_values",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_values()"
     },
     {
@@ -14297,7 +14320,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agent_models_testagentspec",
-      "community": 57,
+      "community": 95,
       "community_name": "AgentSpec",
       "norm_label": "testagentspec"
     },
@@ -14309,7 +14332,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_models_testagentspec_test_default_creation",
-      "community": 57,
+      "community": 95,
       "community_name": "AgentSpec",
       "norm_label": ".test_default_creation()"
     },
@@ -14321,7 +14344,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_models_testagentspec_test_durable_never_expires",
-      "community": 57,
+      "community": 95,
       "community_name": "AgentSpec",
       "norm_label": ".test_durable_never_expires()"
     },
@@ -14333,7 +14356,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_models_testagentspec_test_hot_expires_after_ttl",
-      "community": 57,
+      "community": 95,
       "community_name": "AgentSpec",
       "norm_label": ".test_hot_expires_after_ttl()"
     },
@@ -14345,7 +14368,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_models_testagentspec_test_hot_not_expired_within_ttl",
-      "community": 57,
+      "community": 95,
       "community_name": "AgentSpec",
       "norm_label": ".test_hot_not_expired_within_ttl()"
     },
@@ -14357,7 +14380,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_models_testagentspec_test_to_dict_serializes_enums",
-      "community": 57,
+      "community": 95,
       "community_name": "AgentSpec",
       "norm_label": ".test_to_dict_serializes_enums()"
     },
@@ -14369,7 +14392,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agent_models_testagentspec_test_custom_fields",
-      "community": 57,
+      "community": 95,
       "community_name": "AgentSpec",
       "norm_label": ".test_custom_fields()"
     },
@@ -14383,7 +14406,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerpoolconfig",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "testworkerpoolconfig"
     },
     {
@@ -14395,7 +14418,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerpoolconfig_test_default_allocations",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_default_allocations()"
     },
     {
@@ -14407,7 +14430,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerpoolconfig_test_custom_config",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_custom_config()"
     },
     {
@@ -14420,7 +14443,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testspawnchainentry",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "testspawnchainentry"
     },
     {
@@ -14432,7 +14455,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testspawnchainentry_test_default_creation",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_default_creation()"
     },
     {
@@ -14444,7 +14467,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testspawnchainentry_test_to_dict",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_to_dict()"
     },
     {
@@ -14457,7 +14480,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerpoolstate",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "testworkerpoolstate"
     },
     {
@@ -14469,7 +14492,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerpoolstate_test_default_state",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_default_state()"
     },
     {
@@ -14481,7 +14504,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerpoolstate_test_record_pool_success",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_record_pool_success()"
     },
     {
@@ -14493,7 +14516,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerpoolstate_test_record_pool_failure",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_record_pool_failure()"
     },
     {
@@ -14505,7 +14528,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerpoolstate_test_record_rate_limit",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_record_rate_limit()"
     },
     {
@@ -14517,7 +14540,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerpoolstate_test_get_pool_summary_returns_copy",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_get_pool_summary_returns_copy()"
     },
     {
@@ -14529,7 +14552,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_testworkerpoolstate_test_to_dict",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": ".test_to_dict()"
     },
     {
@@ -14540,7 +14563,7 @@
       "_origin": "ast",
       "id": "tests_test_agent_models_rationale_1",
       "community": 57,
-      "community_name": "AgentSpec",
+      "community_name": "WorkerPoolConfig",
       "norm_label": "tests for models/agent_models.py coverage: agentspec, workerpoolconfig,..."
     },
     {
@@ -14550,7 +14573,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_agentic_cli",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": "test_agentic_cli.py"
     },
@@ -14563,7 +14586,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_write",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "_write()"
     },
     {
@@ -14575,7 +14598,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_args",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "_args()"
     },
     {
@@ -14587,7 +14610,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_fake_saved",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "_fake_saved()"
     },
     {
@@ -14599,7 +14622,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_patch_auto_save",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "_patch_auto_save()"
     },
     {
@@ -14610,8 +14633,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_main_with_args",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": "_main_with_args()"
     },
     {
@@ -14710,7 +14733,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdrun",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "testcmdrun"
     },
     {
@@ -14722,7 +14745,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdrun_test_run_missing_prd_exits",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_run_missing_prd_exits()"
     },
     {
@@ -14734,7 +14757,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdrun_test_run_success_prints_result",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_run_success_prints_result()"
     },
     {
@@ -14746,7 +14769,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdrun_test_run_verbose_prints_full_json",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_run_verbose_prints_full_json()"
     },
     {
@@ -14758,7 +14781,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdrun_test_run_exception_exits",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_run_exception_exits()"
     },
     {
@@ -14770,7 +14793,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdrun_test_run_profile_resolves_and_passes_ramp_and_model",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_run_profile_resolves_and_passes_ramp_and_model()"
     },
     {
@@ -14782,7 +14805,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdrun_test_run_unknown_profile_exits",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_run_unknown_profile_exits()"
     },
     {
@@ -14794,7 +14817,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdrun_test_run_profile_through_main",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_run_profile_through_main()"
     },
     {
@@ -14807,7 +14830,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdstatus",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "testcmdstatus"
     },
     {
@@ -14819,7 +14842,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdstatus_registry",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "._registry()"
     },
     {
@@ -14831,7 +14854,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdstatus_ledger",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "._ledger()"
     },
     {
@@ -14843,7 +14866,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdstatus_test_status_no_progress",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_status_no_progress()"
     },
     {
@@ -14855,7 +14878,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdstatus_test_status_with_ledger_and_registries",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_status_with_ledger_and_registries()"
     },
     {
@@ -14867,7 +14890,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdstatus_test_status_corrupt_ledger",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_status_corrupt_ledger()"
     },
     {
@@ -14879,7 +14902,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdstatus_test_status_custom_progress_path",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_status_custom_progress_path()"
     },
     {
@@ -14891,7 +14914,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdstatus_test_status_legacy_snapshot_still_renders",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_status_legacy_snapshot_still_renders()"
     },
     {
@@ -14903,7 +14926,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdstatus_test_status_defaults_to_real_ledger",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_status_defaults_to_real_ledger()"
     },
     {
@@ -14915,7 +14938,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdpromote",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": "testcmdpromote"
     },
@@ -14927,7 +14950,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdpromote_test_promote_success",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": ".test_promote_success()"
     },
@@ -14939,7 +14962,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdpromote_test_promote_exception_exits",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": ".test_promote_exception_exits()"
     },
@@ -14952,8 +14975,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testmain",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": "testmain"
     },
     {
@@ -14964,8 +14987,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testmain_test_no_command_prints_help_and_exits",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": ".test_no_command_prints_help_and_exits()"
     },
     {
@@ -14976,8 +14999,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testmain_test_run_missing_prd_exits_through_main",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": ".test_run_missing_prd_exits_through_main()"
     },
     {
@@ -14988,8 +15011,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testmain_test_config_routes_through_main",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": ".test_config_routes_through_main()"
     },
     {
@@ -15000,7 +15023,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_ledger_json",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": "_ledger_json()"
     },
@@ -15012,7 +15035,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_ledger_log",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": "_ledger_log()"
     },
@@ -15086,7 +15109,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdreport",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": "testcmdreport"
     },
@@ -15098,7 +15121,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdreport_write_ledger",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": "._write_ledger()"
     },
@@ -15110,7 +15133,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdreport_test_report_writes_both_files_with_model_timeline",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": ".test_report_writes_both_files_with_model_timeline()"
     },
@@ -15122,7 +15145,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdreport_test_report_missing_ledger_writes_empty_report",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": ".test_report_missing_ledger_writes_empty_report()"
     },
@@ -15134,7 +15157,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdreport_test_report_through_main",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": ".test_report_through_main()"
     },
@@ -15148,7 +15171,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdrunautosave",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "testcmdrunautosave"
     },
     {
@@ -15160,7 +15183,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdrunautosave_test_run_auto_saves_report_on_success",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_run_auto_saves_report_on_success()"
     },
     {
@@ -15172,7 +15195,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdrunautosave_test_run_does_not_autosave_on_failure",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": ".test_run_does_not_autosave_on_failure()"
     },
     {
@@ -15184,8 +15207,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdswarm",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": "testcmdswarm"
     },
     {
@@ -15196,8 +15219,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdswarm_setup_method",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": ".setup_method()"
     },
     {
@@ -15208,8 +15231,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdswarm_swarm_args",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": "._swarm_args()"
     },
     {
@@ -15220,8 +15243,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdswarm_test_swarm_list_through_main",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": ".test_swarm_list_through_main()"
     },
     {
@@ -15232,8 +15255,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdswarm_test_swarm_profile_through_main",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": ".test_swarm_profile_through_main()"
     },
     {
@@ -15244,8 +15267,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdswarm_test_swarm_learning_profile_reports_no_runnable_waves",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": ".test_swarm_learning_profile_reports_no_runnable_waves()"
     },
     {
@@ -15256,8 +15279,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdswarm_test_swarm_unknown_profile_errors_clearly",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": ".test_swarm_unknown_profile_errors_clearly()"
     },
     {
@@ -15268,8 +15291,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdswarm_test_swarm_without_args_errors",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": ".test_swarm_without_args_errors()"
     },
     {
@@ -15280,8 +15303,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_cli_testcmdswarm_test_swarm_handler_returns_resolved_profile",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": ".test_swarm_handler_returns_resolved_profile()"
     },
     {
@@ -15291,7 +15314,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_agentic_cli_rationale_1",
-      "community": 29,
+      "community": 101,
       "community_name": "test_agentic_cli.py",
       "norm_label": "tests for tools/agentic_cli.py coverage: cmd_config, basic cli parsing, cmd_run..."
     },
@@ -15303,7 +15326,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_rationale_47",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "fake save_run_report return, so auto-save never writes into the real repo."
     },
     {
@@ -15380,7 +15403,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_rationale_184",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "`run --profile review` resolves the profile's waves as the ramp and the tier-..."
     },
     {
@@ -15391,7 +15414,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_rationale_217",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "argparse wires `run --profile patch` into cmd_run with profile resolved."
     },
     {
@@ -15402,7 +15425,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_rationale_314",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "old progress.json snapshots passed via --progress keep working."
     },
     {
@@ -15413,7 +15436,7 @@
       "_origin": "ast",
       "id": "tests_test_agentic_cli_rationale_335",
       "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community_name": "_args",
       "norm_label": "#19: cmd_status must point at the live progressledgerservice ledger."
     },
     {
@@ -15423,8 +15446,8 @@
       "source_location": "L538",
       "_origin": "ast",
       "id": "tests_test_agentic_cli_rationale_538",
-      "community": 29,
-      "community_name": "test_agentic_cli.py",
+      "community": 77,
+      "community_name": "_main_with_args",
       "norm_label": "coverage for the swarm subcommand: --list, --profile, and error paths."
     },
     {
@@ -15434,8 +15457,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": "test_agentic_orchestrator.py"
     },
     {
@@ -15446,8 +15469,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_epic",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": "_epic()"
     },
     {
@@ -15458,8 +15481,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_analysis",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": "_analysis()"
     },
     {
@@ -15616,8 +15639,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_testcancellationcheck",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 16,
+      "community_name": ".run_full_agentic_workflow",
       "norm_label": "testcancellationcheck"
     },
     {
@@ -15714,8 +15737,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_testapplyworkeroutputspaths",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": "testapplyworkeroutputspaths"
     },
     {
@@ -15738,8 +15761,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_testapplyworkeroutputspaths_test_relative_path_resolves_and_write_failure_logged",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": ".test_relative_path_resolves_and_write_failure_logged()"
     },
     {
@@ -15750,8 +15773,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_testapplyworkeroutputspaths_test_secondary_text_from_response_dict",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": ".test_secondary_text_from_response_dict()"
     },
     {
@@ -15763,8 +15786,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_testpromotedidsbranches",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": "testpromotedidsbranches"
     },
     {
@@ -15800,8 +15823,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_testinitializesystemproxyfailure",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": "testinitializesystemproxyfailure"
     },
     {
@@ -15825,8 +15848,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_testpromotecoldpathagentfileexists",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": "testpromotecoldpathagentfileexists"
     },
     {
@@ -15850,8 +15873,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_testpromotecoldpathchainentryids",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": "testpromotecoldpathchainentryids"
     },
     {
@@ -15875,8 +15898,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_testapplyworkeroutputs",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": "testapplyworkeroutputs"
     },
     {
@@ -15898,8 +15921,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_rationale_1",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": "tests for tools/agentic_orchestrator.py coverage:..."
     },
     {
@@ -15986,8 +16009,8 @@
       "source_location": "L342",
       "_origin": "ast",
       "id": "tests_test_agentic_orchestrator_rationale_342",
-      "community": 8,
-      "community_name": "SubTask",
+      "community": 24,
+      "community_name": "MultiLayeredAgenticOrchestrator",
       "norm_label": "a relative # file: path that resolves to a directory triggers the write-failure..."
     },
     {
@@ -16533,7 +16556,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": "test_claude_proxy_server.py"
     },
     {
@@ -16545,7 +16568,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_fakeresp",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": "_fakeresp"
     },
@@ -16557,7 +16580,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_fakeresp_init",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": ".__init__()"
     },
@@ -16569,7 +16592,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_fakeresp_json",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": ".json()"
     },
@@ -16582,7 +16605,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_multipart_body",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": "_multipart_body()"
     },
     {
@@ -16595,7 +16618,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testparsemultipart",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": "testparsemultipart"
     },
     {
@@ -16607,7 +16630,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testparsemultipart_test_parses_file_and_model",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": ".test_parses_file_and_model()"
     },
     {
@@ -16619,7 +16642,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testparsemultipart_test_no_file_field",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": ".test_no_file_field()"
     },
     {
@@ -16631,7 +16654,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testparsemultipart_test_missing_boundary",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": ".test_missing_boundary()"
     },
     {
@@ -16643,7 +16666,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testparsemultipart_test_default_model_when_no_model_field",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": ".test_default_model_when_no_model_field()"
     },
     {
@@ -16655,7 +16678,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testforwardtranscription",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": "testforwardtranscription"
     },
@@ -16667,7 +16690,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testforwardtranscription_test_success_returns_json",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": ".test_success_returns_json()"
     },
@@ -16679,7 +16702,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testforwardtranscription_test_connection_error_returns_503",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": ".test_connection_error_returns_503()"
     },
@@ -16691,7 +16714,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testforwardtranscription_test_generic_exception_returns_500",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": ".test_generic_exception_returns_500()"
     },
@@ -16703,7 +16726,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testforwardtranscription_test_backend_error_returns_status",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": ".test_backend_error_returns_status()"
     },
@@ -16715,7 +16738,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testforwardtranscription_test_unknown_extension_defaults_to_wav",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": ".test_unknown_extension_defaults_to_wav()"
     },
@@ -17017,7 +17040,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testclaudeproxyhandler_test_post_audio_transcriptions_success",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": ".test_post_audio_transcriptions_success()"
     },
     {
@@ -17028,7 +17051,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testclaudeproxyhandler_test_post_audio_transcriptions_no_file",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": ".test_post_audio_transcriptions_no_file()"
     },
@@ -17041,7 +17064,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_testclaudeproxyhandler_test_post_audio_transcriptions_backend_down",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": ".test_post_audio_transcriptions_backend_down()"
     },
     {
@@ -17052,7 +17075,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_rationale_1",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": "tests for proxy/claude_proxy_server.py coverage: claudeproxyhandler (do_get,..."
     },
     {
@@ -17250,7 +17273,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_rationale_503",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": "multipart audio post \u2192 forwarded to whisper backend \u2192 json response."
     },
     {
@@ -17260,7 +17283,7 @@
       "source_location": "L525",
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_rationale_525",
-      "community": 72,
+      "community": 98,
       "community_name": "_forward_transcription",
       "norm_label": "multipart post without a file field \u2192 400."
     },
@@ -17272,7 +17295,7 @@
       "_origin": "ast",
       "id": "tests_test_claude_proxy_server_rationale_547",
       "community": 72,
-      "community_name": "_forward_transcription",
+      "community_name": "test_claude_proxy_server.py",
       "norm_label": "backend connection failure \u2192 503 with unavailable message."
     },
     {
@@ -18388,8 +18411,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_fast_fallback_testdispatchhelper",
-      "community": 54,
-      "community_name": "FastFallbackConfig",
+      "community": 5,
+      "community_name": "_router_with_keys",
       "norm_label": "testdispatchhelper"
     },
     {
@@ -18400,8 +18423,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_fast_fallback_testdispatchhelper_setup_method",
-      "community": 54,
-      "community_name": "FastFallbackConfig",
+      "community": 5,
+      "community_name": "_router_with_keys",
       "norm_label": ".setup_method()"
     },
     {
@@ -18412,8 +18435,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_fast_fallback_testdispatchhelper_test_dispatch_fast_uses_default_router",
-      "community": 54,
-      "community_name": "FastFallbackConfig",
+      "community": 5,
+      "community_name": "_router_with_keys",
       "norm_label": ".test_dispatch_fast_uses_default_router()"
     },
     {
@@ -18643,8 +18666,8 @@
       "source_location": "L422",
       "_origin": "ast",
       "id": "tests_test_fast_fallback_rationale_422",
-      "community": 54,
-      "community_name": "FastFallbackConfig",
+      "community": 5,
+      "community_name": "_router_with_keys",
       "norm_label": "dispatch_fast reaches the default router and returns an anthropic-shaped..."
     },
     {
@@ -18654,8 +18677,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_fast_pool",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": "test_fast_pool.py"
     },
     {
@@ -18667,8 +18690,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_fast_pool_fakeclient",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": "_fakeclient"
     },
     {
@@ -18679,8 +18702,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_fast_pool_fakeclient_init",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": ".__init__()"
     },
     {
@@ -18691,8 +18714,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_fast_pool_fakeclient_is_closed",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": ".is_closed()"
     },
     {
@@ -18703,8 +18726,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_fast_pool_fakeclient_post",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": ".post()"
     },
     {
@@ -18714,8 +18737,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "timeout",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": "timeout"
     },
     {
@@ -18725,8 +18748,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "tests_test_fast_pool_py_response",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": "response"
     },
     {
@@ -18737,8 +18760,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_fast_pool_fakeclient_close",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": ".close()"
     },
     {
@@ -18749,8 +18772,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_fast_pool_install_fake",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": "_install_fake()"
     },
     {
@@ -18761,8 +18784,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_fast_pool_test_dispatch_localhost_uses_local_connect_timeout",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": "test_dispatch_localhost_uses_local_connect_timeout()"
     },
     {
@@ -18773,8 +18796,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_fast_pool_test_dispatch_remote_keeps_configured_connect_timeout",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": "test_dispatch_remote_keeps_configured_connect_timeout()"
     },
     {
@@ -18784,8 +18807,8 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "tests_test_fast_pool_rationale_7",
-      "community": 17,
-      "community_name": "fast_pool.py",
+      "community": 107,
+      "community_name": "_FakeClient",
       "norm_label": "records the per-request timeout passed to post() without network i/o."
     },
     {
@@ -20134,8 +20157,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_knowledge_cache",
-      "community": 31,
-      "community_name": "KnowledgeCache",
+      "community": 124,
+      "community_name": "knowledge_cache.py",
       "norm_label": "test_knowledge_cache.py"
     },
     {
@@ -20314,8 +20337,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_knowledge_cache_rationale_1",
-      "community": 31,
-      "community_name": "KnowledgeCache",
+      "community": 124,
+      "community_name": "knowledge_cache.py",
       "norm_label": "tests for tools/knowledge_cache.py coverage: knowledgecache \u2014 load_cache,..."
     },
     {
@@ -20490,7 +20513,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_learning_loop",
-      "community": 50,
+      "community": 47,
       "community_name": "test_learning_loop.py",
       "norm_label": "test_learning_loop.py"
     },
@@ -20514,7 +20537,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_learning_loop_make_knowledge_jsonl_entry",
-      "community": 50,
+      "community": 47,
       "community_name": "test_learning_loop.py",
       "norm_label": "_make_knowledge_jsonl_entry()"
     },
@@ -20526,7 +20549,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_learning_loop_make_agent_jsonl_entry",
-      "community": 50,
+      "community": 47,
       "community_name": "test_learning_loop.py",
       "norm_label": "_make_agent_jsonl_entry()"
     },
@@ -20538,7 +20561,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_learning_loop_make_chain_jsonl_entry",
-      "community": 50,
+      "community": 47,
       "community_name": "test_learning_loop.py",
       "norm_label": "_make_chain_jsonl_entry()"
     },
@@ -20551,7 +20574,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_append_jsonl",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": "_append_jsonl()"
     },
     {
@@ -20575,7 +20598,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_evaluate_promotion_criteria",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": "_evaluate_promotion_criteria()"
     },
     {
@@ -20622,8 +20645,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_learning_loop_simulate_reuse",
-      "community": 66,
-      "community_name": "_simulate_reuse",
+      "community": 59,
+      "community_name": "_read_jsonl",
       "norm_label": "_simulate_reuse()"
     },
     {
@@ -20710,7 +20733,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_testevaluatestep",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": "testevaluatestep"
     },
     {
@@ -20722,7 +20745,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_testevaluatestep_test_evaluate_passes_strong_entry",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": ".test_evaluate_passes_strong_entry()"
     },
     {
@@ -20734,7 +20757,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_testevaluatestep_test_evaluate_fails_weak_entry",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": ".test_evaluate_fails_weak_entry()"
     },
     {
@@ -20746,7 +20769,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_testevaluatestep_test_evaluate_detects_duplicate",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": ".test_evaluate_detects_duplicate()"
     },
     {
@@ -20843,7 +20866,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_learning_loop_testloadafterrestart",
-      "community": 50,
+      "community": 47,
       "community_name": "test_learning_loop.py",
       "norm_label": "testloadafterrestart"
     },
@@ -20880,8 +20903,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_learning_loop_testrouteandreuse",
-      "community": 66,
-      "community_name": "_simulate_reuse",
+      "community": 59,
+      "community_name": "_read_jsonl",
       "norm_label": "testrouteandreuse"
     },
     {
@@ -20892,8 +20915,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_learning_loop_testrouteandreuse_test_route_task_to_promoted_agent",
-      "community": 66,
-      "community_name": "_simulate_reuse",
+      "community": 59,
+      "community_name": "_read_jsonl",
       "norm_label": ".test_route_task_to_promoted_agent()"
     },
     {
@@ -20904,8 +20927,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_learning_loop_testrouteandreuse_test_reuse_uses_correct_system_prompt",
-      "community": 66,
-      "community_name": "_simulate_reuse",
+      "community": 59,
+      "community_name": "_read_jsonl",
       "norm_label": ".test_reuse_uses_correct_system_prompt()"
     },
     {
@@ -21001,7 +21024,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_1",
-      "community": 50,
+      "community": 47,
       "community_name": "test_learning_loop.py",
       "norm_label": "tests for the full learning loop lifecycle: capture -> evaluate -> promote ->..."
     },
@@ -21023,7 +21046,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_34",
-      "community": 50,
+      "community": 47,
       "community_name": "test_learning_loop.py",
       "norm_label": "create a cold-path knowledge.jsonl entry."
     },
@@ -21034,7 +21057,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_48",
-      "community": 50,
+      "community": 47,
       "community_name": "test_learning_loop.py",
       "norm_label": "create a cold-path agents.jsonl entry."
     },
@@ -21045,7 +21068,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_61",
-      "community": 50,
+      "community": 47,
       "community_name": "test_learning_loop.py",
       "norm_label": "create a cold-path chain.jsonl entry."
     },
@@ -21057,7 +21080,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_74",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": "append a single json entry as a line to a jsonl file."
     },
     {
@@ -21079,7 +21102,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_95",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": "evaluate whether a learning entry meets cold-path promotion criteria. returns..."
     },
     {
@@ -21122,8 +21145,8 @@
       "source_location": "L338",
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_338",
-      "community": 66,
-      "community_name": "_simulate_reuse",
+      "community": 59,
+      "community_name": "_read_jsonl",
       "norm_label": "simulate routing a task to a promoted agent and getting a response."
     },
     {
@@ -21178,7 +21201,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_429",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": "step 3: evaluate \u2014 score learning against promotion criteria."
     },
     {
@@ -21189,7 +21212,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_432",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": "a strong, substantive entry should pass all promotion criteria."
     },
     {
@@ -21200,7 +21223,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_445",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": "a weak entry should fail promotion criteria."
     },
     {
@@ -21211,7 +21234,7 @@
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_461",
       "community": 47,
-      "community_name": "_evaluate_promotion_criteria",
+      "community_name": "test_learning_loop.py",
       "norm_label": "should detect when an entry already exists in cold knowledge."
     },
     {
@@ -21232,7 +21255,7 @@
       "source_location": "L596",
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_596",
-      "community": 50,
+      "community": 47,
       "community_name": "test_learning_loop.py",
       "norm_label": "step: load \u2014 simulate loading agents after a restart."
     },
@@ -21243,8 +21266,8 @@
       "source_location": "L638",
       "_origin": "ast",
       "id": "tests_test_learning_loop_rationale_638",
-      "community": 66,
-      "community_name": "_simulate_reuse",
+      "community": 59,
+      "community_name": "_read_jsonl",
       "norm_label": "step: route & reuse \u2014 routing tasks to promoted agents."
     },
     {
@@ -22030,8 +22053,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testroutebuilding",
-      "community": 40,
-      "community_name": "MultiProviderFabric",
+      "community": 74,
+      "community_name": "test_multi_provider_fabric.py",
       "norm_label": "testroutebuilding"
     },
     {
@@ -22042,8 +22065,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testroutebuilding_setup_method",
-      "community": 40,
-      "community_name": "MultiProviderFabric",
+      "community": 74,
+      "community_name": "test_multi_provider_fabric.py",
       "norm_label": ".setup_method()"
     },
     {
@@ -22054,8 +22077,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testroutebuilding_test_build_route_list_default",
-      "community": 40,
-      "community_name": "MultiProviderFabric",
+      "community": 74,
+      "community_name": "test_multi_provider_fabric.py",
       "norm_label": ".test_build_route_list_default()"
     },
     {
@@ -22066,8 +22089,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testroutebuilding_test_build_route_list_promotes_last_successful",
-      "community": 40,
-      "community_name": "MultiProviderFabric",
+      "community": 74,
+      "community_name": "test_multi_provider_fabric.py",
       "norm_label": ".test_build_route_list_promotes_last_successful()"
     },
     {
@@ -22078,8 +22101,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testroutebuilding_test_build_route_list_fallback_to_default",
-      "community": 40,
-      "community_name": "MultiProviderFabric",
+      "community": 74,
+      "community_name": "test_multi_provider_fabric.py",
       "norm_label": ".test_build_route_list_fallback_to_default()"
     },
     {
@@ -22176,8 +22199,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testbanpersistence",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 138,
+      "community_name": "TestBanPersistence",
       "norm_label": "testbanpersistence"
     },
     {
@@ -22188,8 +22211,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testbanpersistence_setup_method",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 138,
+      "community_name": "TestBanPersistence",
       "norm_label": ".setup_method()"
     },
     {
@@ -22200,8 +22223,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testbanpersistence_test_401_persists_ban_and_reload_restores",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 138,
+      "community_name": "TestBanPersistence",
       "norm_label": ".test_401_persists_ban_and_reload_restores()"
     },
     {
@@ -22212,8 +22235,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testbanpersistence_test_expired_ban_dropped_on_load",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 138,
+      "community_name": "TestBanPersistence",
       "norm_label": ".test_expired_ban_dropped_on_load()"
     },
     {
@@ -22224,8 +22247,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testbanpersistence_test_non_401_failure_does_not_persist_ban",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 138,
+      "community_name": "TestBanPersistence",
       "norm_label": ".test_non_401_failure_does_not_persist_ban()"
     },
     {
@@ -22381,8 +22404,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testlitellmpresenceinroutes",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 141,
+      "community_name": "TestLitellmPresenceInRoutes",
       "norm_label": "testlitellmpresenceinroutes"
     },
     {
@@ -22393,8 +22416,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testlitellmpresenceinroutes_test_each_fabric_alias_has_litellm_route",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 141,
+      "community_name": "TestLitellmPresenceInRoutes",
       "norm_label": ".test_each_fabric_alias_has_litellm_route()"
     },
     {
@@ -22405,8 +22428,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testlitellmpresenceinroutes_test_litellm_alias_routes_lead_with_litellm",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 141,
+      "community_name": "TestLitellmPresenceInRoutes",
       "norm_label": ".test_litellm_alias_routes_lead_with_litellm()"
     },
     {
@@ -22455,8 +22478,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testmalformedoverlayroutes",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 142,
+      "community_name": "TestMalformedOverlayRoutes",
       "norm_label": "testmalformedoverlayroutes"
     },
     {
@@ -22467,8 +22490,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testmalformedoverlayroutes_install",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 142,
+      "community_name": "TestMalformedOverlayRoutes",
       "norm_label": "._install()"
     },
     {
@@ -22479,8 +22502,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testmalformedoverlayroutes_test_malformed_routes_filtered_at_load",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 142,
+      "community_name": "TestMalformedOverlayRoutes",
       "norm_label": ".test_malformed_routes_filtered_at_load()"
     },
     {
@@ -22491,8 +22514,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_testmalformedoverlayroutes_test_all_malformed_alias_falls_back_to_code_defaults",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 142,
+      "community_name": "TestMalformedOverlayRoutes",
       "norm_label": ".test_all_malformed_alias_falls_back_to_code_defaults()"
     },
     {
@@ -22557,8 +22580,8 @@
       "source_location": "L246",
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_rationale_246",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 138,
+      "community_name": "TestBanPersistence",
       "norm_label": "#40: 401 perma-bans persist to disk and are honored across reloads."
     },
     {
@@ -22667,8 +22690,8 @@
       "source_location": "L455",
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_rationale_455",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 141,
+      "community_name": "TestLitellmPresenceInRoutes",
       "norm_label": "role routing maps worker roles to litellm aliases, so every fabric tier must..."
     },
     {
@@ -22678,8 +22701,8 @@
       "source_location": "L465",
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_rationale_465",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 141,
+      "community_name": "TestLitellmPresenceInRoutes",
       "norm_label": "worker-tier aliases route through the litellm gateway first (42-key gemini..."
     },
     {
@@ -22689,8 +22712,8 @@
       "source_location": "L543",
       "_origin": "ast",
       "id": "tests_test_multi_provider_fabric_rationale_543",
-      "community": 74,
-      "community_name": "test_multi_provider_fabric.py",
+      "community": 142,
+      "community_name": "TestMalformedOverlayRoutes",
       "norm_label": "malformed overlay routes are dropped at load, never crashing dispatch (issue..."
     },
     {
@@ -22700,8 +22723,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_opencode_swarm_service",
-      "community": 25,
-      "community_name": "OpenCodeSwarmManager",
+      "community": 15,
+      "community_name": "WorkerRole",
       "norm_label": "test_opencode_swarm_service.py"
     },
     {
@@ -23340,8 +23363,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_opencode_swarm_service_testtargetreporoot",
-      "community": 58,
-      "community_name": "ConcurrencyRampController",
+      "community": 127,
+      "community_name": "TestTargetRepoRoot",
       "norm_label": "testtargetreporoot"
     },
     {
@@ -23352,8 +23375,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_opencode_swarm_service_testtargetreporoot_test_env_var_wins",
-      "community": 58,
-      "community_name": "ConcurrencyRampController",
+      "community": 127,
+      "community_name": "TestTargetRepoRoot",
       "norm_label": ".test_env_var_wins()"
     },
     {
@@ -23364,8 +23387,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_opencode_swarm_service_testtargetreporoot_test_defaults_to_existing_sibling_or_cwd",
-      "community": 58,
-      "community_name": "ConcurrencyRampController",
+      "community": 127,
+      "community_name": "TestTargetRepoRoot",
       "norm_label": ".test_defaults_to_existing_sibling_or_cwd()"
     },
     {
@@ -23376,8 +23399,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_opencode_swarm_service_testtargetreporoot_test_getcwd_fallback",
-      "community": 58,
-      "community_name": "ConcurrencyRampController",
+      "community": 127,
+      "community_name": "TestTargetRepoRoot",
       "norm_label": ".test_getcwd_fallback()"
     },
     {
@@ -23387,8 +23410,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_opencode_swarm_service_rationale_1",
-      "community": 25,
-      "community_name": "OpenCodeSwarmManager",
+      "community": 15,
+      "community_name": "WorkerRole",
       "norm_label": "tests for services/opencode_swarm_service.py coverage:..."
     },
     {
@@ -23519,8 +23542,8 @@
       "source_location": "L615",
       "_origin": "ast",
       "id": "tests_test_opencode_swarm_service_rationale_615",
-      "community": 58,
-      "community_name": "ConcurrencyRampController",
+      "community": 127,
+      "community_name": "TestTargetRepoRoot",
       "norm_label": "when swarm_target_repo is unset and no sibling target repo exists,..."
     },
     {
@@ -23531,7 +23554,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "test_prd_models.py"
     },
     {
@@ -23544,7 +23567,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testtaskstatus",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "testtaskstatus"
     },
     {
@@ -23556,7 +23579,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testtaskstatus_test_values",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".test_values()"
     },
     {
@@ -23569,7 +23592,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testtaskpriority",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "testtaskpriority"
     },
     {
@@ -23581,7 +23604,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testtaskpriority_test_values",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".test_values()"
     },
     {
@@ -23593,7 +23616,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_prd_models_testsubtask",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": "testsubtask"
     },
@@ -23605,7 +23628,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_prd_models_testsubtask_test_default_creation",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".test_default_creation()"
     },
@@ -23617,7 +23640,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_prd_models_testsubtask_test_to_dict_serializes_enum",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".test_to_dict_serializes_enum()"
     },
@@ -23629,7 +23652,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_prd_models_testsubtask_test_marked_completed_sets_timestamp",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".test_marked_completed_sets_timestamp()"
     },
@@ -23641,7 +23664,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_prd_models_testsubtask_test_with_error",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".test_with_error()"
     },
@@ -23654,7 +23677,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_prd_models_testepictask",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": "testepictask"
     },
@@ -23666,7 +23689,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_prd_models_testepictask_test_default_creation",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".test_default_creation()"
     },
@@ -23678,7 +23701,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_prd_models_testepictask_test_with_subtasks",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".test_with_subtasks()"
     },
@@ -23690,7 +23713,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_prd_models_testepictask_test_to_dict_serializes_nested",
-      "community": 8,
+      "community": 64,
       "community_name": "SubTask",
       "norm_label": ".test_to_dict_serializes_nested()"
     },
@@ -23704,7 +23727,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testspecgap",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "testspecgap"
     },
     {
@@ -23716,7 +23739,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testspecgap_test_default_creation",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".test_default_creation()"
     },
     {
@@ -23728,7 +23751,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testspecgap_test_resolve",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".test_resolve()"
     },
     {
@@ -23740,7 +23763,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testspecgap_test_to_dict",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".test_to_dict()"
     },
     {
@@ -23753,7 +23776,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testprddocument",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "testprddocument"
     },
     {
@@ -23765,7 +23788,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testprddocument_test_default_creation",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".test_default_creation()"
     },
     {
@@ -23777,7 +23800,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testprddocument_test_custom_title",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".test_custom_title()"
     },
     {
@@ -23790,7 +23813,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testprdanalysisresult",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "testprdanalysisresult"
     },
     {
@@ -23802,7 +23825,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testprdanalysisresult_test_default_creation",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".test_default_creation()"
     },
     {
@@ -23814,7 +23837,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testprdanalysisresult_test_to_dict_without_preview",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".test_to_dict_without_preview()"
     },
     {
@@ -23826,7 +23849,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_testprdanalysisresult_test_to_dict_with_preview",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": ".test_to_dict_with_preview()"
     },
     {
@@ -23837,7 +23860,7 @@
       "_origin": "ast",
       "id": "tests_test_prd_models_rationale_1",
       "community": 8,
-      "community_name": "SubTask",
+      "community_name": "PRDAnalysisResult",
       "norm_label": "tests for models/prd_models.py coverage: taskstatus, taskpriority, subtask,..."
     },
     {
@@ -26781,7 +26804,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "test_wave_models.py"
     },
     {
@@ -26794,7 +26817,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwavephase",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "testwavephase"
     },
     {
@@ -26806,7 +26829,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwavephase_test_values",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".test_values()"
     },
     {
@@ -26818,7 +26841,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwavephase_test_ordering",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".test_ordering()"
     },
     {
@@ -26831,7 +26854,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwavestatus",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "testwavestatus"
     },
     {
@@ -26843,7 +26866,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwavestatus_test_values",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".test_values()"
     },
     {
@@ -26856,7 +26879,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwavegatecriteria",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "testwavegatecriteria"
     },
     {
@@ -26868,7 +26891,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwavegatecriteria_test_default_creation",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".test_default_creation()"
     },
     {
@@ -26880,7 +26903,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwavegatecriteria_test_to_dict",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".test_to_dict()"
     },
     {
@@ -26892,7 +26915,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwavegatecriteria_test_custom_checks",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".test_custom_checks()"
     },
     {
@@ -26905,7 +26928,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwaveexecutionstate",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "testwaveexecutionstate"
     },
     {
@@ -26917,7 +26940,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwaveexecutionstate_test_default_creation",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".test_default_creation()"
     },
     {
@@ -26929,7 +26952,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwaveexecutionstate_test_advance_to_in_progress",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".test_advance_to_in_progress()"
     },
     {
@@ -26941,7 +26964,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwaveexecutionstate_test_to_dict",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".test_to_dict()"
     },
     {
@@ -26953,7 +26976,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_testwaveexecutionstate_test_failure",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": ".test_failure()"
     },
     {
@@ -26964,7 +26987,7 @@
       "_origin": "ast",
       "id": "tests_test_wave_models_rationale_1",
       "community": 9,
-      "community_name": "WaveExecutionState",
+      "community_name": "WaveGateController",
       "norm_label": "tests for models/wave_models.py coverage: wavephase, wavestatus,..."
     },
     {
@@ -27010,7 +27033,7 @@
       "_origin": "ast",
       "id": "tests_test_webapp_client",
       "community": 17,
-      "community_name": "fast_pool.py",
+      "community_name": "multi_provider_fabric.py",
       "norm_label": "client()"
     },
     {
@@ -27132,8 +27155,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_webapp_testprofiles",
-      "community": 81,
-      "community_name": "test_webapp.py",
+      "community": 162,
+      "community_name": "TestProfiles",
       "norm_label": "testprofiles"
     },
     {
@@ -27144,8 +27167,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_webapp_testprofiles_test_profiles_round_trip_update",
-      "community": 81,
-      "community_name": "test_webapp.py",
+      "community": 162,
+      "community_name": "TestProfiles",
       "norm_label": ".test_profiles_round_trip_update()"
     },
     {
@@ -27156,8 +27179,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_webapp_testprofiles_test_profiles_put_unknown_profile_404",
-      "community": 81,
-      "community_name": "test_webapp.py",
+      "community": 162,
+      "community_name": "TestProfiles",
       "norm_label": ".test_profiles_put_unknown_profile_404()"
     },
     {
@@ -27168,8 +27191,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_webapp_testprofiles_test_profiles_put_invalid_body_400",
-      "community": 81,
-      "community_name": "test_webapp.py",
+      "community": 162,
+      "community_name": "TestProfiles",
       "norm_label": ".test_profiles_put_invalid_body_400()"
     },
     {
@@ -27218,8 +27241,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_webapp_stream",
-      "community": 81,
-      "community_name": "test_webapp.py",
+      "community": 160,
+      "community_name": "_Stream",
       "norm_label": "_stream"
     },
     {
@@ -27230,8 +27253,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_webapp_stream_init",
-      "community": 81,
-      "community_name": "test_webapp.py",
+      "community": 160,
+      "community_name": "_Stream",
       "norm_label": ".__init__()"
     },
     {
@@ -27242,8 +27265,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_webapp_stream_aiter",
-      "community": 81,
-      "community_name": "test_webapp.py",
+      "community": 160,
+      "community_name": "_Stream",
       "norm_label": ".__aiter__()"
     },
     {
@@ -27254,8 +27277,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_webapp_stream_aclose",
-      "community": 81,
-      "community_name": "test_webapp.py",
+      "community": 160,
+      "community_name": "_Stream",
       "norm_label": ".aclose()"
     },
     {
@@ -27687,8 +27710,8 @@
       "source_location": "L196",
       "_origin": "ast",
       "id": "tests_test_webapp_rationale_196",
-      "community": 81,
-      "community_name": "test_webapp.py",
+      "community": 160,
+      "community_name": "_Stream",
       "norm_label": "async byte stream over fixed chunks for the mocked litellm sse response."
     },
     {
@@ -27731,7 +27754,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "test_worker_runtime_adapter.py"
     },
@@ -27744,7 +27767,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_spec",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "_spec()"
     },
     {
@@ -27756,7 +27779,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testmodedetection",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "testmodedetection"
     },
@@ -27768,7 +27791,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testmodedetection_test_resolve_opencode_bin_is_str_or_none",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": ".test_resolve_opencode_bin_is_str_or_none()"
     },
@@ -27780,7 +27803,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testmodedetection_test_opencode_available_is_bool",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": ".test_opencode_available_is_bool()"
     },
@@ -27792,7 +27815,7 @@
       "_callable": true,
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testmodedetection_test_detect_mode_returns_valid",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": ".test_detect_mode_returns_valid()"
     },
@@ -27806,7 +27829,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testadapterconstruction",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "testadapterconstruction"
     },
     {
@@ -27818,7 +27841,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testadapterconstruction_test_explicit_native_mode",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_explicit_native_mode()"
     },
     {
@@ -27830,7 +27853,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testadapterconstruction_test_explicit_direct_fabric_mode",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_explicit_direct_fabric_mode()"
     },
     {
@@ -27842,7 +27865,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testadapterconstruction_test_invalid_mode_raises",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_invalid_mode_raises()"
     },
     {
@@ -27854,7 +27877,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testadapterconstruction_test_next_port_increments",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_next_port_increments()"
     },
     {
@@ -27866,7 +27889,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testadapterconstruction_test_singleton_caches_per_mode",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_singleton_caches_per_mode()"
     },
     {
@@ -27879,7 +27902,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testlaunchworker",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "testlaunchworker"
     },
     {
@@ -27891,7 +27914,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testlaunchworker_test_native_launch_completed",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_native_launch_completed()"
     },
     {
@@ -27903,7 +27926,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testlaunchworker_test_native_launch_simulated_is_hard_failure",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_native_launch_simulated_is_hard_failure()"
     },
     {
@@ -27915,7 +27938,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testlaunchworker_test_native_launch_failed_on_exception",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_native_launch_failed_on_exception()"
     },
     {
@@ -27927,7 +27950,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testlaunchworker_test_direct_fabric_launch_delegates",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_direct_fabric_launch_delegates()"
     },
     {
@@ -27939,7 +27962,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testlaunchworker_test_opencode_falls_back_to_native_when_no_bin",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_opencode_falls_back_to_native_when_no_bin()"
     },
     {
@@ -27952,7 +27975,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testlaunchbatch",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "testlaunchbatch"
     },
     {
@@ -27964,7 +27987,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testlaunchbatch_test_batch_returns_result_per_task",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_batch_returns_result_per_task()"
     },
     {
@@ -27976,7 +27999,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testlaunchbatch_test_batch_survives_worker_exception",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_batch_survives_worker_exception()"
     },
     {
@@ -27988,7 +28011,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testshutdown",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "testshutdown"
     },
@@ -28001,7 +28024,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_testshutdown_test_shutdown_clears_processes",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": ".test_shutdown_clears_processes()"
     },
     {
@@ -28011,7 +28034,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_rationale_1",
-      "community": 7,
+      "community": 15,
       "community_name": "WorkerRole",
       "norm_label": "tests for services/worker_runtime_adapter.py real-behavior coverage of the..."
     },
@@ -28023,7 +28046,7 @@
       "_origin": "ast",
       "id": "tests_test_worker_runtime_adapter_rationale_90",
       "community": 7,
-      "community_name": "WorkerRole",
+      "community_name": "WorkerRuntimeAdapter",
       "norm_label": "a simulated fabric response must fail, never complete or 'partial'. this is the..."
     },
     {
@@ -65874,6 +65897,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/merged_agentic_swarm/webapp.py",
+      "source_location": "L987",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_merged_agentic_swarm_webapp",
+      "target": "src_merged_agentic_swarm_webapp_load_dashboard_html",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/merged_agentic_swarm/webapp.py",
       "source_location": "L245",
       "weight": 1.0,
       "_origin": "ast",
@@ -67386,6 +67420,17 @@
       "_origin": "ast",
       "source": "src_merged_agentic_swarm_webapp_rationale_954",
       "target": "src_merged_agentic_swarm_webapp_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/merged_agentic_swarm/webapp.py",
+      "source_location": "L988",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_merged_agentic_swarm_webapp_rationale_988",
+      "target": "src_merged_agentic_swarm_webapp_load_dashboard_html",
       "confidence_score": 1.0
     },
     {
@@ -92450,5 +92495,5 @@
       "source_file": ".agents/skills/graphify/references/query.md"
     }
   ],
-  "built_at_commit": "446e11e7e74cc862b4165109cecf3ba40aa616e8"
+  "built_at_commit": "29fa83cba3747eaadd56b899c6fc17d9b2fed243"
 }

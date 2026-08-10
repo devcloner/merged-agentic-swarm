@@ -375,8 +375,8 @@
     "semantic_hash": "ce9239654a8ac3f80bdbc8090f0480b7"
   },
   "src/merged_agentic_swarm/webapp.py": {
-    "mtime": 1786397661.175306,
-    "ast_hash": "f7c7caf72005707d9652ce20084c6f04",
+    "mtime": 1786402456.0535135,
+    "ast_hash": "f05be2e860d31d68154f0597825163e8",
     "semantic_hash": ""
   },
   "tests/__init__.py": {
@@ -1072,6 +1072,11 @@
   "docs/ultraswarm-failure-report-2026-08-10.md": {
     "mtime": 1786397240.0850272,
     "ast_hash": "482490420c11cae6f33325b915e15335",
+    "semantic_hash": ""
+  },
+  "templates/dashboard.html": {
+    "mtime": 1786402449.7270484,
+    "ast_hash": "c0dabb935e1b83b6fd9b79fa6b08ecbf",
     "semantic_hash": ""
   }
 }

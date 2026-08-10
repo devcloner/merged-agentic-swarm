@@ -1,16 +1,16 @@
 # Graph Report - merged-agentic-swarm  (2026-08-10)
 
 ## Corpus Check
-- 205 files · ~196,844 words
+- 207 files · ~199,767 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2810 nodes · 4927 edges · 222 communities (157 shown, 65 thin omitted)
-- Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 622 edges (avg confidence: 0.58)
+- 2839 nodes · 4968 edges · 217 communities (156 shown, 61 thin omitted)
+- Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 625 edges (avg confidence: 0.58)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `6d806765`
+- Built from commit: `446e11e7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -21,25 +21,25 @@
 - CloudCLIClient
 - webapp.py
 - _router_with_keys
-- AgentSpec
+- Ultraswarm Run Failure Report — 2026-08-10
 - WorkerRole
-- PRDAnalysisResult
-- WaveGateController
+- SubTask
+- WaveExecutionState
 - CodebaseMapService
 - DurableAgentFactory
 - LiteLLM Gateway
 - ProxyChainHealth
 - DurableAgentRouter
-- services/__init__.py
-- MultiLayeredAgenticOrchestrator
-- multi_provider_fabric.py
+- resolve_model_alias_for_profile
+- .run_full_agentic_workflow
+- fast_pool.py
 - Graphify
 - FastFallbackRouter
 - TaskMasterService
 - TestClaudeProxyHandler
 - KeyPoolManager
 - test_streaming_proxy.py
-- SubTask
+- MultiLayeredAgenticOrchestrator
 - OpenCodeSwarmManager
 - conftest.py
 - opencode.json
@@ -56,12 +56,12 @@
 - TestWaveGatesWithRealState
 - ProgressLogEntry
 - MultiProviderFabric
-- report_service.py
+- agentic_cli.py
 - swarm_run.py
 - run_smoke_workflow.sh
 - test_health_check.py
 - APIKeyInfo
-- ChainRegistry
+- Request
 - _evaluate_promotion_criteria
 - _make_learning_entry
 - TestDispatchRequest
@@ -72,14 +72,14 @@
 - FastFallbackConfig
 - generate_progress_report.sh
 - verify_component.sh
-- WorkerPoolConfig
+- AgentSpec
 - ConcurrencyRampController
 - _read_jsonl
 - ProxyServerDaemon
 - test_report_service.py
 - graphify-out/graph.json
 - Task Spine CLI
-- _DNSCache
+- multi_provider_fabric.py
 - ClaudeProxyHandler
 - _simulate_reuse
 - TestFormatConversion
@@ -92,9 +92,9 @@
 - test_multi_provider_fabric.py
 - DurableAgentRouter
 - Real task-master CLI
-- _parse_multipart
-- Any
-- _FakeClient
+- WaveGateController
+- create_app
+- handle_chain_update
 - TestRun
 - test_webapp.py
 - StreamingProxyConfig
@@ -110,18 +110,19 @@
 - graphify reference: extra exports and benchmark
 - dynamic_learning_loop
 - project
-- .get_available_worker
+- services/__init__.py
 - start_task_spine.sh
-- _load_registry
-- cmd_config
+- model_routing.py
+- Any
 - ingest
 - Extraction Rules
-- _run_latency_test
+- handle_latency_test
 - orchestrator
 - role_allocations
 - run_learning_loop_test.sh
 - start_proxy.sh
 - verify_task_spine.sh
+- handle_profile_update
 - .handle_task_failure
 - test_check_streaming_fcc_happy_path
 - query, path, and explain reference
@@ -129,7 +130,7 @@
 - CI Script
 - CI test job
 - check_proxy_health.sh
-- TestTargetRepoRoot
+- graphify-obsidian-sync.sh
 - _ChunkStream
 - _StallStream
 - graphify reference: query, path, explain
@@ -138,10 +139,8 @@
 - graphify reference: query, path, explain
 - opencode-swarm.json
 - verify_worker_runtime.sh
-- handle_run
-- TestCLIStringFunctions
+- handle_run_status
 - TestCaptureStep
-- TestBanPersistence
 - TestLatencyTest
 - TestReports
 - graphify.serve module
@@ -153,9 +152,6 @@
 - start_worker_runtime.sh
 - stop_agentic_services.sh
 - TestCmdProviders
-- TestLitellmPresenceInRoutes
-- TestMalformedOverlayRoutes
-- _Stream
 - TestRunPlan
 - graphify extract
 - graphify reference: incremental update and cluster-only
@@ -174,7 +170,6 @@
 - discover_environment.sh
 - verify_proxy.sh
 - TestModelRoleUpdate
-- TestProfiles
 - BFS/DFS Graph Traversal
 - graphify Skill Spec
 - GitHub clone and cross-repo merge reference
@@ -256,9 +251,9 @@
   tests/test_fast_fallback.py → src/merged_agentic_swarm/fast_fallback.py
 - `TestDispatchBehavior` --uses--> `FastFallbackConfig`  [INFERRED]
   tests/test_fast_fallback.py → src/merged_agentic_swarm/fast_fallback.py
-- `TestDispatchHelper` --uses--> `FastFallbackConfig`  [INFERRED]
-  tests/test_fast_fallback.py → src/merged_agentic_swarm/fast_fallback.py
 - `TestParallelProbe` --uses--> `FastFallbackConfig`  [INFERRED]
+  tests/test_fast_fallback.py → src/merged_agentic_swarm/fast_fallback.py
+- `TestAdaptiveSelection` --uses--> `FastFallbackRouter`  [INFERRED]
   tests/test_fast_fallback.py → src/merged_agentic_swarm/fast_fallback.py
 
 ## Import Cycles
@@ -313,7 +308,7 @@
 - **Task Management Flow** — docs_agentic_registry_state_path_notes_task_master_service, docs_agentic_registry_state_path_notes_model_fabric, docs_agentic_registry_state_path_notes_python_proxy [EXTRACTED 1.00]
 - **Graph Query Flow** — _agents_skills_graphify_references_query_traversal, _agents_skills_graphify_references_query_queryexpansion, _agents_skills_graphify_references_query_saveresult [EXTRACTED 1.00]
 
-## Communities (222 total, 65 thin omitted)
+## Communities (217 total, 61 thin omitted)
 
 ### Community 0 - "TaskSpineStore"
 Cohesion: 0.06
@@ -332,36 +327,36 @@ Cohesion: 0.07
 Nodes (21): CloudCLIClient, CloudCLIConfig, CloudCLIError, Any, CloudCLI client — trigger remote AI agents via the cloneclove.com /api/agent…, Trigger a remote agent with streaming (SSE) and yield each event dict., Raised when CloudCLI returns a non-2xx response or is misconfigured., Minimal client for the CloudCLI agent API (``POST /api/agent``). (+13 more)
 
 ### Community 4 - "webapp.py"
-Cohesion: 0.09
-Nodes (47): HTMLResponse, JSONResponse, create_app(), _fabric_chains(), _fabric_routes(), handle_chain_update(), handle_chains(), handle_dashboard() (+39 more)
+Cohesion: 0.20
+Nodes (13): _fabric_routes(), handle_reports_list(), handle_status(), _key_pool_snapshot(), _latest_report(), Agentic Swarm — Web UI Control Panel. A Starlette control panel (JSON API + a…, Provider -> {active, total, key_ids} — key_id list only, never values., MODEL_FABRIC_ROUTES as alias -> [{provider, model}] chains. (+5 more)
 
 ### Community 5 - "_router_with_keys"
-Cohesion: 0.09
-Nodes (28): _anthropic_response(), _mock_response(), patch, Tests for merged_agentic_swarm/fast_fallback.py Coverage: parallel probe first-…, Both wave probes fire concurrently; the first 2xx is returned., A failing primary overlaps the fallback's latency instead of serializing it., A losing in-flight probe (2xx after another probe won) must not corrupt state., With probe_stagger_ms, the primary's head-start lets it win even if slower. (+20 more)
+Cohesion: 0.10
+Nodes (26): _anthropic_response(), _mock_response(), patch, Tests for merged_agentic_swarm/fast_fallback.py Coverage: parallel probe first-…, Both wave probes fire concurrently; the first 2xx is returned., A failing primary overlaps the fallback's latency instead of serializing it., A losing in-flight probe (2xx after another probe won) must not corrupt state., With probe_stagger_ms, the primary's head-start lets it win even if slower. (+18 more)
 
-### Community 6 - "AgentSpec"
-Cohesion: 0.08
-Nodes (20): AgentSpec, Return True if this agent has a TTL and has exceeded it., get_runtime_adapter(), Any, Unified adapter that launches workers in the selected execution mode. Modes:…, Return the resolved opencode binary, or None if unavailable., Launch a single worker with a task and return a result dict. Result keys:…, Launch a batch of tasks for a given role, up to max_concurrency. (+12 more)
+### Community 6 - "Ultraswarm Run Failure Report — 2026-08-10"
+Cohesion: 0.12
+Nodes (16): 1. `chat-backend` — 3× timeout (exit code 143 = SIGTERM), 2. `chatbox-ui` + `expose-and-test` — BLOCKED, Immediate (this session), Log Paths, Long-term, Medium-term, Model Tier Misrouting, Preflight State (+8 more)
 
 ### Community 7 - "WorkerRole"
-Cohesion: 0.10
-Nodes (23): Run the agentic swarm orchestrator against spotify-ai project. Produces an…, Phase 5: Durable Learning Loop End-to-End Verification, AgentType, Enum, str, Agent, Worker Pool, and Spawn Chain Data Models, WorkerRole, agents_registry_path() (+15 more)
+Cohesion: 0.06
+Nodes (33): Run the agentic swarm orchestrator against spotify-ai project. Produces an…, Phase 5: Durable Learning Loop End-to-End Verification, AgentType, Enum, str, Agent, Worker Pool, and Spawn Chain Data Models, WorkerRole, Durable Agent Factory & Knowledge-Box -> Spawn Chain Registry Turns validated… (+25 more)
 
-### Community 8 - "PRDAnalysisResult"
-Cohesion: 0.13
-Nodes (19): Models Package Initialization, PRDAnalysisResult, PRDDocument, Enum, str, PRD and Task Master Data Models, SpecGap, TaskPriority (+11 more)
-
-### Community 9 - "WaveGateController"
+### Community 8 - "SubTask"
 Cohesion: 0.09
-Nodes (21): int, Any, Enum, str, Wave Gates Data Models, WaveExecutionState, WaveGateCriteria, WavePhase (+13 more)
+Nodes (36): Models Package Initialization, EpicTask, PRDAnalysisResult, PRDDocument, Any, Enum, str, PRD and Task Master Data Models (+28 more)
+
+### Community 9 - "WaveExecutionState"
+Cohesion: 0.15
+Nodes (13): int, Enum, str, Wave Gates Data Models, WaveExecutionState, WaveGateCriteria, WavePhase, WaveStatus (+5 more)
 
 ### Community 10 - "CodebaseMapService"
 Cohesion: 0.08
 Nodes (14): CodebaseMapService, Any, Scans workspace repository files and parses AST definitions., Parses Python file to extract top-level functions, classes, and imports., Cross-references required components against mapped codebase to find spec gaps.…, Load persisted codebase map state from disk., Persist codebase map state so restart doesn't require re-scan., Closes a specific spec gap after verifying fixes. (+6 more)
 
 ### Community 11 - "DurableAgentFactory"
-Cohesion: 0.08
-Nodes (16): DurableAgentFactory, Any, Remove and return count of expired HOT micro-specialists (FIX-09)., Resolve the durable cold-path agents registry (agents.jsonl). Prefers an…, Load durable agents from the cold-path agents.jsonl registry. Called once at…, Append a COLD_DURABLE agent record to the durable agents.jsonl registry.…, Write an agent spec .md file from a JSONL entry. Returns the file path, or None…, Read agents.jsonl and write spec files for every entry. Returns the count of… (+8 more)
+Cohesion: 0.05
+Nodes (25): ChainRegistry, DurableAgentFactory, Any, Remove and return count of expired HOT micro-specialists (FIX-09)., Resolve the durable cold-path agents registry (agents.jsonl). Prefers an…, Load durable agents from the cold-path agents.jsonl registry. Called once at…, Append a COLD_DURABLE agent record to the durable agents.jsonl registry.…, Write an agent spec .md file from a JSONL entry. Returns the file path, or None… (+17 more)
 
 ### Community 12 - "LiteLLM Gateway"
 Cohesion: 0.07
@@ -373,19 +368,19 @@ Nodes (38): HealthConfig, ProxyChainHealth, Runs reachability, streaming, and pr
 
 ### Community 14 - "DurableAgentRouter"
 Cohesion: 0.08
-Nodes (18): DurableAgentRouter, get_durable_router(), Any, Path, Extract YAML-style frontmatter between --- markers., Read the body content after frontmatter., Extract lowercase alphanumeric tokens, dropping very short/common words., Collect trigger keywords from an agent's body (Trigger section) + system_prompt. (+10 more)
+Nodes (19): agents_registry_path(), Resolve the durable cold-path agents registry (agents.jsonl). Prefers an…, DurableAgentRouter, get_durable_router(), Any, Path, Extract YAML-style frontmatter between --- markers., Read the body content after frontmatter. (+11 more)
 
-### Community 15 - "services/__init__.py"
-Cohesion: 0.09
-Nodes (33): Services Package Initialization, litellm_model_for_fabric_route(), Model Role Routing Resolves a worker role (deep / main / fast tier, or a…, Return the first litellm model in the fabric route list for a model alias., Return the litellm virtual Gemini alias for a worker role. Resolution order: 1.…, resolve_litellm_model_for_role(), list_profiles(), load_profiles() (+25 more)
+### Community 15 - "resolve_model_alias_for_profile"
+Cohesion: 0.23
+Nodes (11): load_profiles(), Swarm Profile Service Named, slash-command-style presets for pushing a large…, Load all swarm profiles (cached); fall back to the code-side dict when missing., Return the resolved profile dict for a name; raise KeyError for unknown names., Return the profile's model alias, or resolve via model_routing when absent.…, resolve_model_alias_for_profile(), resolve_profile(), handle_profiles() (+3 more)
 
-### Community 16 - "MultiLayeredAgenticOrchestrator"
-Cohesion: 0.09
-Nodes (18): _cancellation_check(), MultiLayeredAgenticOrchestrator, Any, Event, Deduplicate cold-path registries by content hash (knowledge) and ID…, Apply worker outputs to disk and count files written. Primary path: agentic-…, Append a JSON line to a JSONL registry., Cold-path: normalize hot cache entries → knowledge.jsonl → validated →… (+10 more)
+### Community 16 - ".run_full_agentic_workflow"
+Cohesion: 0.13
+Nodes (11): _cancellation_check(), Any, Event, Deduplicate cold-path registries by content hash (knowledge) and ID…, Apply worker outputs to disk and count files written. Primary path: agentic-…, Return an aborted result if the run was cancelled, else None., Initializes Key Pool Proxy server and verifies service readiness., Return an abort result when a gate fails and gates are enforced.… (+3 more)
 
-### Community 17 - "multi_provider_fabric.py"
-Cohesion: 0.10
-Nodes (29): Client, HTTPTransport, Limits, _build_transport(), close_thread_client(), _create_client(), dispatch(), FastPoolConfig (+21 more)
+### Community 17 - "fast_pool.py"
+Cohesion: 0.06
+Nodes (41): Client, HTTPTransport, Limits, NetworkStream, _build_transport(), _CachedDNSBackend, close_thread_client(), _create_client() (+33 more)
 
 ### Community 18 - "Graphify"
 Cohesion: 0.07
@@ -396,28 +391,28 @@ Cohesion: 0.12
 Nodes (18): dispatch_fast(), FastFallbackRouter, _ProbeContext, _ProbeResult, Any, Event, Fast Fallback Router — parallel-probe, minimal-latency fallback dispatch. Why…, Parallel-probe fallback router over the model fabric's route table.… (+10 more)
 
 ### Community 20 - "TaskMasterService"
-Cohesion: 0.10
-Nodes (11): Parses and optimizes PRD via Task Master AI model fabric routing. Calls the…, Orchestrator wrapping the real Task Master AI spine. NOTE on state paths: -…, Updates task status in state and syncs to file., Saves Task Master state as the authoritative single source of truth., Rough complexity analysis: estimate turns based on task scope., TaskMasterService, Tests for services/task_master_service.py Coverage: TaskMasterService —…, Regression for #41: temp file must not be the fixed <target>.tmp. (+3 more)
+Cohesion: 0.09
+Nodes (10): Orchestrator wrapping the real Task Master AI spine. NOTE on state paths: -…, Updates task status in state and syncs to file., Saves Task Master state as the authoritative single source of truth., Rough complexity analysis: estimate turns based on task scope., TaskMasterService, Tests for services/task_master_service.py Coverage: TaskMasterService —…, Regression for #41: temp file must not be the fixed <target>.tmp., Concurrent save_state calls must never leave a torn JSON target. (+2 more)
 
 ### Community 21 - "TestClaudeProxyHandler"
 Cohesion: 0.06
 Nodes (15): #42: /status surfaces exhausted/cooldown/latency per provider., #35: a body over the JSON cap must be rejected before buffering., #35: a body under the cap still reaches normal processing (400 here)., #35: audio multipart bodies have their own (higher) cap., #33: FAST_FALLBACK_ENABLED routes through the hedged router., #33: without the flag the proxy keeps using the fabric dispatch path., POST /v1/messages should return a response (simulation fallback)., POST /v1/messages without an auth token → 401. (+7 more)
 
 ### Community 22 - "KeyPoolManager"
-Cohesion: 0.08
-Nodes (12): KeyPoolManager, Any, Loads API keys from env file, environment variables, and local key files., Hot-reload keys from all sources, preserving runtime stats for persistent keys.…, Gather (provider, secret_value, key_id) candidates from all key sources.…, When every key is still cooling down, get_key returns None so the fabric…, Even with many keys, none may be reused while every one is cooling down., A key still cooling down must not be picked while another is active. (+4 more)
+Cohesion: 0.10
+Nodes (9): KeyPoolManager, Any, When every key is still cooling down, get_key returns None so the fabric…, Even with many keys, none may be reused while every one is cooling down., A key still cooling down must not be picked while another is active., #42: summary reports exhausted count, next cooldown expiry, avg latency., Getting a key from a provider that doesn't exist should not raise., TestKeyPoolManager (+1 more)
 
 ### Community 23 - "test_streaming_proxy.py"
 Cohesion: 0.17
 Nodes (30): asyncio, make_proxy(), make_request(), post(), Tests for ``merged_agentic_swarm.streaming_proxy``. Covers the zero-buffering…, Send one proxied request and return the proxy's Response., Each upstream network chunk must reach the client with identical boundaries —…, Proves no-buffering: the first chunk is yielded the instant the upstream writes… (+22 more)
 
-### Community 24 - "SubTask"
-Cohesion: 0.11
-Nodes (15): EpicTask, SubTask, _analysis(), _epic(), Tests for tools/agentic_orchestrator.py Coverage:…, A relative # file: path that resolves to a directory triggers the write-failure…, When _write_agent_spec_file returns None (already exists), the skip branch logs…, Two categories promoted in one batch must produce distinct chain entry_ids… (+7 more)
+### Community 24 - "MultiLayeredAgenticOrchestrator"
+Cohesion: 0.12
+Nodes (7): MultiLayeredAgenticOrchestrator, Append a JSON line to a JSONL registry., Cold-path: normalize hot cache entries → knowledge.jsonl → validated →…, Load previously promoted learning IDs so cold-path dedup survives restarts., When _write_agent_spec_file returns None (already exists), the skip branch logs…, Two categories promoted in one batch must produce distinct chain entry_ids…, TestRunSyntaxVerificationPaths
 
 ### Community 25 - "OpenCodeSwarmManager"
-Cohesion: 0.08
-Nodes (18): live, OpenCodeSwarmManager, make_subtask(), Factory fixture that returns a function to create SubTask instances., Tests for services/opencode_swarm_service.py Coverage:…, A worker subtask goes through the agentic tool loop and reports honestly. A…, Wave N batch executes at ramp[N] concurrency, not the 4-worker default., A provided ramp_sequence overrides the default wave_gate_level mapping. (+10 more)
+Cohesion: 0.07
+Nodes (22): live, OpenCodeSwarmManager, Initializes the 40 worker specs across role allocations., Gets an available worker matching the specified role using round-robin…, Internal: must be called while holding self._worker_lock., Map a WorkerRole to a pool-health bucket key., make_subtask(), Factory fixture that returns a function to create SubTask instances. (+14 more)
 
 ### Community 26 - "conftest.py"
 Cohesion: 0.09
@@ -464,24 +459,24 @@ Cohesion: 0.08
 Nodes (10): Subtasks producing output within owned paths should have no violations., #36: absent ownership map is an optional gate — warn and pass., Map exists but the requested pool is absent — keep the hard-fail., Wave 1 fails because task master has no tasks for it., Wave 2 gate should evaluate with task_master data., Wave 3 gate should evaluate with task_master data and ownership., Wave 0 should pass when there are no unresolved spec gaps., advance_wave should move from wave 0 to wave 1 if gate criteria pass. (+2 more)
 
 ### Community 37 - "TestTokenSavior"
-Cohesion: 0.09
-Nodes (8): Tools Package Initialization, Token Savior & Context Compactor Optimizes context window consumption via…, Removes blank lines and excessive indentation spaces to save tokens., Filters noisy bash logs and retains error tracebacks + summary lines., Compresses assistant prose (Caveman mode) by removing pleasantries, hedging,…, TokenSavior, Tests for tools/token_savior.py Coverage: TokenSavior — compact_code_snippet,…, TestTokenSavior
+Cohesion: 0.10
+Nodes (7): Token Savior & Context Compactor Optimizes context window consumption via…, Removes blank lines and excessive indentation spaces to save tokens., Filters noisy bash logs and retains error tracebacks + summary lines., Compresses assistant prose (Caveman mode) by removing pleasantries, hedging,…, TokenSavior, Tests for tools/token_savior.py Coverage: TokenSavior — compact_code_snippet,…, TestTokenSavior
 
 ### Community 38 - "TestWaveGatesWithRealState"
 Cohesion: 0.20
 Nodes (7): _ownership_map(), Tests for services/wave_gate_service.py Coverage: WaveGateController —…, Attach real epics (wave 1) with subtasks carrying output artifacts., Attach real wave-3 epics whose subtasks output src/ artifacts., Wave 3 must not pass on statuses alone — verification must have run., Inline syntax fallback (no tests_ran) must not satisfy tests_passing., TestWaveGatesWithRealState
 
 ### Community 39 - "ProgressLogEntry"
-Cohesion: 0.16
-Nodes (12): ObstaclePlaybookEntry, ProgressLogEntry, Any, Progress Ledger, Success Markers, and Obstacle Playbooks Models, SuccessMarker, TaskMasterStateSnapshot, Progress Ledger, Success Markers, and Self-Healing Obstacle Playbook Engine…, Tests for models/ledger_models.py Coverage: SuccessMarker,… (+4 more)
+Cohesion: 0.18
+Nodes (10): ObstaclePlaybookEntry, ProgressLogEntry, Any, SuccessMarker, TaskMasterStateSnapshot, Tests for models/ledger_models.py Coverage: SuccessMarker,…, TestObstaclePlaybookEntry, TestProgressLogEntry (+2 more)
 
 ### Community 40 - "MultiProviderFabric"
-Cohesion: 0.15
-Nodes (13): _load_fabric_routes_overlay(), MultiProviderFabric, Any, Load the per-alias route overlay (cached); {} when missing or unreadable., Flatten Anthropic content blocks (or plain text) into a single text string., Convert normalized messages (Anthropic-shaped) to OpenAI Chat Completions…, Normalize a content value into a list of Anthropic content blocks., Convert normalized messages to Anthropic Messages API format. Used for… (+5 more)
+Cohesion: 0.12
+Nodes (14): _load_fabric_routes_overlay(), MultiProviderFabric, Any, Load the per-alias route overlay (cached); {} when missing or unreadable., Flatten Anthropic content blocks (or plain text) into a single text string., Convert normalized messages (Anthropic-shaped) to OpenAI Chat Completions…, Normalize a content value into a list of Anthropic content blocks., Convert normalized messages to Anthropic Messages API format. Used for… (+6 more)
 
-### Community 41 - "report_service.py"
-Cohesion: 0.17
-Nodes (22): _build_epics(), _build_gates(), build_run_report(), _build_timeline(), _build_waves(), _format_ts(), Any, Path (+14 more)
+### Community 41 - "agentic_cli.py"
+Cohesion: 0.06
+Nodes (52): _build_epics(), _build_gates(), build_run_report(), _build_timeline(), _build_waves(), _format_ts(), Any, Path (+44 more)
 
 ### Community 42 - "swarm_run.py"
 Cohesion: 0.29
@@ -496,12 +491,12 @@ Cohesion: 0.10
 Nodes (19): _make_sse_response(), Response, Return a 200 httpx.Response whose .stream yields SSE events., from_env returns defaults when no env vars are set., from_env picks up env overrides for string fields., from_env casts numeric env vars to int/float., from_env surfaces ValueError for non-numeric env values (no silent fallback)., --json flag emits machine-readable JSON for all checks. (+11 more)
 
 ### Community 45 - "APIKeyInfo"
-Cohesion: 0.13
-Nodes (11): Providers Package Initialization, APIKeyInfo, KeyStatus, Enum, str, API Key Pool Manager & Key Rotator Supports multi-provider key rotation, quota…, Gets an active API key using round-robin / least-used strategy., Internal: must be called while holding self._lock. (+3 more)
+Cohesion: 0.11
+Nodes (9): APIKeyInfo, Loads API keys from env file, environment variables, and local key files., Hot-reload keys from all sources, preserving runtime stats for persistent keys.…, Gets an active API key using round-robin / least-used strategy., Internal: must be called while holding self._lock., Avoid leaking the secret value in logs/debug output., Gather (provider, secret_value, key_id) candidates from all key sources.…, Tests for providers/key_pool.py Coverage: APIKeyInfo, KeyPoolManager… (+1 more)
 
-### Community 46 - "ChainRegistry"
-Cohesion: 0.13
-Nodes (9): ChainRegistry, Generate a collision-proof spawn-chain entry_id (sequence + timestamp suffix).…, isolated_agents_registry(), fixture, Tests for services/agent_factory_service.py Coverage: ChainRegistry (load,…, Return a temp path for the durable cold-path agents.jsonl registry., #18: entry_ids in one promotion batch must never collide., #18: separate registry instances sharing a file must not reuse entry_ids. (+1 more)
+### Community 46 - "Request"
+Cohesion: 0.16
+Nodes (17): HTMLResponse, JSONResponse, _clean_expired_sessions(), handle_chat(), handle_chat_session(), handle_chat_sessions(), handle_dashboard(), handle_report_detail() (+9 more)
 
 ### Community 47 - "_evaluate_promotion_criteria"
 Cohesion: 0.20
@@ -532,8 +527,8 @@ Cohesion: 0.16
 Nodes (8): gates=False keeps advance_wave() running (state advances) but a non-passing…, A run emits proxy_deployed (after init) and run_deployed (pre-wave)…, Each wave threads its wave number as wave_gate_level so the swarm executes at…, A provided ramp_sequence reaches every swarm batch, default_model is recorded…, Without a profile, the swarm batch gets no ramp_sequence kwarg and the ledger…, #32: a set cancel_event makes the workflow return an aborted result., Wire the orchestrator singletons for a deterministic workflow run., TestRunFullAgenticWorkflow
 
 ### Community 54 - "FastFallbackConfig"
-Cohesion: 0.14
-Nodes (9): dict, FastFallbackConfig, Build a config from ``FAST_FALLBACK_*`` environment variables., Tunables for the fast-fallback router (dataclass defaults + env overrides)., A fallback with strong latency history outranks a slow primary., No latency history → static verified-first order is untouched., A perma-banned provider does not appear in the candidate list., TestAdaptiveSelection (+1 more)
+Cohesion: 0.11
+Nodes (11): dict, FastFallbackConfig, Build a config from ``FAST_FALLBACK_*`` environment variables., Tunables for the fast-fallback router (dataclass defaults + env overrides)., A fallback with strong latency history outranks a slow primary., No latency history → static verified-first order is untouched., A perma-banned provider does not appear in the candidate list., dispatch_fast reaches the default router and returns an Anthropic-shaped… (+3 more)
 
 ### Community 55 - "generate_progress_report.sh"
 Cohesion: 0.12
@@ -543,21 +538,21 @@ Nodes (5): count_files(), durable_agent_count(), generate_evidence_table(), gene
 Cohesion: 0.22
 Nodes (15): CHECK_COMMANDS, CHECK_DETAILS, CHECK_EXIT_CODES, check_git(), CHECK_NAMES, check_node(), check_opencode(), check_proxy() (+7 more)
 
-### Community 57 - "WorkerPoolConfig"
-Cohesion: 0.10
-Nodes (14): Any, Increment the completed counter for the given pool., Increment the failed or rate_limited counter for the given pool., Return a copy of the pool_health dict., SpawnChainEntry, WorkerPoolConfig, WorkerPoolState, Initializes the 40 worker specs across role allocations. (+6 more)
+### Community 57 - "AgentSpec"
+Cohesion: 0.07
+Nodes (22): AgentSpec, Any, Increment the completed counter for the given pool., Increment the failed or rate_limited counter for the given pool., Return a copy of the pool_health dict., Return True if this agent has a TTL and has exceeded it., SpawnChainEntry, WorkerPoolConfig (+14 more)
 
 ### Community 58 - "ConcurrencyRampController"
-Cohesion: 0.12
-Nodes (6): ConcurrencyRampController, Controls worker concurrency ramp-up across wave gates., Map wave gate level to max workers. Gate 0 -> 4, gate 1 -> 8, gate 2 -> 16,…, Return the full ramp sequence., Executes a batch of subtasks in parallel using ThreadPoolExecutor up to max…, TestConcurrencyRampController
+Cohesion: 0.09
+Nodes (9): ConcurrencyRampController, Controls worker concurrency ramp-up across wave gates., Map wave gate level to max workers. Gate 0 -> 4, gate 1 -> 8, gate 2 -> 16,…, Return the full ramp sequence., Resolve the working repo the swarm writes into. ``SWARM_TARGET_REPO`` env var…, Executes a batch of subtasks in parallel using ThreadPoolExecutor up to max…, When SWARM_TARGET_REPO is unset and no sibling target repo exists,…, TestConcurrencyRampController (+1 more)
 
 ### Community 59 - "_read_jsonl"
 Cohesion: 0.24
 Nodes (10): _load_agents_from_registry(), Verify all 5 cold-path artifacts exist and are valid. Returns list of failures., Simulate loading agents after restart: read agents.jsonl and .md files., End-to-end: capture -> record -> evaluate -> promote -> verify -> load -> route…, Run the complete lifecycle and verify every step., Read all JSONL entries from a file, returning a list of dicts., Promote multiple different learnings and verify they are all loadable., _read_jsonl() (+2 more)
 
 ### Community 60 - "ProxyServerDaemon"
-Cohesion: 0.11
-Nodes (13): HTTPServer, ProxyServerDaemon, Claude API Key Pool Proxy Server Exposes Anthropic-compatible, OpenAI-…, Threaded HTTP server to handle concurrent requests., ThreadedHTTPServer, Proxy Package Initialization, fixture, Tests for proxy/claude_proxy_server.py Coverage: ClaudeProxyHandler (do_GET,… (+5 more)
+Cohesion: 0.12
+Nodes (11): HTTPServer, ProxyServerDaemon, Threaded HTTP server to handle concurrent requests., ThreadedHTTPServer, Proxy Package Initialization, fixture, ProxyServerDaemon should start and stop without error., Calling start() twice should not create a second server. (+3 more)
 
 ### Community 61 - "test_report_service.py"
 Cohesion: 0.26
@@ -571,9 +566,9 @@ Nodes (16): FalkorDB instance, graphify export falkordb, graphify export neo4j, 
 Cohesion: 0.14
 Nodes (16): Check Proxy Health Script, Claude Proxy Server, Claude Proxy Systemd Service, Fast Pool, Gemini Pool, Generate LiteLLM Config, LiteLLM Proxy, Model Fabric Routes (+8 more)
 
-### Community 64 - "_DNSCache"
-Cohesion: 0.13
-Nodes (10): NetworkStream, _CachedDNSBackend, _DNSCache, Any, Drop one entry (used to invalidate a stale cached IP)., Resolve hostname to IP, consulting the in-process DNS cache first. Returns the…, httpcore sync backend that connects to a cached IP for each hostname.…, Lightweight TTL-bounded DNS cache to avoid repeated gethostbyname calls. All… (+2 more)
+### Community 64 - "multi_provider_fabric.py"
+Cohesion: 0.17
+Nodes (11): Providers Package Initialization, KeyStatus, Enum, str, API Key Pool Manager & Key Rotator Supports multi-provider key rotation, quota…, _load_bans(), Multi-Backend Model Fabric Routes requests across providers with priority…, Load persisted perma-bans into _permanently_dead, dropping expired entries. (+3 more)
 
 ### Community 65 - "ClaudeProxyHandler"
 Cohesion: 0.21
@@ -604,16 +599,16 @@ Cohesion: 0.21
 Nodes (7): Probe routatic-proxy /health and surface circuit-breaker metrics., Probe the FCC gateway /health endpoint., Check upstream OpenCode API reachability (models endpoint)., Stream a tiny /v1/messages request and time first token + total. ``endpoint``…, Monitor provider/circuit-breaker status via routatic + FCC models list., Run every check; returns results in a stable order., _truncate()
 
 ### Community 72 - "_forward_transcription"
-Cohesion: 0.22
-Nodes (5): _forward_transcription(), Forward a transcription request to the configured Whisper backend., _FakeResp, Multipart audio POST → forwarded to Whisper backend → JSON response., TestForwardTranscription
+Cohesion: 0.11
+Nodes (12): _forward_transcription(), _parse_multipart(), Forward a transcription request to the configured Whisper backend., Return (file_bytes, file_name, model_name) from a multipart body., _FakeResp, _multipart_body(), Tests for proxy/claude_proxy_server.py Coverage: ClaudeProxyHandler (do_GET,…, Multipart audio POST → forwarded to Whisper backend → JSON response. (+4 more)
 
 ### Community 73 - "ObstaclePlaybookEngine"
 Cohesion: 0.17
 Nodes (3): ObstaclePlaybookEngine, Tests for services/progress_ledger_service.py Coverage: ObstaclePlaybookEngine…, TestObstaclePlaybookEngine
 
 ### Community 74 - "test_multi_provider_fabric.py"
-Cohesion: 0.15
-Nodes (6): _isolated_bans_path(), fixture, Tests for providers/multi_provider_fabric.py Coverage:…, Redirect the persisted-bans path so tests never write into the repo., TestFabricRouteOverlay, TestRouteBuilding
+Cohesion: 0.09
+Nodes (12): _isolated_bans_path(), fixture, Tests for providers/multi_provider_fabric.py Coverage:…, #40: 401 perma-bans persist to disk and are honored across reloads., Redirect the persisted-bans path so tests never write into the repo., Role routing maps worker roles to litellm aliases, so every fabric tier must…, Worker-tier aliases route through the litellm gateway FIRST (42-key Gemini…, Malformed overlay routes are dropped at load, never crashing dispatch (issue… (+4 more)
 
 ### Community 75 - "DurableAgentRouter"
 Cohesion: 0.20
@@ -623,21 +618,25 @@ Nodes (11): DurableAgentRouter, Durable Regex Validation Specialist, _extract_ke
 Cohesion: 0.20
 Nodes (12): Anthropic Messages API, Blueprint expectation, .env TASKMASTER_STATE_FILE, EpicTask/SubTask schema, fcc-server proxy, Model fabric (multi_provider_fabric.py), PERPLEXITY_API_KEY, Python proxy (port 8085) (+4 more)
 
-### Community 77 - "_parse_multipart"
-Cohesion: 0.23
-Nodes (6): _parse_multipart(), Return (file_bytes, file_name, model_name) from a multipart body., _multipart_body(), Multipart POST without a file field → 400., Backend connection failure → 503 with unavailable message., TestParseMultipart
-
-### Community 79 - "_FakeClient"
+### Community 77 - "WaveGateController"
 Cohesion: 0.21
-Nodes (7): _FakeClient, _install_fake(), Response, Records the per-request timeout passed to post() without network I/O., test_dispatch_localhost_uses_local_connect_timeout(), test_dispatch_remote_keeps_configured_connect_timeout(), Timeout
+Nodes (7): Any, Record the Wave-3 verification outcome for the Zero-Defect gate. Accepts the…, Evaluates whether all criteria for a wave gate are met., Evaluate Wave 3's Zero-Defect verification criteria. Uses the results recorded…, Attempts to pass the current wave gate and advance to the next wave., Verify each subtask's output paths against the ownership map for pool_id.…, WaveGateController
+
+### Community 78 - "create_app"
+Cohesion: 0.18
+Nodes (12): create_app(), _fetch_litellm_aliases(), handle_models(), main(), AsyncBaseTransport, AsyncClient, Starlette, Live litellm /v1/models aliases; on failure (aliases=[], note). (+4 more)
+
+### Community 79 - "handle_chain_update"
+Cohesion: 0.29
+Nodes (8): _fabric_chains(), handle_chain_update(), handle_chains(), _load_fabric_overlay(), fabric-routes.json as {"routes": {alias: [route, …]}}; {} when absent., Merged fabric chain view: code MODEL_FABRIC_ROUTES overlaid per alias., Upsert one chain alias into fabric-routes.json atomically., _write_fabric_overlay()
 
 ### Community 80 - "TestRun"
 Cohesion: 0.17
 Nodes (3): #32: GET /api/run/status reports runs started by POST /api/run., #32: POST /api/run/{id}/cancel signals the workflow's cancel_event., TestRun
 
 ### Community 81 - "test_webapp.py"
-Cohesion: 0.18
-Nodes (4): merged-agentic-swarm — Agentic orchestration system with multi-provider fabric…, Tests for merged_agentic_swarm.webapp — the control-panel JSON API + dashboard.…, TestModels, TestStatus
+Cohesion: 0.10
+Nodes (7): merged-agentic-swarm — Agentic orchestration system with multi-provider fabric…, Tests for merged_agentic_swarm.webapp — the control-panel JSON API + dashboard.…, Async byte stream over fixed chunks for the mocked litellm SSE response., _Stream, TestModels, TestProfiles, TestStatus
 
 ### Community 82 - "StreamingProxyConfig"
 Cohesion: 0.22
@@ -691,17 +690,17 @@ Nodes (9): dynamic_learning_loop, agent_registry, chain_registry, cold_registry,
 Cohesion: 0.22
 Nodes (9): project, description, knowledge_graph_path, name, ownership_map, progress_report, provider_registry, root_dir (+1 more)
 
+### Community 95 - "services/__init__.py"
+Cohesion: 0.33
+Nodes (3): Progress Ledger, Success Markers, and Obstacle Playbooks Models, Services Package Initialization, Progress Ledger, Success Markers, and Self-Healing Obstacle Playbook Engine…
+
 ### Community 96 - "start_task_spine.sh"
 Cohesion: 0.36
 Nodes (8): banner(), fail(), info(), ok(), start_task_spine.sh script, TASK_SPINE_STATE, TASK_SPINE_TYPE, warn()
 
-### Community 97 - "_load_registry"
-Cohesion: 0.25
-Nodes (9): _load_registry(), Any, Load the provider registry (cached); return {} when missing/unreadable., Clear the cached registry and reload it from disk. Called after the provider…, reload_registry(), Persist one role -> alias mapping into PROVIDER_REGISTRY.json atomically. The…, Tier + registered-role -> litellm alias via model_routing resolution., _role_mapping() (+1 more)
-
-### Community 98 - "cmd_config"
-Cohesion: 0.25
-Nodes (6): cmd_config(), Show configuration state., cmd_config should print key pool, routes, and swarm info without crashing., Verify model routes appear in config output., Verify argparse setup works for each subcommand., TestCmdConfig
+### Community 97 - "model_routing.py"
+Cohesion: 0.17
+Nodes (15): litellm_model_for_fabric_route(), _load_registry(), Any, Model Role Routing Resolves a worker role (deep / main / fast tier, or a…, Return the first litellm model in the fabric route list for a model alias., Load the provider registry (cached); return {} when missing/unreadable., Clear the cached registry and reload it from disk. Called after the provider…, Return the litellm virtual Gemini alias for a worker role. Resolution order: 1.… (+7 more)
 
 ### Community 99 - "ingest"
 Cohesion: 0.25
@@ -711,9 +710,9 @@ Nodes (8): Claude Vision, graph, html2text, ingest, oEmbed, update, watch, yt-dl
 Cohesion: 0.64
 Nodes (8): Confidence Scoring, Deep Mode, Extraction Rules, Extraction Subagent Prompt, Hyperedge Guidance, JSON Schema, Node ID Format, Source File Rule
 
-### Community 101 - "_run_latency_test"
-Cohesion: 0.25
-Nodes (8): Exception, _fetch_litellm_aliases(), _latency_error(), AsyncClient, Live litellm /v1/models aliases; on failure (aliases=[], note)., ok:false payload — short error, never the key., Stream one chat/completions request; report TTFB and total wall time., _run_latency_test()
+### Community 101 - "handle_latency_test"
+Cohesion: 0.33
+Nodes (6): Exception, handle_latency_test(), _latency_error(), ok:false payload — short error, never the key., Stream one chat/completions request; report TTFB and total wall time., _run_latency_test()
 
 ### Community 102 - "orchestrator"
 Cohesion: 0.25
@@ -734,6 +733,10 @@ Nodes (7): check_proxy(), FCC_PORT, FCC_PROCESS_NAME, ROUTATIC_PORT, ROUTATIC_PR
 ### Community 106 - "verify_task_spine.sh"
 Cohesion: 0.39
 Nodes (5): banner(), die(), verify_task_spine.sh script, step_fail(), step_ok()
+
+### Community 107 - "handle_profile_update"
+Cohesion: 0.67
+Nodes (3): handle_profile_update(), Persist profiles to disk atomically and invalidate the load cache., _write_profiles()
 
 ### Community 108 - ".handle_task_failure"
 Cohesion: 0.32
@@ -762,10 +765,6 @@ Nodes (7): Ruff lint and format check, Import-chain smoke script, CI test job, u
 ### Community 114 - "check_proxy_health.sh"
 Cohesion: 0.33
 Nodes (6): HEALTH_URL, log(), LOG_FILE, SERVICE_NAME, check_proxy_health.sh script, TIMEOUT_SEC
-
-### Community 115 - "TestTargetRepoRoot"
-Cohesion: 0.38
-Nodes (3): Resolve the working repo the swarm writes into. ``SWARM_TARGET_REPO`` env var…, When SWARM_TARGET_REPO is unset and no sibling target repo exists,…, TestTargetRepoRoot
 
 ### Community 116 - "_ChunkStream"
 Cohesion: 0.29
@@ -799,13 +798,9 @@ Nodes (5): agent_pools, control_agents, phase_1_agents, $schema, version
 Cohesion: 0.60
 Nodes (5): die(), log(), verify_worker_runtime.sh script, usage(), VERIFY_RESULTS_FILE
 
-### Community 124 - "handle_run"
-Cohesion: 0.33
-Nodes (6): handle_run(), Registry entry for a background workflow run., Start a real agentic workflow on a background daemon thread (returns now).…, Start a real agentic workflow in a background daemon thread; return now., RunHandle, _spawn_agentic_run()
-
-### Community 125 - "TestCLIStringFunctions"
-Cohesion: 0.33
-Nodes (4): cmd_status should handle a missing progress ledger gracefully., Test internal helper behaviors exposed through the CLI module., cmd_promote should not crash when called directly (uses fresh orchestrator)., TestCLIStringFunctions
+### Community 124 - "handle_run_status"
+Cohesion: 0.29
+Nodes (7): handle_run_status(), Registry entry for a background workflow run., Start a real agentic workflow on a background daemon thread (returns now).…, Report live status for a run (or all runs when no ``run_id`` is given)., RunHandle, _serialize_run(), _spawn_agentic_run()
 
 ### Community 126 - "TestCaptureStep"
 Cohesion: 0.33
@@ -838,10 +833,6 @@ Nodes (4): die(), log(), start_worker_runtime.sh script, usage()
 ### Community 137 - "stop_agentic_services.sh"
 Cohesion: 0.70
 Nodes (4): is_protected(), kill_worker(), main(), stop_agentic_services.sh script
-
-### Community 140 - "TestLitellmPresenceInRoutes"
-Cohesion: 0.40
-Nodes (3): Role routing maps worker roles to litellm aliases, so every fabric tier must…, Worker-tier aliases route through the litellm gateway FIRST (42-key Gemini…, TestLitellmPresenceInRoutes
 
 ### Community 144 - "graphify extract"
 Cohesion: 0.50
@@ -946,9 +937,9 @@ Nodes (3): claude-code-proxy.json Spec, opencode-swarm.json Spec, setup-and-run.
   .claude/skills/graphify/references/exports.md · relation: references
 
 ## Knowledge Gaps
-- **379 isolated node(s):** `$schema`, `version`, `name`, `description`, `root_dir` (+374 more)
+- **392 isolated node(s):** `$schema`, `version`, `name`, `description`, `root_dir` (+387 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **65 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **61 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -957,12 +948,12 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
 - **What is the exact relationship between `graphify export falkordb` and `.graphify_python`?**
   _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
-- **Why does `create_app()` connect `webapp.py` to `PassthroughStreamingProxy`, `handle_run`, `_run_latency_test`?**
-  _High betweenness centrality (0.096) - this node is a cross-community bridge._
+- **Why does `create_app()` connect `create_app` to `model_routing.py`, `webapp.py`, `handle_latency_test`, `handle_profile_update`, `Request`, `handle_chain_update`, `resolve_model_alias_for_profile`, `PassthroughStreamingProxy`, `handle_run_status`?**
+  _High betweenness centrality (0.093) - this node is a cross-community bridge._
 - **Why does `PassthroughStreamingProxy` connect `PassthroughStreamingProxy` to `CircuitBreaker`, `StreamingProxyConfig`, `_ChunkStream`, `_StallStream`, `test_streaming_proxy.py`?**
-  _High betweenness centrality (0.094) - this node is a cross-community bridge._
-- **Why does `MultiLayeredAgenticOrchestrator` connect `MultiLayeredAgenticOrchestrator` to `TestLatencyTest`, `TestModelRoleUpdate`, `TestProfiles`, `TestReports`, `webapp.py`, `WorkerRole`, `PRDAnalysisResult`, `_Stream`, `services/__init__.py`, `handle_run`, `test_webapp.py`, `TestRun`, `TestChains`, `TestRunPlan`, `TestRunFullAgenticWorkflow`, `SubTask`, `ProxyServerDaemon`?**
-  _High betweenness centrality (0.081) - this node is a cross-community bridge._
+  _High betweenness centrality (0.087) - this node is a cross-community bridge._
+- **Why does `MultiLayeredAgenticOrchestrator` connect `MultiLayeredAgenticOrchestrator` to `TestLatencyTest`, `TestModelRoleUpdate`, `TestReports`, `webapp.py`, `WorkerRole`, `SubTask`, `agentic_cli.py`, `TestRunPlan`, `.run_full_agentic_workflow`, `handle_run_status`, `test_webapp.py`, `TestChains`, `TestRun`, `TestRunFullAgenticWorkflow`, `ProxyServerDaemon`?**
+  _High betweenness centrality (0.078) - this node is a cross-community bridge._
 - **Are the 24 inferred relationships involving `KeyPoolManager` (e.g. with `isolated_key_pool()` and `TestCLIStringFunctions`) actually correct?**
   _`KeyPoolManager` has 24 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 29 inferred relationships involving `SubTask` (e.g. with `ConcurrencyRampController` and `DurableAgentRouter`) actually correct?**

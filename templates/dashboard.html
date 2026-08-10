@@ -1,0 +1,544 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic Swarm Control Panel</title>
+<style>
+  :root { --bg:#0f1115; --panel:#171a21; --line:#2a2f3a; --text:#d7dce3; --dim:#8b93a1; --acc:#4f8cff; --ok:#2ecc71; --bad:#e74c3c; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--text); }
+  header { padding:16px 24px; border-bottom:1px solid var(--line); background:var(--panel); }
+  header h1 { margin:0; font-size:18px; }
+  header p { margin:4px 0 0; color:var(--dim); font-size:12px; }
+  main { display:grid; grid-template-columns:repeat(auto-fit, minmax(430px,1fr)); gap:16px; padding:20px 24px; }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px 16px; }
+  section h2 { margin:0 0 10px; font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--acc); }
+  section h3 { margin:16px 0 6px; font-size:12px; color:var(--dim); }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th,td { text-align:left; padding:5px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--dim); font-weight:600; white-space:nowrap; }
+  .ok { color:var(--ok); } .bad { color:var(--bad); } .dim { color:var(--dim); }
+  .mono { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  input,select,button { background:#0d0f13; border:1px solid var(--line); color:var(--text); border-radius:6px; padding:7px 10px; font:inherit; }
+  button { background:var(--acc); color:#fff; cursor:pointer; border-color:var(--acc); }
+  pre { background:#0d0f13; border:1px solid var(--line); border-radius:6px; padding:10px; overflow:auto; font-size:12px; max-height:320px; }
+  a { color:var(--acc); cursor:pointer; }
+  /* ── Chat ── */
+  #chat { display:flex; flex-direction:column; }
+  .chat-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
+  .chat-header h2 { margin:0; }
+  #chat-messages { flex:1; min-height:220px; max-height:450px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:4px 0; }
+  .chat-msg { padding:8px 12px; border-radius:10px; max-width:85%; font-size:13px; line-height:1.5; white-space:pre-wrap; word-break:break-word; }
+  .chat-msg.user { align-self:flex-end; background:var(--acc); color:#fff; border-bottom-right-radius:3px; }
+  .chat-msg.assistant { align-self:flex-start; background:#0d0f13; border:1px solid var(--line); border-bottom-left-radius:3px; }
+  .chat-msg.streaming::after { content:"\\25A0"; animation:chat-blink 1s step-end infinite; margin-left:2px; }
+  @keyframes chat-blink { 50% { opacity:0; } }
+  .chat-msg.error { align-self:flex-start; background:transparent; border:1px solid var(--bad); color:var(--bad); font-size:12px; }
+  #chat-system-toggle { margin-bottom:8px; font-size:12px; color:var(--dim); }
+  #chat-system-toggle summary { cursor:pointer; user-select:none; }
+  #chat-system { width:100%; resize:vertical; margin-top:6px; }
+  #chat-send { white-space:nowrap; }
+  #chat-send:disabled { opacity:.55; cursor:not-allowed; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Agentic Swarm Control Panel</h1>
+  <p>Provider pools, fabric routes, run reports, swarm profiles, and model routing. Secrets are never shown — auth is referenced by env-var name only.</p>
+</header>
+<main>
+  <section id="chat">
+    <div class="chat-header">
+      <h2>Chat</h2>
+      <div class="row">
+        <select id="chat-model"><option>Loading models…</option></select>
+        <button id="chat-new-btn" title="Start a new chat session">+ New</button>
+      </div>
+    </div>
+    <details id="chat-system-toggle">
+      <summary>System prompt</summary>
+      <textarea id="chat-system" rows="3" placeholder="Optional system prompt (set before sending the first message)…"></textarea>
+    </details>
+    <div id="chat-messages"><p class="dim" style="margin:auto;padding:40px 0">Select a model and send a message to start.</p></div>
+    <div class="row" style="margin-top:8px">
+      <textarea id="chat-input" rows="2" placeholder="Type a message… (Enter to send, Shift+Enter for newline)" style="flex:1;resize:none"></textarea>
+      <button id="chat-send">Send</button>
+    </div>
+    <span id="chat-status" class="dim" style="font-size:11px;margin-top:4px"></span>
+  </section>
+
+  <section id="status">
+    <h2>System Status</h2>
+    <h3>Latest Report</h3>
+    <div id="latest-report"><p class="dim">Loading…</p></div>
+    <h3>Key Pools</h3>
+    <div id="key-pools"><p class="dim">Loading…</p></div>
+    <h3>Fabric Routes</h3>
+    <div id="fabric-routes"><p class="dim">Loading…</p></div>
+    <h3>Registry Backends</h3>
+    <div id="registry-backends"><p class="dim">Loading…</p></div>
+  </section>
+
+  <section>
+    <h2>Run Timeline (latest report)</h2>
+    <div id="timeline"><p class="dim">Loading…</p></div>
+  </section>
+
+  <section>
+    <h2>Reports</h2>
+    <div id="reports"><p class="dim">Loading…</p></div>
+    <pre id="report-body">…click a report to view…</pre>
+  </section>
+
+  <section>
+    <h2>Swarm Profiles</h2>
+    <div id="profiles"><p class="dim">Loading…</p></div>
+    <div class="row" style="margin-top:10px">
+      <select id="plan-profile"></select>
+      <button id="plan-btn">Resolve plan (no run)</button>
+    </div>
+    <pre id="run-plan-result">…</pre>
+    <h3>Run Profile — executes for real</h3>
+    <form id="run-form" class="row">
+      <select id="run-profile" style="min-width:110px"></select>
+      <textarea name="prd" rows="3" placeholder="# title&#10;&#10;body" required style="min-width:300px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px"></textarea>
+      <button type="submit">Start run</button>
+    </form>
+    <p class="bad" style="font-size:12px;margin:6px 0 0">Warning: this starts a real agentic workflow in the background.</p>
+    <span id="run-result" class="dim"></span>
+  </section>
+
+  <section>
+    <h2>Model Routing</h2>
+    <h3>Litellm Live Aliases</h3>
+    <div id="model-aliases"><p class="dim">Loading…</p></div>
+    <h3>Role → Alias</h3>
+    <div id="role-mapping"><p class="dim">Loading…</p></div>
+    <h3>Edit Role Alias</h3>
+    <form id="role-form" class="row">
+      <input name="role" placeholder="role, e.g. deep" required style="width:140px">
+      <input name="alias" placeholder="alias, e.g. gemini-batch" required style="min-width:180px">
+      <button type="submit">Save role</button>
+    </form>
+    <span id="role-result" class="dim"></span>
+  </section>
+
+  <section>
+    <h2>Fabric Chains</h2>
+    <div id="chains"><p class="dim">Loading…</p></div>
+    <h3>Edit Chain Alias</h3>
+    <form id="chain-form" class="row">
+      <input name="alias" placeholder="chain alias, e.g. claude-3-7-sonnet" required style="min-width:190px">
+      <textarea name="routes" rows="3" placeholder='[{"provider":"gemini","model":"gemini-2.5-flash","timeout":30}]' required style="min-width:280px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px"></textarea>
+      <button type="submit">Save chain</button>
+    </form>
+    <span id="chain-result" class="dim"></span>
+  </section>
+
+  <section>
+    <h2>Latency Test</h2>
+    <form id="latency-form" class="row">
+      <input name="model" placeholder="model alias, e.g. gemini-batch" required style="min-width:220px">
+      <input name="max_tokens" type="number" value="256" min="1" style="width:110px" title="reasoning-heavy aliases need >= 256">
+      <button type="submit">Run probe</button>
+    </form>
+    <pre id="latency-result">…</pre>
+  </section>
+</main>
+<script>
+async function getJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(url + " -> HTTP " + r.status);
+  return r.json();
+}
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function statusSpan(s) {
+  const ok = s === "ok" || s === "available" || s === true || s === "completed" || s === "spawned";
+  return '<span class="' + (ok ? "ok" : "bad") + '">' + esc(s) + "</span>";
+}
+function table(headers, rows) {
+  return "<table><tr>" + headers.map(h => "<th>" + esc(h) + "</th>").join("") + "</tr>" + rows.join("") + "</table>";
+}
+
+function renderStatus(status) {
+  const lr = status.latest_report;
+  const rep = document.getElementById("latest-report");
+  if (!lr) {
+    rep.innerHTML = '<p class="dim">No run report generated yet.</p>';
+  } else {
+    const waves = Object.entries(lr.waves || {}).map(([w, d]) =>
+      w + ": " + Object.entries(d.status_counts || {}).map(([k, v]) => k + "=" + v).join(", ") + " (" + d.tokens_used + " tok)"
+    ).join("<br>");
+    rep.innerHTML = table(
+      ["field", "value"],
+      [
+        "<tr><th>report</th><td class='mono'>" + esc(lr.name) + "</td></tr>",
+        "<tr><th>generated (UTC)</th><td>" + esc(lr.generated_at_utc) + "</td></tr>",
+        "<tr><th>prd</th><td>" + esc(lr.prd_title || "-") + "</td></tr>",
+        "<tr><th>tokens</th><td>" + esc(lr.total_tokens_used) + "</td></tr>",
+        "<tr><th>markers</th><td>" + esc(lr.success_markers) + "</td></tr>",
+        "<tr><th>chain entries</th><td>" + esc(lr.chain_registry_entries) + "</td></tr>",
+        "<tr><th>knowledge entries</th><td>" + esc(lr.knowledge_registry_entries) + "</td></tr>",
+        (waves ? "<tr><th>waves</th><td>" + waves + "</td></tr>" : "")
+      ]
+    );
+  }
+
+  const pools = document.getElementById("key-pools");
+  const poolRows = Object.entries(status.key_pools || {}).map(([p, info]) =>
+    "<tr><td class='mono'>" + esc(p) + "</td><td>" + esc(info.active) + "/" + esc(info.total) + " active</td><td class='mono'>" + (info.key_ids || []).map(esc).join(", ") + "</td></tr>"
+  );
+  pools.innerHTML = poolRows.length ? table(["provider", "active/total", "keys"], poolRows) : '<p class="dim">No key pools loaded.</p>';
+
+  const fabric = document.getElementById("fabric-routes");
+  const fRows = Object.entries(status.fabric_routes || {}).map(([alias, routes]) =>
+    "<tr><td class='mono'>" + esc(alias) + "</td><td class='mono'>" + routes.map(r => esc(r.provider) + "/" + esc(r.model)).join("<br>") + "</td></tr>"
+  );
+  fabric.innerHTML = fRows.length ? table(["alias", "route chain (provider/model)"], fRows) : '<p class="dim">No fabric routes.</p>';
+
+  const reg = document.getElementById("registry-backends");
+  const rRows = Object.entries(status.registry_backends || {}).map(([name, b]) =>
+    "<tr><td class='mono'>" + esc(name) + "</td><td class='mono'>" + esc(b.base_url) + "</td><td class='mono'>" + esc(b.auth_env) + "</td><td>" + statusSpan(b.status) + "</td></tr>"
+  );
+  reg.innerHTML = rRows.length ? table(["backend", "base_url", "auth env", "status"], rRows) : '<p class="dim">No registry backends.</p>';
+}
+
+function renderTimeline(status) {
+  const lr = status.latest_report;
+  const evts = (lr && lr.timeline) || [];
+  const el = document.getElementById("timeline");
+  if (!evts.length) { el.innerHTML = '<p class="dim">No timeline events.</p>'; return; }
+  const rows = evts.slice(-40).reverse().map(e => {
+    const ts = e.timestamp ? new Date(e.timestamp * 1000).toISOString().replace("T", " ").slice(0, 19) : "-";
+    return "<tr><td class='mono'>" + esc(ts) + "</td><td>" + esc(e.kind) + "</td><td>" + esc(e.wave_id == null ? "-" : e.wave_id) + "</td><td class='mono'>" + esc(e.action) + "</td><td>" + statusSpan(e.status) + "</td><td class='mono'>" + esc(e.model || "-") + "</td><td>" + esc(e.tokens_used) + "</td></tr>";
+  });
+  el.innerHTML = table(["time (UTC)", "kind", "wave", "action", "status", "model", "tok"], rows);
+}
+
+function renderReports(reports) {
+  const el = document.getElementById("reports");
+  const list = (reports.reports || []);
+  if (!list.length) { el.innerHTML = '<p class="dim">No reports yet.</p>'; return; }
+  const rows = list.map(r =>
+    "<tr><td class='mono'><a data-name='" + esc(r.name) + "'>" + esc(r.name) + "</a></td><td>" + esc(new Date(r.mtime * 1000).toISOString()) + "</td></tr>"
+  );
+  el.innerHTML = table(["report", "mtime"], rows);
+  el.querySelectorAll("a").forEach(a => a.addEventListener("click", async () => {
+    const pre = document.getElementById("report-body");
+    pre.textContent = "Loading…";
+    try {
+      const data = await getJSON("/api/reports/" + encodeURIComponent(a.dataset.name));
+      pre.textContent = JSON.stringify(data, null, 2);
+    } catch (err) { pre.textContent = "error: " + err; }
+  }));
+}
+
+function renderProfiles(profiles) {
+  const el = document.getElementById("profiles");
+  const rows = Object.entries(profiles || {}).map(([name, p]) =>
+    "<tr><td class='mono'>" + esc(name) + "</td><td>" + esc(p.description) + "</td><td>" + esc((p.waves || []).join(", ")) + "</td><td>" + esc(p.default_tier) + "</td><td>" + esc((p.worker_roles || []).join(", ")) + "</td></tr>"
+  );
+  el.innerHTML = rows.length ? table(["name", "description", "waves", "tier", "roles"], rows) : '<p class="dim">No profiles.</p>';
+  const opts = Object.keys(profiles || {}).map(n => "<option value='" + esc(n) + "'>" + esc(n) + "</option>").join("");
+  document.getElementById("plan-profile").innerHTML = opts;
+  document.getElementById("run-profile").innerHTML = opts;
+}
+
+function renderChains(chains) {
+  const el = document.getElementById("chains");
+  const rows = Object.entries(chains || {}).map(([alias, routes]) =>
+    "<tr><td class='mono'><a data-alias='" + esc(alias) + "'>" + esc(alias) + "</a></td><td class='mono'>" + (routes || []).map(r => esc(r.provider) + "/" + esc(r.model)).join("<br>") + "</td></tr>"
+  );
+  el.innerHTML = rows.length ? table(["alias", "route chain (provider/model)"], rows) : '<p class="dim">No fabric chains.</p>';
+  el.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+    const f = document.getElementById("chain-form");
+    f.alias.value = a.dataset.alias;
+    f.routes.value = JSON.stringify(chains[a.dataset.alias], null, 2);
+    document.getElementById("chain-result").textContent = "Loaded " + a.dataset.alias + " — edit and Save chain to persist.";
+  }));
+}
+
+function renderModels(models) {
+  const aliases = document.getElementById("model-aliases");
+  if (models.error) {
+    aliases.innerHTML = '<p class="dim">' + esc(models.error) + "</p>";
+  } else {
+    const items = (models.aliases || []).map(a => "<code>" + esc(a) + "</code>").join(" ");
+    aliases.innerHTML = items || '<p class="dim">No aliases returned.</p>';
+  }
+  const mapping = document.getElementById("role-mapping");
+  const rows = Object.entries(models.role_mapping || {}).map(([role, alias]) =>
+    "<tr><td class='mono'>" + esc(role) + "</td><td class='mono'>" + esc(alias) + "</td></tr>"
+  );
+  mapping.innerHTML = rows.length ? table(["role", "alias"], rows) : '<p class="dim">No mapping.</p>';
+  /* Also populate the chat model dropdown */
+  const chatSel = document.getElementById("chat-model");
+  const chatAliases = (models.aliases || []).filter(function(a) { return a; });
+  if (chatAliases.length) {
+    chatSel.innerHTML = chatAliases.map(function(a) { return "<option value='" + esc(a) + "'>" + esc(a) + "</option>"; }).join("");
+  } else if (!models.error) {
+    chatSel.innerHTML = "<option>No models available</option>";
+  }
+}
+
+/* ── Chat logic ── */
+
+var _chatSessionId = "s" + Date.now().toString(36);
+var _chatAbortCtrl = null;
+
+function _chatMsgEl(role, text) {
+  var div = document.createElement("div");
+  div.className = "chat-msg " + role;
+  div.textContent = text;
+  return div;
+}
+
+function _chatBubble(role) {
+  var div = document.createElement("div");
+  div.className = "chat-msg " + role;
+  return div;
+}
+
+async function chatSend() {
+  var input = document.getElementById("chat-input");
+  var text = input.value.trim();
+  if (!text) return;
+
+  var model = document.getElementById("chat-model").value;
+  var system = document.getElementById("chat-system").value.trim();
+  var area = document.getElementById("chat-messages");
+  var status = document.getElementById("chat-status");
+  var sendBtn = document.getElementById("chat-send");
+
+  /* Remove placeholder if present */
+  var placeholder = area.querySelector("p.dim");
+  if (placeholder) placeholder.remove();
+
+  /* Append user bubble */
+  area.appendChild(_chatMsgEl("user", text));
+  input.value = "";
+  area.scrollTop = area.scrollHeight;
+
+  /* Create assistant bubble */
+  var assistantBubble = _chatBubble("assistant");
+  assistantBubble.classList.add("streaming");
+  area.appendChild(assistantBubble);
+  area.scrollTop = area.scrollHeight;
+
+  status.textContent = "Streaming…";
+  sendBtn.disabled = true;
+
+  /* Abort any in-flight request */
+  if (_chatAbortCtrl) { _chatAbortCtrl.abort(); }
+  _chatAbortCtrl = new AbortController();
+
+  try {
+    var messages = [{ role: "user", content: text }];
+    var body = { model: model, messages: messages, stream: true };
+    if (system) body.system = system;
+
+    var resp = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: _chatAbortCtrl.signal
+    });
+
+    if (!resp.ok) {
+      assistantBubble.classList.remove("streaming");
+      var errText;
+      try {
+        var errJson = await resp.json();
+        errText = "Error: " + (errJson.error || ("HTTP " + resp.status));
+      } catch (_) {
+        errText = "Error: HTTP " + resp.status;
+      }
+      assistantBubble.textContent = errText;
+      assistantBubble.className = "chat-msg error";
+      status.textContent = "";
+      sendBtn.disabled = false;
+      _chatAbortCtrl = null;
+      return;
+    }
+
+    var reader = resp.body.getReader();
+    var decoder = new TextDecoder();
+    var buf = "";
+
+    while (true) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+      buf += decoder.decode(chunk.value, { stream: true });
+      var lines = buf.split("\\n");
+      buf = lines.pop() || "";
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        if (line.indexOf("data: ") === 0) {
+          var data = line.slice(6);
+          if (data === "[DONE]") continue;
+          try {
+            var parsed = JSON.parse(data);
+            var choices = parsed.choices;
+            if (choices && choices[0]) {
+              var delta = choices[0].delta;
+              if (delta && delta.content) {
+                assistantBubble.textContent += delta.content;
+              }
+            }
+          } catch (_) { /* skip unparseable chunks */ }
+        }
+      }
+      area.scrollTop = area.scrollHeight;
+    }
+
+    assistantBubble.classList.remove("streaming");
+    status.textContent = "";
+    sendBtn.disabled = false;
+    _chatAbortCtrl = null;
+  } catch (err) {
+    if (err.name === "AbortError") {
+      assistantBubble.textContent = (assistantBubble.textContent || "") + "\\n[stopped]";
+    } else {
+      assistantBubble.textContent = "Error: " + err;
+      assistantBubble.className = "chat-msg error";
+    }
+    assistantBubble.classList.remove("streaming");
+    status.textContent = "";
+    sendBtn.disabled = false;
+    _chatAbortCtrl = null;
+  }
+}
+
+function chatNewSession() {
+  /* Abort any in-flight streaming */
+  if (_chatAbortCtrl) { _chatAbortCtrl.abort(); _chatAbortCtrl = null; }
+
+  var area = document.getElementById("chat-messages");
+  area.innerHTML = '<p class="dim" style="margin:auto;padding:40px 0">Select a model and send a message to start.</p>';
+
+  document.getElementById("chat-system").value = "";
+  document.getElementById("chat-system-toggle").open = false;
+  document.getElementById("chat-input").value = "";
+  document.getElementById("chat-status").textContent = "";
+  document.getElementById("chat-send").disabled = false;
+
+  _chatSessionId = "s" + Date.now().toString(36);
+}
+
+document.getElementById("chat-send").addEventListener("click", chatSend);
+document.getElementById("chat-input").addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chatSend(); }
+});
+document.getElementById("chat-new-btn").addEventListener("click", chatNewSession);
+
+document.getElementById("latency-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const body = { model: f.model.value.trim() };
+  const mt = parseInt(f.max_tokens.value, 10);
+  if (mt > 0) body.max_tokens = mt;
+  const pre = document.getElementById("latency-result");
+  pre.textContent = "Running probe…";
+  try {
+    const r = await fetch("/api/latency-test", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    pre.textContent = JSON.stringify(await r.json(), null, 2);
+  } catch (err) { pre.textContent = "error: " + err; }
+});
+
+document.getElementById("plan-btn").addEventListener("click", async () => {
+  const name = document.getElementById("plan-profile").value;
+  const pre = document.getElementById("run-plan-result");
+  pre.textContent = "Resolving plan…";
+  try {
+    const r = await fetch("/api/run-plan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ profile: name })
+    });
+    pre.textContent = JSON.stringify(await r.json(), null, 2);
+  } catch (err) { pre.textContent = "error: " + err; }
+});
+
+document.getElementById("role-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const out = document.getElementById("role-result");
+  out.textContent = "Saving role…";
+  try {
+    const r = await fetch("/api/models/" + encodeURIComponent(f.role.value.trim()), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ alias: f.alias.value.trim() })
+    });
+    const data = await r.json();
+    if (!r.ok) { out.textContent = "error: " + (data.error || r.status); return; }
+    out.textContent = "Saved " + f.role.value.trim() + " -> " + f.alias.value.trim();
+    load();
+  } catch (err) { out.textContent = "error: " + err; }
+});
+
+document.getElementById("chain-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const out = document.getElementById("chain-result");
+  let routes;
+  try { routes = JSON.parse(f.routes.value); }
+  catch { out.textContent = "error: routes must be valid JSON"; return; }
+  out.textContent = "Saving chain…";
+  try {
+    const r = await fetch("/api/chains/" + encodeURIComponent(f.alias.value.trim()), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ routes: routes })
+    });
+    const data = await r.json();
+    if (!r.ok) { out.textContent = "error: " + (data.error || r.status); return; }
+    out.textContent = "Saved chain " + f.alias.value.trim();
+    load();
+  } catch (err) { out.textContent = "error: " + err; }
+});
+
+document.getElementById("run-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const out = document.getElementById("run-result");
+  out.textContent = "Starting run…";
+  try {
+    const r = await fetch("/api/run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ profile: document.getElementById("run-profile").value, prd: f.prd.value })
+    });
+    const data = await r.json();
+    if (!r.ok) { out.textContent = "error: " + (data.error || r.status); return; }
+    out.textContent = "Started " + data.profile + " (" + data.model_alias + ") — watch System Status / Reports.";
+  } catch (err) { out.textContent = "error: " + err; }
+});
+
+async function load() {
+  try {
+    const [status, profiles, models, reports, chains] = await Promise.all([
+      getJSON("/api/status"), getJSON("/api/profiles"), getJSON("/api/models"), getJSON("/api/reports"), getJSON("/api/chains")
+    ]);
+    renderStatus(status);
+    renderTimeline(status);
+    renderProfiles(profiles);
+    renderModels(models);
+    renderReports(reports);
+    renderChains(chains.chains);
+  } catch (err) {
+    document.body.insertAdjacentHTML("afterbegin", "<p style='color:#e74c3c;padding:10px 24px'>Failed to load: " + esc(err) + "</p>");
+  }
+}
+load();
+</script>
+</body>
+</html>
