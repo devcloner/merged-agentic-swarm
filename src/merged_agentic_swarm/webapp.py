@@ -36,6 +36,7 @@ import os
 import re
 import threading
 import time
+import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -44,7 +45,7 @@ from pathlib import Path
 import httpx
 from starlette.applications import Starlette
 from starlette.requests import Request
-from starlette.responses import HTMLResponse, JSONResponse
+from starlette.responses import HTMLResponse, JSONResponse, StreamingResponse
 from starlette.routing import Route
 
 from merged_agentic_swarm.providers import multi_provider_fabric
@@ -62,6 +63,22 @@ _REPORTS_DIR = _REPO_ROOT / "reports"
 _LITELLM_BASE = "http://127.0.0.1:4000"
 _LITELLM_MODELS_URL = f"{_LITELLM_BASE}/v1/models"
 _LITELLM_CHAT_URL = f"{_LITELLM_BASE}/v1/chat/completions"
+
+# ── Chat session store ─────────────────────────────────────────────────────
+
+_CHAT_SESSIONS: dict[str, dict] = {}
+_CHAT_SESSIONS_LOCK = threading.Lock()
+_CHAT_SESSION_TTL = 3600  # 1 hour
+
+
+def _clean_expired_sessions() -> None:
+    """Remove sessions older than TTL."""
+    now = time.time()
+    with _CHAT_SESSIONS_LOCK:
+        expired = [sid for sid, s in _CHAT_SESSIONS.items() if now - s["last_active"] > _CHAT_SESSION_TTL]
+        for sid in expired:
+            del _CHAT_SESSIONS[sid]
+
 
 # The ramp agentic-cli applies when a profile's waves list is empty.
 DEFAULT_RAMP = [4, 8, 16, 24, 40]
@@ -416,6 +433,255 @@ async def _run_latency_test(client: httpx.AsyncClient, model: str, max_tokens: i
     }
 
 
+# ── Chat handlers ──────────────────────────────────────────────────────────
+
+
+async def _stream_chat_response(
+    client: httpx.AsyncClient, model: str, messages: list[dict], max_tokens: int, temperature: float
+):
+    """Generator that yields SSE chunks from litellm chat/completions."""
+    key = os.environ.get("LITELLM_PROXY_KEY")
+    headers = {"Content-Type": "application/json"}
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
+    payload = {
+        "model": model,
+        "messages": messages,
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+        "stream": True,
+    }
+    try:
+        req = client.build_request("POST", _LITELLM_CHAT_URL, json=payload, headers=headers)
+        resp = await client.send(req, stream=True)
+    except Exception as exc:
+        error_chunk = json.dumps({"error": f"litellm unreachable: {exc}", "model": model, "provider": "litellm"})
+        yield b"data: " + error_chunk.encode() + b"\n\n"
+        yield b"data: [DONE]\n\n"
+        return
+
+    try:
+        async for chunk in resp.aiter_bytes():
+            if chunk:
+                yield (
+                    b"data: "
+                    + json.dumps(
+                        {"model": model, "provider": "litellm", "chunk": chunk.decode(errors="replace")}
+                    ).encode()
+                    + b"\n\n"
+                )
+    except Exception as exc:
+        error_chunk = json.dumps({"error": f"stream read error: {exc}", "model": model, "provider": "litellm"})
+        yield b"data: " + error_chunk.encode() + b"\n\n"
+    finally:
+        if not resp.is_closed:
+            await resp.aclose()
+    yield b"data: [DONE]\n\n"
+
+
+async def handle_chat(request: Request):
+    """POST /api/chat — send a chat message, optionally stream the response."""
+    _clean_expired_sessions()
+    try:
+        body = await request.json()
+    except ValueError:
+        return JSONResponse({"error": "invalid JSON body"}, status_code=400)
+    if not isinstance(body, dict):
+        return JSONResponse({"error": "body must be a JSON object"}, status_code=400)
+
+    model = body.get("model")
+    if not isinstance(model, str) or not model.strip():
+        return JSONResponse({"error": "model is required"}, status_code=400)
+
+    messages = body.get("messages")
+    if not isinstance(messages, list) or not messages:
+        return JSONResponse({"error": "messages must be a non-empty list"}, status_code=400)
+
+    stream = bool(body.get("stream", True))
+    max_tokens = int(body.get("max_tokens") or 1024)
+    temperature = float(body.get("temperature") or 0.7)
+
+    client: httpx.AsyncClient = request.app.state.httpx_client
+
+    if stream:
+        return StreamingResponse(
+            _stream_chat_response(client, model, messages, max_tokens, temperature),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
+        )
+
+    # Non-streaming path
+    key = os.environ.get("LITELLM_PROXY_KEY")
+    headers = {"Content-Type": "application/json"}
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
+    payload = {
+        "model": model,
+        "messages": messages,
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+        "stream": False,
+    }
+    try:
+        resp = await client.post(_LITELLM_CHAT_URL, json=payload, headers=headers)
+        data = resp.json()
+        return JSONResponse({"model": model, "provider": "litellm", "response": data})
+    except Exception as exc:
+        return JSONResponse({"error": f"chat request failed: {exc}", "model": model}, status_code=502)
+
+
+async def handle_chat_sessions(request: Request):
+    """GET /api/chat/sessions — list active sessions.
+    POST /api/chat/sessions — create a new session."""
+    _clean_expired_sessions()
+    if request.method == "GET":
+        with _CHAT_SESSIONS_LOCK:
+            sessions = [
+                {
+                    "session_id": sid,
+                    "created_at": s["created_at"],
+                    "last_active": s["last_active"],
+                    "message_count": len(s["messages"]),
+                }
+                for sid, s in _CHAT_SESSIONS.items()
+            ]
+        return JSONResponse({"sessions": sessions})
+
+    # POST — create session
+    session_id = uuid.uuid4().hex[:12]
+    now = time.time()
+    with _CHAT_SESSIONS_LOCK:
+        _CHAT_SESSIONS[session_id] = {
+            "id": session_id,
+            "created_at": now,
+            "last_active": now,
+            "messages": [],
+        }
+    return JSONResponse({"session_id": session_id, "created_at": now}, status_code=201)
+
+
+async def handle_chat_session(request: Request):
+    """GET /api/chat/sessions/{session_id} — get session messages.
+    POST /api/chat/sessions/{session_id} — send message in session.
+    DELETE /api/chat/sessions/{session_id} — delete session."""
+    _clean_expired_sessions()
+    session_id = request.path_params["session_id"]
+
+    with _CHAT_SESSIONS_LOCK:
+        session = _CHAT_SESSIONS.get(session_id)
+
+    if session is None:
+        return JSONResponse({"error": f"unknown session: {session_id}"}, status_code=404)
+
+    if request.method == "GET":
+        return JSONResponse(
+            {
+                "session_id": session_id,
+                "messages": session["messages"],
+                "created_at": session["created_at"],
+                "last_active": session["last_active"],
+            }
+        )
+
+    if request.method == "DELETE":
+        with _CHAT_SESSIONS_LOCK:
+            _CHAT_SESSIONS.pop(session_id, None)
+        return JSONResponse({"deleted": True, "session_id": session_id})
+
+    # POST — send message in session context
+    try:
+        body = await request.json()
+    except ValueError:
+        return JSONResponse({"error": "invalid JSON body"}, status_code=400)
+    if not isinstance(body, dict):
+        return JSONResponse({"error": "body must be a JSON object"}, status_code=400)
+
+    model = body.get("model")
+    if not isinstance(model, str) or not model.strip():
+        return JSONResponse({"error": "model is required"}, status_code=400)
+
+    content = body.get("content")
+    if not isinstance(content, str) or not content.strip():
+        return JSONResponse({"error": "content is required"}, status_code=400)
+
+    stream = bool(body.get("stream", True))
+    max_tokens = int(body.get("max_tokens") or 1024)
+    temperature = float(body.get("temperature") or 0.7)
+
+    # Append user message
+    user_msg = {"role": "user", "content": content}
+    with _CHAT_SESSIONS_LOCK:
+        session["messages"].append(user_msg)
+        session["last_active"] = time.time()
+        messages = list(session["messages"])
+
+    client: httpx.AsyncClient = request.app.state.httpx_client
+
+    if stream:
+
+        async def session_stream():
+            full_response = ""
+            async for chunk in _stream_chat_response(client, model, messages, max_tokens, temperature):
+                yield chunk
+                # Accumulate assistant response from chunks
+                try:
+                    if chunk.startswith(b"data: ") and not chunk.startswith(b"data: [DONE]"):
+                        data = json.loads(chunk[6:].decode(errors="replace"))
+                        if "chunk" in data:
+                            # Try to parse litellm SSE chunk for delta content
+                            try:
+                                sse_data = json.loads(data["chunk"].removeprefix("data: ").strip())
+                                for choice in sse_data.get("choices", []):
+                                    delta = choice.get("delta", {})
+                                    if "content" in delta:
+                                        full_response += delta["content"]
+                            except json.JSONDecodeError, KeyError:
+                                pass
+                except Exception:
+                    pass
+            # Append assistant message to session
+            if full_response:
+                with _CHAT_SESSIONS_LOCK:
+                    session["messages"].append({"role": "assistant", "content": full_response})
+                    session["last_active"] = time.time()
+
+        return StreamingResponse(
+            session_stream(),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
+        )
+
+    # Non-streaming session
+    key = os.environ.get("LITELLM_PROXY_KEY")
+    headers = {"Content-Type": "application/json"}
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
+    payload = {
+        "model": model,
+        "messages": messages,
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+        "stream": False,
+    }
+    try:
+        resp = await client.post(_LITELLM_CHAT_URL, json=payload, headers=headers)
+        data = resp.json()
+        assistant_content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+        assistant_msg = {"role": "assistant", "content": assistant_content}
+        with _CHAT_SESSIONS_LOCK:
+            session["messages"].append(assistant_msg)
+            session["last_active"] = time.time()
+        return JSONResponse(
+            {"session_id": session_id, "model": model, "provider": "litellm", "messages": session["messages"]}
+        )
+    except Exception as exc:
+        return JSONResponse({"error": f"chat request failed: {exc}", "model": model}, status_code=502)
+
+
 # ── Route handlers ──────────────────────────────────────────────────────────
 
 
@@ -670,6 +936,9 @@ def create_app(transport: httpx.AsyncBaseTransport | None = None) -> Starlette:
             Route("/api/chains", handle_chains, methods=["GET"]),
             Route("/api/chains/{alias}", handle_chain_update, methods=["PUT"]),
             Route("/api/latency-test", handle_latency_test, methods=["POST"]),
+            Route("/api/chat", handle_chat, methods=["POST"]),
+            Route("/api/chat/sessions", handle_chat_sessions, methods=["GET", "POST"]),
+            Route("/api/chat/sessions/{session_id}", handle_chat_session, methods=["GET", "POST", "DELETE"]),
             Route("/api/run-plan", handle_run_plan, methods=["POST"]),
             Route("/api/run", handle_run, methods=["POST"]),
             Route("/api/run/status", handle_run_status, methods=["GET"]),
@@ -682,10 +951,31 @@ def create_app(transport: httpx.AsyncBaseTransport | None = None) -> Starlette:
 
 
 def main() -> None:
-    """Run the control panel on loopback only."""
+    """Run the control panel. Defaults to loopback; pass --host 0.0.0.0 to expose."""
+    import sys
+
     import uvicorn
 
-    uvicorn.run(create_app(), host="127.0.0.1", port=8123)
+    host = os.environ.get("WEBAPP_HOST", "127.0.0.1")
+    port = int(os.environ.get("WEBAPP_PORT", "8123"))
+
+    # Allow --host and --port CLI overrides
+    args = sys.argv[1:]
+    i = 0
+    while i < len(args):
+        if args[i] == "--host" and i + 1 < len(args):
+            host = args[i + 1]
+            i += 2
+        elif args[i] == "--port" and i + 1 < len(args):
+            port = int(args[i + 1])
+            i += 2
+        else:
+            i += 1
+
+    if host in ("0.0.0.0", "::"):
+        print(f"⚠ Web UI bound to {host} — accessible on your network. Secrets are never exposed.", flush=True)
+
+    uvicorn.run(create_app(), host=host, port=port)
 
 
 # ── Dashboard (single page, inline CSS/JS, no build step) ───────────────────
@@ -718,6 +1008,22 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
   button { background:var(--acc); color:#fff; cursor:pointer; border-color:var(--acc); }
   pre { background:#0d0f13; border:1px solid var(--line); border-radius:6px; padding:10px; overflow:auto; font-size:12px; max-height:320px; }
   a { color:var(--acc); cursor:pointer; }
+  /* ── Chat ── */
+  #chat { display:flex; flex-direction:column; }
+  .chat-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
+  .chat-header h2 { margin:0; }
+  #chat-messages { flex:1; min-height:220px; max-height:450px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:4px 0; }
+  .chat-msg { padding:8px 12px; border-radius:10px; max-width:85%; font-size:13px; line-height:1.5; white-space:pre-wrap; word-break:break-word; }
+  .chat-msg.user { align-self:flex-end; background:var(--acc); color:#fff; border-bottom-right-radius:3px; }
+  .chat-msg.assistant { align-self:flex-start; background:#0d0f13; border:1px solid var(--line); border-bottom-left-radius:3px; }
+  .chat-msg.streaming::after { content:"\\25A0"; animation:chat-blink 1s step-end infinite; margin-left:2px; }
+  @keyframes chat-blink { 50% { opacity:0; } }
+  .chat-msg.error { align-self:flex-start; background:transparent; border:1px solid var(--bad); color:var(--bad); font-size:12px; }
+  #chat-system-toggle { margin-bottom:8px; font-size:12px; color:var(--dim); }
+  #chat-system-toggle summary { cursor:pointer; user-select:none; }
+  #chat-system { width:100%; resize:vertical; margin-top:6px; }
+  #chat-send { white-space:nowrap; }
+  #chat-send:disabled { opacity:.55; cursor:not-allowed; }
 </style>
 </head>
 <body>
@@ -726,6 +1032,26 @@ _DASHBOARD_HTML = """<!DOCTYPE html>
   <p>Provider pools, fabric routes, run reports, swarm profiles, and model routing. Secrets are never shown — auth is referenced by env-var name only.</p>
 </header>
 <main>
+  <section id="chat">
+    <div class="chat-header">
+      <h2>Chat</h2>
+      <div class="row">
+        <select id="chat-model"><option>Loading models…</option></select>
+        <button id="chat-new-btn" title="Start a new chat session">+ New</button>
+      </div>
+    </div>
+    <details id="chat-system-toggle">
+      <summary>System prompt</summary>
+      <textarea id="chat-system" rows="3" placeholder="Optional system prompt (set before sending the first message)…"></textarea>
+    </details>
+    <div id="chat-messages"><p class="dim" style="margin:auto;padding:40px 0">Select a model and send a message to start.</p></div>
+    <div class="row" style="margin-top:8px">
+      <textarea id="chat-input" rows="2" placeholder="Type a message… (Enter to send, Shift+Enter for newline)" style="flex:1;resize:none"></textarea>
+      <button id="chat-send">Send</button>
+    </div>
+    <span id="chat-status" class="dim" style="font-size:11px;margin-top:4px"></span>
+  </section>
+
   <section id="status">
     <h2>System Status</h2>
     <h3>Latest Report</h3>
@@ -932,7 +1258,165 @@ function renderModels(models) {
     "<tr><td class='mono'>" + esc(role) + "</td><td class='mono'>" + esc(alias) + "</td></tr>"
   );
   mapping.innerHTML = rows.length ? table(["role", "alias"], rows) : '<p class="dim">No mapping.</p>';
+  /* Also populate the chat model dropdown */
+  const chatSel = document.getElementById("chat-model");
+  const chatAliases = (models.aliases || []).filter(function(a) { return a; });
+  if (chatAliases.length) {
+    chatSel.innerHTML = chatAliases.map(function(a) { return "<option value='" + esc(a) + "'>" + esc(a) + "</option>"; }).join("");
+  } else if (!models.error) {
+    chatSel.innerHTML = "<option>No models available</option>";
+  }
 }
+
+/* ── Chat logic ── */
+
+var _chatSessionId = "s" + Date.now().toString(36);
+var _chatAbortCtrl = null;
+
+function _chatMsgEl(role, text) {
+  var div = document.createElement("div");
+  div.className = "chat-msg " + role;
+  div.textContent = text;
+  return div;
+}
+
+function _chatBubble(role) {
+  var div = document.createElement("div");
+  div.className = "chat-msg " + role;
+  return div;
+}
+
+async function chatSend() {
+  var input = document.getElementById("chat-input");
+  var text = input.value.trim();
+  if (!text) return;
+
+  var model = document.getElementById("chat-model").value;
+  var system = document.getElementById("chat-system").value.trim();
+  var area = document.getElementById("chat-messages");
+  var status = document.getElementById("chat-status");
+  var sendBtn = document.getElementById("chat-send");
+
+  /* Remove placeholder if present */
+  var placeholder = area.querySelector("p.dim");
+  if (placeholder) placeholder.remove();
+
+  /* Append user bubble */
+  area.appendChild(_chatMsgEl("user", text));
+  input.value = "";
+  area.scrollTop = area.scrollHeight;
+
+  /* Create assistant bubble */
+  var assistantBubble = _chatBubble("assistant");
+  assistantBubble.classList.add("streaming");
+  area.appendChild(assistantBubble);
+  area.scrollTop = area.scrollHeight;
+
+  status.textContent = "Streaming…";
+  sendBtn.disabled = true;
+
+  /* Abort any in-flight request */
+  if (_chatAbortCtrl) { _chatAbortCtrl.abort(); }
+  _chatAbortCtrl = new AbortController();
+
+  try {
+    var messages = [{ role: "user", content: text }];
+    var body = { model: model, messages: messages, stream: true };
+    if (system) body.system = system;
+
+    var resp = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: _chatAbortCtrl.signal
+    });
+
+    if (!resp.ok) {
+      assistantBubble.classList.remove("streaming");
+      var errText;
+      try {
+        var errJson = await resp.json();
+        errText = "Error: " + (errJson.error || ("HTTP " + resp.status));
+      } catch (_) {
+        errText = "Error: HTTP " + resp.status;
+      }
+      assistantBubble.textContent = errText;
+      assistantBubble.className = "chat-msg error";
+      status.textContent = "";
+      sendBtn.disabled = false;
+      _chatAbortCtrl = null;
+      return;
+    }
+
+    var reader = resp.body.getReader();
+    var decoder = new TextDecoder();
+    var buf = "";
+
+    while (true) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+      buf += decoder.decode(chunk.value, { stream: true });
+      var lines = buf.split("\\n");
+      buf = lines.pop() || "";
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        if (line.indexOf("data: ") === 0) {
+          var data = line.slice(6);
+          if (data === "[DONE]") continue;
+          try {
+            var parsed = JSON.parse(data);
+            var choices = parsed.choices;
+            if (choices && choices[0]) {
+              var delta = choices[0].delta;
+              if (delta && delta.content) {
+                assistantBubble.textContent += delta.content;
+              }
+            }
+          } catch (_) { /* skip unparseable chunks */ }
+        }
+      }
+      area.scrollTop = area.scrollHeight;
+    }
+
+    assistantBubble.classList.remove("streaming");
+    status.textContent = "";
+    sendBtn.disabled = false;
+    _chatAbortCtrl = null;
+  } catch (err) {
+    if (err.name === "AbortError") {
+      assistantBubble.textContent = (assistantBubble.textContent || "") + "\\n[stopped]";
+    } else {
+      assistantBubble.textContent = "Error: " + err;
+      assistantBubble.className = "chat-msg error";
+    }
+    assistantBubble.classList.remove("streaming");
+    status.textContent = "";
+    sendBtn.disabled = false;
+    _chatAbortCtrl = null;
+  }
+}
+
+function chatNewSession() {
+  /* Abort any in-flight streaming */
+  if (_chatAbortCtrl) { _chatAbortCtrl.abort(); _chatAbortCtrl = null; }
+
+  var area = document.getElementById("chat-messages");
+  area.innerHTML = '<p class="dim" style="margin:auto;padding:40px 0">Select a model and send a message to start.</p>';
+
+  document.getElementById("chat-system").value = "";
+  document.getElementById("chat-system-toggle").open = false;
+  document.getElementById("chat-input").value = "";
+  document.getElementById("chat-status").textContent = "";
+  document.getElementById("chat-send").disabled = false;
+
+  _chatSessionId = "s" + Date.now().toString(36);
+}
+
+document.getElementById("chat-send").addEventListener("click", chatSend);
+document.getElementById("chat-input").addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chatSend(); }
+});
+document.getElementById("chat-new-btn").addEventListener("click", chatNewSession);
 
 document.getElementById("latency-form").addEventListener("submit", async (e) => {
   e.preventDefault();
